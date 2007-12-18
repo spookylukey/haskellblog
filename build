@@ -1,4 +1,4 @@
 #!/bin/sh
-ghc -package cgi -package xhtml -fallow-overlapping-instances --make -o blog.cgi blog.hs || exit 1
+ghc -package cgi -package xhtml -fallow-overlapping-instances -static -optl-static --make -o blog.cgi blog.hs || exit 1
 chmod ugo+rwx blog.cgi
 mv blog.cgi /home/luke/httpd/lukeplant.me.uk/web/cgi-bin/blog.cgi

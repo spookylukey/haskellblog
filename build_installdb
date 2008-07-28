@@ -1,6 +1,0 @@
-#!/bin/sh
-
-cd src
-ghc -package cgi -package xhtml -fallow-overlapping-instances -package HDBC -package HDBC-sqlite3 --make -o  installdb.cgi installdb.hs settings.hs db.hs || exit 1
-chmod ugo+rwx installdb.cgi
-mv installdb.cgi /home/luke/httpd/lukeplant.me.uk/web/cgi-bin/

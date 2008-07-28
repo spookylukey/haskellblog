@@ -1,5 +1,6 @@
 #!/bin/sh
+TARGET=$1
 cd src
-ghc -package cgi -package xhtml -fallow-overlapping-instances --make -o blog.cgi blog.hs || exit 1
-chmod ugo+rwx blog.cgi
-mv blog.cgi /home/luke/httpd/lukeplant.me.uk/web/cgi-bin/blog.cgi
+ghc -package cgi -package xhtml -fallow-overlapping-instances --make -o $TARGET.cgi $TARGET.hs settings.hs db.hs || exit 1
+chmod ugo+rwx $TARGET.cgi
+mv $TARGET.cgi /home/luke/httpd/lukeplant.me.uk/web/cgi-bin/$TARGET.cgi

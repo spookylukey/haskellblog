@@ -1,6 +1,6 @@
 #!/bin/sh
 TARGET=$1
 cd src
-ghc -package cgi -package xhtml -fallow-overlapping-instances --make -o $TARGET.cgi $TARGET.hs settings.hs db.hs || exit 1
+ghc -package cgi -package xhtml -fallow-overlapping-instances --make -o $TARGET.cgi $TARGET.hs $(find . -name '*.hs' | grep -Ev 'Installdb\.hs|Blog\.hs|Migrate\.hs|settingsl.*\.hs') || exit 1
 chmod ugo+rwx $TARGET.cgi
 mv $TARGET.cgi /home/luke/httpd/lukeplant.me.uk/web/cgi-bin/$TARGET.cgi

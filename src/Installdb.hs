@@ -35,7 +35,8 @@ createTables c = do
            "\n\
            \  CREATE TABLE posts (\n\
            \    id INTEGER PRIMARY KEY AUTOINCREMENT,\n\
-           \    subject TEXT,\n\
+           \    title TEXT,\n\
+           \    slug TEXT,\n\
            \    post_raw TEXT,\n\
            \    post_formatted TEXT,\n\
            \    summary_raw TEXT,\n\

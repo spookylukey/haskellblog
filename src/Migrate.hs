@@ -42,20 +42,7 @@ makeItems filename constructor = do
 readCategories = makeItems "categories.txt" mkCat
     where mkCat row = C.Category { C.id = read (row !! 0),
                                    C.name = row !! 1}
-{-
-writeItems writer items = mapM 
-                           (\i -> do cn <- DB.connect
-                                     newitem <- writer cn i
-                                     commit cn
-                                     disconnect cn
-                                     return newitem) 
-                           items
--}
-writeItems writer items = do cn <- DB.connect
-                             newitems <- mapM (writer cn) items
-                             commit cn
-                             disconnect cn
-                             return newitems
+writeItems cn writer items = mapM (writer cn) items
 
 addCategory cn c =  DB.doInsert cn "categories" 
                     ["id", 
@@ -105,8 +92,10 @@ addPost cn p = do { DB.doInsert cn "posts"
                     newid <- quickQuery cn "SELECT max(id) FROM posts;" [];
                     return p { P.id = fromSql $ head $ head newid } ; }
 
-main = handleSqlError $ do          
-  cats <- readCategories >>= (writeItems addCategory)
+main = handleSqlError $ do
+  cn <- DB.connect
+  cats <- readCategories
+  writeItems cn addCategory cats
   origPosts <- readPosts
-  newPosts <- writeItems addPost origPosts
+  newPosts <- writeItems cn addPost origPosts
   return ()

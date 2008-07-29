@@ -44,5 +44,4 @@ writeCategories cs = do cn <- DB.connect
                         mapM_ (\c -> DB.doInsert cn "categories" ["id", "name"] [toSql $ C.id c, toSql $ C.name c]) cs
                         commit cn
 
-main = do cats <- readCategories
-          writeCategories cats
+main = readCategories >>= writeCategories 

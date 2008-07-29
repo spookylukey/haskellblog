@@ -6,9 +6,8 @@ import qualified Settings
 -- padding columns to specified amount
 readTable :: FilePath -> Int -> IO [[String]]
 readTable filename cols = do f <- readFile filename
-                             let lines = splitRows f
-                                 lines' = filter (/= "") lines
-                                 arr = map (padCols . splitCols) lines'
+                             let lines = filter (/= "") $ splitRows f
+                                 arr = map (padCols . splitCols) lines
                              return arr
     where 
       splitRows s = split s '\n'

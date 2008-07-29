@@ -89,8 +89,8 @@ addPost cn p = do { DB.doInsert cn "posts"
                      toSql $ P.format_id p,
                      toSql $ P.timestamp p,
                      toSql $ P.comments_open p];
-                    newid <- quickQuery cn "SELECT max(id) FROM posts;" [];
-                    return p { P.id = fromSql $ head $ head newid } ; }
+                    [[newid]] <- quickQuery cn "SELECT max(id) FROM posts;" [];
+                    return p { P.id = fromSql $ newid } ; }
 
 main = handleSqlError $ do
   cn <- DB.connect
@@ -98,4 +98,7 @@ main = handleSqlError $ do
   writeItems cn addCategory cats
   origPosts <- readPosts
   newPosts <- writeItems cn addPost origPosts
+  -- we need the new IDs to rewrite comments tables
+  -- and the post/categories m2m
+  commit cn
   return ()

@@ -1,8 +1,7 @@
 module Category where
 {
 
-  data Category = Category { id :: Int,
-                             name :: String } deriving (Show, Eq)
+    data Category = Category { id :: Int,
+                               name :: String } deriving (Show, Eq)
 
 }
-

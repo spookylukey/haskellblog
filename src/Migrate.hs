@@ -1,5 +1,7 @@
 import qualified Category as C
 import qualified Settings
+import qualified DB
+import Database.HDBC
 -- Migration script for the old data
 
 -- Read a table of newline/tab delimited data,
@@ -37,3 +39,10 @@ readCategories = do ds <- readTable (Settings.old_data_path ++ "categories.txt")
                     let mkCat row = C.Category { C.id = read (row !! 0),
                                                  C.name = row !! 1}
                     return $ map mkCat ds
+
+writeCategories cs = do cn <- DB.connect
+                        mapM_ (\c -> DB.doInsert cn "categories" ["id", "name"] [toSql $ C.id c, toSql $ C.name c]) cs
+                        commit cn
+
+main = do cats <- readCategories
+          writeCategories cats

@@ -89,7 +89,7 @@ addPost cn p = do { DB.doInsert cn "posts"
                      toSql $ P.format_id p,
                      toSql $ P.timestamp p,
                      toSql $ P.comments_open p];
-                    [[newid]] <- quickQuery cn "SELECT max(id) FROM posts;" [];
+                    [[newid]] <- quickQuery cn "SELECT last_insert_rowid();" [];
                     return p { P.id = fromSql $ newid } ; }
 
 main = handleSqlError $ do

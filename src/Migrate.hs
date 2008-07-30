@@ -5,6 +5,8 @@ import qualified DB
 import qualified Formats
 import Database.HDBC
 import List (sortBy)
+import qualified Data.Map as Map
+import Data.Maybe (fromJust)
 import Data.Ord (comparing)
 import Monad (liftM)
 -- Migration script for the old data
@@ -97,6 +99,17 @@ addPost cn p = do { DB.doInsert cn "posts"
                     [[newid]] <- quickQuery cn "SELECT last_insert_rowid();" [];
                     return p { P.id = fromSql $ newid } ; }
 
+readPostCategories = makeItems "postcategories.txt" mkPostCategory
+    where mkPostCategory row = (read (row !! 0),
+                                read (row !! 1)) :: (Int, Int)
+
+addPostCategory cn pc = do { DB.doInsert cn "post_categories"
+                             ["post_id",
+                              "category_id"]
+                             [toSql $ fst pc,
+                              toSql $ snd pc];
+                             return pc; }
+
 main = handleSqlError $ do
   cn <- DB.connect
   cats <- readCategories
@@ -105,5 +118,11 @@ main = handleSqlError $ do
   newPosts <- writeItems cn addPost origPosts
   -- we need the new IDs to rewrite comments tables
   -- and the post/categories m2m
+  let id_map = Map.fromList $ zip (map P.id origPosts) (map P.id newPosts)
+  postCategories' <- readPostCategories
+  let postCategories = correctIds postCategories' id_map
+  writeItems cn addPostCategory postCategories
   commit cn
   return ()
+
+    where correctIds pcs id_map = map (\(p_id, c_id) -> (fromJust $ Map.lookup p_id id_map, c_id)) pcs

@@ -90,9 +90,8 @@ readPosts = makeItems "posts.txt" mkPost
                                 P.comments_open = True
                               }
           addFullText p = do f <- readFile (Settings.old_data_path ++ "posts/" ++ (show $ P.id p))
-                                  -- TODO: replace '&#10;' with '\n'
-                                  -- TODO: encoding
-                             return p { P.post_raw = f, P.post_formatted = f }
+                             let fixed = B.unpack $ regexReplace (B.pack "&#10;") (B.pack "\n") (B.pack f)
+                             return p { P.post_raw = fixed, P.post_formatted = fixed }
 
 addPost cn p = do { slug <- makeSlug cn p;
                     p2 <- return $ p { P.slug = slug };

@@ -1,6 +1,10 @@
 #!/bin/sh
 TARGET=$1
+TARGETSTEM=${TARGET%%.cgi}
 cd src
-ghc -package cgi -package xhtml -fallow-overlapping-instances --make -o $TARGET.cgi $TARGET.hs $(find . -name '*.hs' | grep -Ev 'Installdb\.hs|Blog\.hs|Migrate\.hs|settingsl.*\.hs') || exit 1
-chmod ugo+rwx $TARGET.cgi
-mv $TARGET.cgi /home/luke/httpd/lukeplant.me.uk/web/cgi-bin/$TARGET.cgi
+ghc -package cgi -package xhtml -fallow-overlapping-instances --make -o $TARGET $TARGETSTEM.hs $(find . -name '*.hs' | grep -Ev 'Installdb\.hs|Blog\.hs|Migrate\.hs|settingsl.*\.hs') || exit 1
+chmod ugo+rwx $TARGET
+if [ ! "$TARGETSETM" == "$TARGET"]
+then
+	mv $TARGET /home/luke/httpd/lukeplant.me.uk/web/cgi-bin/$TARGET
+fi

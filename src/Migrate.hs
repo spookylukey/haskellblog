@@ -1,4 +1,6 @@
 import qualified Data.ByteString.Char8 as B
+import qualified Data.ByteString.Lazy.UTF8 as UTF8
+import qualified Data.ByteString.Lazy as BL
 import qualified Category as C
 import qualified Post as P
 import qualified Settings
@@ -11,6 +13,7 @@ import Data.Maybe (fromJust)
 import Data.Ord (comparing)
 import GHC.Unicode (toLower)
 import Monad (liftM)
+import Text.Template (readTemplate, renderToFile)
 import Utils (regexReplace)
 -- Migration script for the old data
 
@@ -137,6 +140,12 @@ addPostCategory cn pc = do { DB.doInsert cn "post_categories"
                               toSql $ snd pc];
                              return pc; }
 
+createRedirectFile postUrlMap categoryUrlMap = do
+    tpl <- readTemplate Settings.redirect_file_template
+    let ctx = Map.fromList ([(UTF8.fromString "postIdsToUrls", UTF8.fromString "test1"),
+                             (UTF8.fromString "categoryIdsToUrls", UTF8.fromString "test2")])
+    renderToFile Settings.redirect_file_output tpl ctx
+
 main = handleSqlError $ do
   cn <- DB.connect
   cats <- readCategories
@@ -150,8 +159,7 @@ main = handleSqlError $ do
   let postCategories = correctIds postCategories' id_map
   writeItems cn addPostCategory postCategories
 
-  -- TODO: derive a blog.php script that contains the new mappings
-  -- for posts and categories and will do redirects to the new URLs
+  createRedirectFile () ()
   commit cn
   return ()
 

@@ -50,30 +50,39 @@ makeItems filename constructor = do
 
 readCategories = makeItems "categories.txt" mkCat
     where mkCat row = C.Category { C.id = read (row !! 0),
-                                   C.name = row !! 1}
+                                   C.name = row !! 1,
+                                   C.slug = ""}
 writeItems cn writer items = mapM (writer cn) items
 
-addCategory cn c =  DB.doInsert cn "categories"
-                    ["id",
-                     "name"]
-                    [toSql $ C.id c,
-                     toSql $ C.name c]
-                    >> return c
+addCategory cn c =  do slug <- makeCategorySlug cn c
+                       let c2 = c { C.slug = slug }
+                       DB.doInsert cn "categories"
+                             ["id",
+                              "name",
+                              "slug"]
+                             [toSql $ C.id c2,
+                              toSql $ C.name c2,
+                              toSql $ C.slug c2]
+                       return c2
 
 slugFromTitle title = map toLower $ UTF8.toString $
                       regexReplace (B.pack "-+$") (B.pack "") $
                       regexReplace (B.pack "[^A-Za-z0-9]+") (B.pack "-") (B.pack title)
 
-makeSlug cn p = makeSlug' cn (slugFromTitle $ P.title p)  1
-    where makeSlug' cn slugBase iter = do
-            let slugAttempt =  (slugBase ++ makeSuffix iter);
-            [[SqlString c]] <- quickQuery cn "SELECT count(slug) FROM posts WHERE slug = ?" [toSql slugAttempt];
-            case c of
-              "0" -> return slugAttempt
-              _   -> makeSlug' cn slugBase (iter + 1)
+makePostSlug cn p = makeSlugGeneric cn (slugFromTitle $ P.title p) "posts" 1
 
-          makeSuffix 1 = ""
-          makeSuffix n = show n
+makeCategorySlug cn cat = makeSlugGeneric cn (slugFromTitle $ C.name cat) "categories" 1
+
+makeSlugGeneric cn slugBase table iter = do
+  let slugAttempt =  (slugBase ++ makeSuffix iter);
+  [[SqlString c]] <- quickQuery cn ("SELECT count(slug) FROM " ++ table ++ " WHERE slug = ?") [toSql slugAttempt];
+  case c of
+    "0" -> return slugAttempt
+    _   -> makeSlugGeneric cn slugBase table (iter + 1)
+
+ where
+   makeSuffix 1 = ""
+   makeSuffix n = show n
 
 readPosts = makeItems "posts.txt" mkPost
             >>= mapM addFullText
@@ -93,7 +102,7 @@ readPosts = makeItems "posts.txt" mkPost
                              let fixed = B.unpack $ regexReplace (B.pack "&#10;") (B.pack "\n") (B.pack f)
                              return p { P.post_raw = fixed, P.post_formatted = fixed }
 
-addPost cn p = do { slug <- makeSlug cn p;
+addPost cn p = do { slug <- makePostSlug cn p;
                     p2 <- return $ p { P.slug = slug };
                     DB.doInsert cn "posts"
                     ["title",

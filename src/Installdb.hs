@@ -19,7 +19,7 @@ runSql = catchDyn (do
 
 createTables :: IConnection conn => conn -> IO ()
 createTables c = do
-  let commands = 
+  let commands =
           ["\n\
            \  CREATE TABLE metainfo (\n\
            \    key TEXT,\n\
@@ -48,7 +48,8 @@ createTables c = do
            "\n\
            \  CREATE TABLE categories (\n\
            \    id INTEGER PRIMARY KEY AUTOINCREMENT,\n\
-           \    name TEXT\n\
+           \    name TEXT,\n\
+           \    slug TEXT\n\
            \  );",
            "\n\
            \  CREATE TABLE post_categories (\n\

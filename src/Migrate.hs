@@ -64,7 +64,16 @@ slugFromTitle title = map toLower $ UTF8.toString $
                       regexReplace (B.pack "-+$") (B.pack "") $
                       regexReplace (B.pack "[^A-Za-z0-9]+") (B.pack "-") (B.pack title)
 
-makeSlug cn p = return $ slugFromTitle (P.title p)
+makeSlug cn p = makeSlug' cn (slugFromTitle $ P.title p)  1
+    where makeSlug' cn slugBase iter = do
+            let slugAttempt =  (slugBase ++ makeSuffix iter);
+            [[SqlString c]] <- quickQuery cn "SELECT count(slug) FROM posts WHERE slug = ?" [toSql slugAttempt];
+            case c of
+              "0" -> return slugAttempt
+              _   -> makeSlug' cn slugBase (iter + 1)
+
+          makeSuffix 1 = ""
+          makeSuffix n = show n
 
 readPosts = makeItems "posts.txt" mkPost
             >>= mapM addFullText

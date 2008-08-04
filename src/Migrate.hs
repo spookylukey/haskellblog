@@ -1,5 +1,4 @@
 import qualified Data.ByteString.Char8 as B
-import qualified Data.ByteString.UTF8 as UTF8
 import qualified Category as C
 import qualified Post as P
 import qualified Settings
@@ -65,7 +64,7 @@ addCategory cn c =  do slug <- makeCategorySlug cn c
                               toSql $ C.slug c2]
                        return c2
 
-slugFromTitle title = map toLower $ UTF8.toString $
+slugFromTitle title = map toLower $ B.unpack $
                       regexReplace (B.pack "-+$") (B.pack "") $
                       regexReplace (B.pack "[^A-Za-z0-9]+") (B.pack "-") (B.pack title)
 

@@ -18,7 +18,7 @@ readTable filename = do f <- readFile filename
                         let lines = filter (/= "") $ splitRows f
                             arr = map (padCols . splitCols) lines
                         return arr
-    where 
+    where
       splitRows s = split s '\n'
       splitCols s = split s '\t'
       padCols = (++ (repeat ""))
@@ -40,7 +40,7 @@ readInt s = read s
 makeItems :: String          -- Filename to parse
           -> ([String] -> a) -- function that takes a list of data and creates an item
           -> IO [a]
-makeItems filename constructor = do 
+makeItems filename constructor = do
   rows <- readTable (Settings.old_data_path ++ filename)
   return $ map constructor rows
 
@@ -49,21 +49,21 @@ readCategories = makeItems "categories.txt" mkCat
                                    C.name = row !! 1}
 writeItems cn writer items = mapM (writer cn) items
 
-addCategory cn c =  DB.doInsert cn "categories" 
-                    ["id", 
-                     "name"] 
-                    [toSql $ C.id c, 
+addCategory cn c =  DB.doInsert cn "categories"
+                    ["id",
+                     "name"]
+                    [toSql $ C.id c,
                      toSql $ C.name c]
                     >> return c
 
 makeSlug = id -- TODO
 
-readPosts = makeItems "posts.txt" mkPost 
+readPosts = makeItems "posts.txt" mkPost
             >>= mapM addFullText
             >>= return . sortBy (comparing P.timestamp)
     where mkPost row = P.Post { P.id = read (row !! 0),
                                 P.title = row !! 1,
-                                P.slug = makeSlug (row !! 1),
+                                P.slug = "",
                                 P.post_raw = "",
                                 P.post_formatted = "",
                                 P.summary_raw = row !! 4,
@@ -77,16 +77,18 @@ readPosts = makeItems "posts.txt" mkPost
                                   -- TODO: encoding
                              return p { P.post_raw = f, P.post_formatted = f }
 
-addPost cn p = do { DB.doInsert cn "posts" 
-                    ["title", 
-                     "slug", 
-                     "post_raw", 
-                     "post_formatted", 
-                     "summary_raw", 
-                     "summary_formatted", 
-                     "format_id", 
-                     "timestamp", 
-                     "comments_open"] 
+addPost cn p = do { slug <- makeSlug cn p;
+                    let p = p { P.slug = slug } in
+                    DB.doInsert cn "posts"
+                    ["title",
+                     "slug",
+                     "post_raw",
+                     "post_formatted",
+                     "summary_raw",
+                     "summary_formatted",
+                     "format_id",
+                     "timestamp",
+                     "comments_open"]
                     [toSql $ P.title p,
                      toSql $ P.slug p,
                      toSql $ P.post_raw p,
@@ -97,7 +99,8 @@ addPost cn p = do { DB.doInsert cn "posts"
                      toSql $ P.timestamp p,
                      toSql $ P.comments_open p];
                     [[newid]] <- quickQuery cn "SELECT last_insert_rowid();" [];
-                    return p { P.id = fromSql $ newid } ; }
+                    return p { P.id = fromSql $ newid } ;
+                  }
 
 readPostCategories = makeItems "postcategories.txt" mkPostCategory
     where mkPostCategory row = (read (row !! 0),
@@ -122,6 +125,9 @@ main = handleSqlError $ do
   postCategories' <- readPostCategories
   let postCategories = correctIds postCategories' id_map
   writeItems cn addPostCategory postCategories
+
+  -- TODO: derive a blog.php script that contains the new mappings
+  -- for posts and categories and will do redirects to the new URLs
   commit cn
   return ()
 

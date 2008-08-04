@@ -1,3 +1,5 @@
+import qualified Data.ByteString.Char8 as B
+import qualified Data.ByteString.UTF8 as UTF8
 import qualified Category as C
 import qualified Post as P
 import qualified Settings
@@ -8,7 +10,9 @@ import List (sortBy)
 import qualified Data.Map as Map
 import Data.Maybe (fromJust)
 import Data.Ord (comparing)
+import GHC.Unicode (toLower)
 import Monad (liftM)
+import Utils (regexReplace)
 -- Migration script for the old data
 
 -- Read a table of newline/tab delimited data,
@@ -56,7 +60,11 @@ addCategory cn c =  DB.doInsert cn "categories"
                      toSql $ C.name c]
                     >> return c
 
-makeSlug = id -- TODO
+slugFromTitle title = map toLower $ UTF8.toString $
+                      regexReplace (B.pack "-+$") (B.pack "") $
+                      regexReplace (B.pack "[^A-Za-z0-9]+") (B.pack "-") (B.pack title)
+
+makeSlug cn p = return $ slugFromTitle (P.title p)
 
 readPosts = makeItems "posts.txt" mkPost
             >>= mapM addFullText
@@ -78,7 +86,7 @@ readPosts = makeItems "posts.txt" mkPost
                              return p { P.post_raw = f, P.post_formatted = f }
 
 addPost cn p = do { slug <- makeSlug cn p;
-                    let p = p { P.slug = slug } in
+                    p2 <- return $ p { P.slug = slug };
                     DB.doInsert cn "posts"
                     ["title",
                      "slug",
@@ -89,17 +97,17 @@ addPost cn p = do { slug <- makeSlug cn p;
                      "format_id",
                      "timestamp",
                      "comments_open"]
-                    [toSql $ P.title p,
-                     toSql $ P.slug p,
-                     toSql $ P.post_raw p,
-                     toSql $ P.post_formatted p,
-                     toSql $ P.summary_raw p,
-                     toSql $ P.summary_formatted p,
-                     toSql $ P.format_id p,
-                     toSql $ P.timestamp p,
-                     toSql $ P.comments_open p];
+                    [toSql $ P.title p2,
+                     toSql $ P.slug p2,
+                     toSql $ P.post_raw p2,
+                     toSql $ P.post_formatted p2,
+                     toSql $ P.summary_raw p2,
+                     toSql $ P.summary_formatted p2,
+                     toSql $ P.format_id p2,
+                     toSql $ P.timestamp p2,
+                     toSql $ P.comments_open p2];
                     [[newid]] <- quickQuery cn "SELECT last_insert_rowid();" [];
-                    return p { P.id = fromSql $ newid } ;
+                    return p2 { P.id = fromSql $ newid } ;
                   }
 
 readPostCategories = makeItems "postcategories.txt" mkPostCategory

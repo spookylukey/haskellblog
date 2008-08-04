@@ -7,4 +7,6 @@ chmod ugo+rwx $TARGET
 if [ ! "$TARGETSTEM" == "$TARGET" ]
 then
 	mv $TARGET /home/luke/httpd/lukeplant.me.uk/web/cgi-bin/$TARGET
+else
+	mv $TARGET ..
 fi

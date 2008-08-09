@@ -7,7 +7,7 @@ import qualified Settings
 import qualified DB
 import qualified Formats
 import Database.HDBC
-import List (sortBy)
+import List (sortBy, intersperse)
 import qualified Data.Map as Map
 import Data.Maybe (fromJust)
 import Data.Ord (comparing)
@@ -137,16 +137,25 @@ addPostCategory cn pc = do { DB.doInsert cn "post_categories"
 
 utf8 = UTF8.fromString
 
+makePHPMap amap = "array(" ++
+                  (concat $ intersperse ",\n" $ map mkPair $ Map.toList amap)
+                  ++ ")"
+    where mkPair (a,b) = (show a) ++ " => " ++ (show b)
+
 createRedirectFile postUrlMap categoryUrlMap = do
     tpl <- readTemplate Settings.redirect_file_template
-    let ctx = Map.fromList ([(utf8 "postIdsToUrls", utf8 "test1"),
-                             (utf8 "categoryIdsToUrls", utf8 "test2")])
+    let ctx = Map.fromList ([(utf8 "postIdsToUrls", utf8 $ makePHPMap postUrlMap),
+                             (utf8 "categoryIdsToUrls", utf8 $ makePHPMap categoryUrlMap)])
     renderToFile Settings.redirect_file_output tpl ctx
+
+-- TODO - a better way of generating this, something like Routes
+makePostUrl p = Settings.root_url ++ "posts/" ++ (P.slug p) ++ "/"
+makeCategoryUrl c = Settings.root_url ++ "categories/" ++ (C.slug c) ++ "/"
 
 main = handleSqlError $ do
   cn <- DB.connect
-  cats <- readCategories
-  writeItems cn addCategory cats
+  origCats <- readCategories
+  newCats <- writeItems cn addCategory origCats
   origPosts <- readPosts
   newPosts <- writeItems cn addPost origPosts
   -- we need the new IDs to rewrite comments tables
@@ -156,7 +165,9 @@ main = handleSqlError $ do
   let postCategories = correctIds postCategories' id_map
   writeItems cn addPostCategory postCategories
 
-  createRedirectFile () ()
+  let postUrlMap = Map.fromList $ zip (map (show . P.id) origPosts) (map makePostUrl newPosts)
+  let categoryUrlMap = Map.fromList $ zip (map (show . C.id) origCats) (map makeCategoryUrl newCats)
+  createRedirectFile postUrlMap categoryUrlMap
   commit cn
   return ()
 

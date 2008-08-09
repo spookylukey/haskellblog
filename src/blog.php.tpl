@@ -12,9 +12,9 @@
   // template language uses dollar substitutions, and dollar signs
   // must be escaped by doubling.
 
-$$postMap = array($postIdsToUrls);
+$$postMap = ${postIdsToUrls};
 
-$$catMap = array($categoryIdsToUrls);
+$$catMap = ${categoryIdsToUrls};
 
 
 ?>

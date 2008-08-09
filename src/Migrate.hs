@@ -54,13 +54,12 @@ writeItems cn writer items = mapM (writer cn) items
 addCategory cn c =  do slug <- makeCategorySlug cn c
                        let c2 = c { C.slug = slug }
                        DB.doInsert cn "categories"
-                             ["id",
-                              "name",
+                             ["name",
                               "slug"]
-                             [toSql $ C.id c2,
-                              toSql $ C.name c2,
+                             [toSql $ C.name c2,
                               toSql $ C.slug c2]
-                       return c2
+                       [[newid]] <- quickQuery cn "SELECT last_insert_rowid();" [];
+                       return c2 { C.id = fromSql $ newid }
 
 slugFromTitle title = map toLower $ B.unpack $
                       regexReplace (B.pack "-+$") (B.pack "") $
@@ -158,11 +157,12 @@ main = handleSqlError $ do
   newCats <- writeItems cn addCategory origCats
   origPosts <- readPosts
   newPosts <- writeItems cn addPost origPosts
-  -- we need the new IDs to rewrite comments tables
+  -- we need the new/old IDs of posts/categories to rewrite comments tables
   -- and the post/categories m2m
-  let id_map = Map.fromList $ zip (map P.id origPosts) (map P.id newPosts)
+  let post_id_map = Map.fromList $ zip (map P.id origPosts) (map P.id newPosts)
+  let cat_id_map = Map.fromList $ zip (map C.id origCats) (map C.id newCats)
   postCategories' <- readPostCategories
-  let postCategories = correctIds postCategories' id_map
+  let postCategories = correctIds postCategories' post_id_map cat_id_map
   writeItems cn addPostCategory postCategories
 
   let postUrlMap = Map.fromList $ zip (map (show . P.id) origPosts) (map makePostUrl newPosts)
@@ -171,4 +171,6 @@ main = handleSqlError $ do
   commit cn
   return ()
 
-    where correctIds pcs id_map = map (\(p_id, c_id) -> (fromJust $ Map.lookup p_id id_map, c_id)) pcs
+    where correctIds pcs p_id_map c_id_map =
+              map (\(p_id, c_id) -> (fromJust $ Map.lookup p_id p_id_map,
+                                     fromJust $ Map.lookup c_id c_id_map)) pcs

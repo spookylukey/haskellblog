@@ -94,9 +94,12 @@ readPosts = makeItems "posts.txt" mkPost
                                 P.timestamp = read (row !! 2),
                                 P.comments_open = True
                               }
-          addFullText p = do f <- readFile (Settings.old_data_path ++ "posts/" ++ (show $ P.id p))
-                             let fixed = B.unpack $ regexReplace (B.pack "&#10;") (B.pack "\n") (B.pack f)
-                             return p { P.post_raw = fixed, P.post_formatted = fixed }
+          addFullText p = do let dataFile = Settings.old_data_path ++ "posts/" ++ (show $ P.id p)
+                             f <- readFile dataFile
+                             let fixed = fixCodes f
+                             return p { P.post_raw = fixed,
+                                        P.post_formatted = fixed }
+          fixCodes txt = B.unpack $ regexReplace (B.pack "&#10;") (B.pack "\n") (B.pack txt)
 
 addPost cn p = do { slug <- makePostSlug cn p;
                     p2 <- return $ p { P.slug = slug };
@@ -137,16 +140,18 @@ addPostCategory cn pc = do { DB.doInsert cn "post_categories"
 utf8 = UTF8.fromString
 
 makePHPMap amap = "array(" ++
-                  (concat $ intersperse ",\n" $ map mkPair $ Map.toList amap)
+                  (concat $ intersperse ",\n" $ map arrayPair $ Map.toList amap)
                   ++ ")"
-    where mkPair (a,b) = (show a) ++ " => " ++ (show b) -- doesn't handle
-                                                        -- funny chars, but
-                                                        -- it works for now
+    where arrayPair (a,b) = (show a) ++ " => " ++ (show b) -- doesn't handle
+                                                           -- funny chars, but
+                                                           -- it works for now
 
 createRedirectFile postUrlMap categoryUrlMap = do
     tpl <- readTemplate Settings.redirect_file_template
-    let ctx = Map.fromList ([(utf8 "postIdsToUrls", utf8 $ makePHPMap postUrlMap),
-                             (utf8 "categoryIdsToUrls", utf8 $ makePHPMap categoryUrlMap)])
+    let ctx = Map.fromList ([(utf8 "postIdsToUrls",
+                              utf8 $ makePHPMap postUrlMap),
+                             (utf8 "categoryIdsToUrls",
+                              utf8 $ makePHPMap categoryUrlMap)])
     renderToFile Settings.redirect_file_output tpl ctx
 
 -- TODO - a better way of generating this, something like Routes
@@ -167,8 +172,10 @@ main = handleSqlError $ do
   let postCategories = correctIds postCategories' post_id_map cat_id_map
   writeItems cn addPostCategory postCategories
 
-  let postUrlMap = Map.fromList $ zip (map (show . P.id) origPosts) (map makePostUrl newPosts)
-  let categoryUrlMap = Map.fromList $ zip (map (show . C.id) origCats) (map makeCategoryUrl newCats)
+  let postUrlMap = Map.fromList $ zip (map (show . P.id) origPosts)
+                                      (map makePostUrl newPosts)
+  let categoryUrlMap = Map.fromList $ zip (map (show . C.id) origCats)
+                                          (map makeCategoryUrl newCats)
   createRedirectFile postUrlMap categoryUrlMap
   commit cn
   return ()

@@ -135,10 +135,12 @@ addPostCategory cn pc = do { DB.doInsert cn "post_categories"
                               toSql $ snd pc];
                              return pc; }
 
+utf8 = UTF8.fromString
+
 createRedirectFile postUrlMap categoryUrlMap = do
     tpl <- readTemplate Settings.redirect_file_template
-    let ctx = Map.fromList ([(UTF8.fromString "postIdsToUrls", UTF8.fromString "test1"),
-                             (UTF8.fromString "categoryIdsToUrls", UTF8.fromString "test2")])
+    let ctx = Map.fromList ([(utf8 "postIdsToUrls", utf8 "test1"),
+                             (utf8 "categoryIdsToUrls", utf8 "test2")])
     renderToFile Settings.redirect_file_output tpl ctx
 
 main = handleSqlError $ do

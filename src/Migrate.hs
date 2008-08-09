@@ -139,7 +139,9 @@ utf8 = UTF8.fromString
 makePHPMap amap = "array(" ++
                   (concat $ intersperse ",\n" $ map mkPair $ Map.toList amap)
                   ++ ")"
-    where mkPair (a,b) = (show a) ++ " => " ++ (show b)
+    where mkPair (a,b) = (show a) ++ " => " ++ (show b) -- doesn't handle
+                                                        -- funny chars, but
+                                                        -- it works for now
 
 createRedirectFile postUrlMap categoryUrlMap = do
     tpl <- readTemplate Settings.redirect_file_template

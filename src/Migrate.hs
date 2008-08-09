@@ -17,6 +17,15 @@ import Text.Template (readTemplate, renderToFile)
 import Utils (regexReplace)
 -- Migration script for the old data
 
+-- Misc utilities
+split :: String -> Char -> [String]
+split [] delim = [""]
+split (c:cs) delim
+   | c == delim = "" : rest
+   | otherwise = (c : head rest) : tail rest
+   where
+       rest = split cs delim
+
 -- Read a table of newline/tab delimited data,
 -- padding columns to specified amount
 readTable :: FilePath -> IO [[String]]
@@ -28,20 +37,6 @@ readTable filename = do f <- readFile filename
       splitRows s = split s '\n'
       splitCols s = split s '\t'
       padCols = (++ (repeat ""))
-
-split :: String -> Char -> [String]
-split [] delim = [""]
-split (c:cs) delim
-   | c == delim = "" : rest
-   | otherwise = (c : head rest) : tail rest
-   where
-       rest = split cs delim
-
--- Utility functions that handle null data
--- and return appropriate defaults
-readInt :: String -> Int
-readInt "" = 0
-readInt s = read s
 
 makeItems :: String          -- Filename to parse
           -> ([String] -> a) -- function that takes a list of data and creates an item

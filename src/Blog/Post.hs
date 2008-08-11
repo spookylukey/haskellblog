@@ -1,4 +1,4 @@
-module Post where
+module Blog.Post where
 {
   data Post = Post {
         id :: Int,

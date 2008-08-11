@@ -1,4 +1,4 @@
-module Category where
+module Blog.Category where
 {
 
     data Category = Category { id :: Int,

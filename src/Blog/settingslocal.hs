@@ -1,4 +1,4 @@
-module Settings where
+module Blog.Settings where
 
 sqlite_path = "/home/luke/httpd/lukeplant.me.uk/web/cgi-bin/data/test1.db"
 root_url = "/blog/"

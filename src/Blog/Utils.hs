@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -fbang-patterns  #-}
-module Utils where
+module Blog.Utils where
 
 import qualified Data.ByteString.Char8 as B
 import System.Environment(getArgs)

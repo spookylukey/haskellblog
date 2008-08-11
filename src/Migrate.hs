@@ -9,6 +9,7 @@ import qualified Blog.Category as C
 import qualified Blog.DB as DB
 import qualified Blog.Formats as Formats
 import qualified Blog.Post as P
+import qualified Blog.Routes as Routes
 import qualified Blog.Settings as Settings
 import qualified Data.ByteString.Char8 as B
 import qualified Data.ByteString.Lazy as BL
@@ -39,12 +40,6 @@ readCategories = makeItems "categories.txt" mkCat
     where mkCat row = C.Category { C.uid = read (row !! 0),
                                    C.name = row !! 1,
                                    C.slug = ""}
-writeItems cn writer items = mapM (writer cn) items
-
-
-
-
-
 
 readPosts = makeItems "posts.txt" mkPost
             >>= mapM addFullText
@@ -71,12 +66,7 @@ readPostCategories = makeItems "postcategories.txt" mkPostCategory
     where mkPostCategory row = (read (row !! 0),
                                 read (row !! 1)) :: (Int, Int)
 
-addPostCategory cn pc = do { DB.doInsert cn "post_categories"
-                             ["post_id",
-                              "category_id"]
-                             [toSql $ fst pc,
-                              toSql $ snd pc];
-                             return pc; }
+writeItems cn writer items = mapM (writer cn) items
 
 utf8 = UTF8.fromString
 
@@ -95,10 +85,6 @@ createRedirectFile postUrlMap categoryUrlMap = do
                               utf8 $ makePHPMap categoryUrlMap)])
     renderToFile Settings.redirect_file_output tpl ctx
 
--- TODO - a better way of generating this, something like Routes
-makePostUrl p = Settings.root_url ++ "posts/" ++ (P.slug p) ++ "/"
-makeCategoryUrl c = Settings.root_url ++ "categories/" ++ (C.slug c) ++ "/"
-
 main = handleSqlError $ do
   cn <- DB.connect
   origCats <- readCategories
@@ -111,12 +97,12 @@ main = handleSqlError $ do
   let cat_id_map = Map.fromList $ zip (map C.uid origCats) (map C.uid newCats)
   postCategories' <- readPostCategories
   let postCategories = correctIds postCategories' post_id_map cat_id_map
-  writeItems cn addPostCategory postCategories
+  writeItems cn P.addPostCategory postCategories
 
   let postUrlMap = Map.fromList $ zip (map (show . P.uid) origPosts)
-                                      (map makePostUrl newPosts)
+                                      (map Routes.makePostUrl newPosts)
   let categoryUrlMap = Map.fromList $ zip (map (show . C.uid) origCats)
-                                          (map makeCategoryUrl newCats)
+                                          (map Routes.makeCategoryUrl newCats)
   createRedirectFile postUrlMap categoryUrlMap
   commit cn
   return ()

@@ -43,3 +43,10 @@ addPost cn p = do { theslug <- makePostSlug cn p;
                   }
 
 makePostSlug cn p = makeSlugGeneric cn (slugFromTitle $ title p) "posts" 1
+
+addPostCategory cn pc = do { DB.doInsert cn "post_categories"
+                             ["post_id",
+                              "category_id"]
+                             [toSql $ fst pc,
+                              toSql $ snd pc];
+                             return pc; }

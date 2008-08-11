@@ -1,7 +1,7 @@
 module Blog.Category where
 
 import Database.HDBC
-import Blog.DBUtils (makeSlugGeneric, slugFromTitle)
+import Blog.DBUtils (makeSlugGeneric)
 import qualified Blog.DB as DB
 
 data Category = Category { uid :: Int,
@@ -19,4 +19,4 @@ addCategory cn c =  do theslug <- makeCategorySlug cn c
                        [[newid]] <- quickQuery cn "SELECT last_insert_rowid();" [];
                        return c2 { uid = fromSql $ newid }
 
-makeCategorySlug cn cat = makeSlugGeneric cn (slugFromTitle $ name cat) "categories" 1
+makeCategorySlug cn cat = makeSlugGeneric cn (name cat) "categories" 1

@@ -1,11 +1,11 @@
 {-# OPTIONS_GHC -fbang-patterns  #-}
 module Blog.Utils where
 
-import qualified Data.ByteString.Char8 as B
-import System.Environment(getArgs)
-import Text.Regex.PCRE
-import Text.Regex.Base
 import Data.Char
+import System.Environment(getArgs)
+import Text.Regex.Base
+import Text.Regex.PCRE
+import qualified Data.ByteString.Char8 as B
 
 regexReplace !re !rep !source = go source []
  where go str res =

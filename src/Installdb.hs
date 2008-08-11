@@ -1,8 +1,6 @@
-
 import Control.Exception
 import Control.Monad
 import Database.HDBC
-
 import qualified Blog.DB as DB
 
 main :: IO ()

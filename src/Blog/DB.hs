@@ -1,9 +1,9 @@
 module Blog.DB where
 
 import Database.HDBC
-import Database.HDBC.Sqlite3 (connectSqlite3 {-, setBusyTimeout-})
-import qualified Blog.Settings  as Settings
+import Database.HDBC.Sqlite3 (connectSqlite3)
 import List
+import qualified Blog.Settings as Settings
 
 connect = connectSqlite3 Settings.sqlite_path
 

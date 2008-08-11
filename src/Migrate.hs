@@ -1,20 +1,20 @@
-import qualified Data.ByteString.Char8 as B
-import qualified Data.ByteString.Lazy.UTF8 as UTF8
-import qualified Data.ByteString.Lazy as BL
-import qualified Blog.Category as C
-import qualified Blog.Post as P
-import qualified Blog.Settings as Settings
-import qualified Blog.DB as DB
-import qualified Blog.Formats as Formats
-import Database.HDBC
-import List (sortBy, intersperse)
-import qualified Data.Map as Map
+import Blog.Utils (regexReplace)
 import Data.Maybe (fromJust)
 import Data.Ord (comparing)
+import Database.HDBC
 import GHC.Unicode (toLower)
+import List (sortBy, intersperse)
 import Monad (liftM)
 import Text.Template (readTemplate, renderToFile)
-import Blog.Utils (regexReplace)
+import qualified Blog.Category as C
+import qualified Blog.DB as DB
+import qualified Blog.Formats as Formats
+import qualified Blog.Post as P
+import qualified Blog.Settings as Settings
+import qualified Data.ByteString.Char8 as B
+import qualified Data.ByteString.Lazy as BL
+import qualified Data.ByteString.Lazy.UTF8 as UTF8
+import qualified Data.Map as Map
 -- Migration script for the old data
 
 -- Misc utilities

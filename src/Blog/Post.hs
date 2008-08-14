@@ -42,7 +42,7 @@ addPost cn p = do { theslug <- makePostSlug cn p;
                     return p2 { uid = fromSql $ newid } ;
                   }
 
-makePostSlug cn p = makeSlugGeneric cn (title p) "posts" 1
+makePostSlug cn p = makeSlugGeneric cn (title p) "posts"
 
 addPostCategory cn pc = do { DB.doInsert cn "post_categories"
                              ["post_id",

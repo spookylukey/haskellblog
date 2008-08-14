@@ -19,4 +19,4 @@ addCategory cn c =  do theslug <- makeCategorySlug cn c
                        [[newid]] <- quickQuery cn "SELECT last_insert_rowid();" [];
                        return c2 { uid = fromSql $ newid }
 
-makeCategorySlug cn cat = makeSlugGeneric cn (name cat) "categories" 1
+makeCategorySlug cn cat = makeSlugGeneric cn (name cat) "categories"

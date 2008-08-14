@@ -9,7 +9,7 @@ slugFromTitle title = map toLower $ B.unpack $
                       regexReplace (B.pack "-+$") (B.pack "") $
                       regexReplace (B.pack "[^A-Za-z0-9]+") (B.pack "-") (B.pack title)
 
-makeSlugGeneric cn title table iter = makeSlugGeneric' cn (slugFromTitle title) table iter
+makeSlugGeneric cn title table = makeSlugGeneric' cn (slugFromTitle title) table 1
 makeSlugGeneric' cn slugBase table iter = do
   let slugAttempt =  (slugBase ++ makeSuffix iter);
   [[SqlString c]] <- quickQuery cn ("SELECT count(slug) FROM " ++ table ++ " WHERE slug = ?") [toSql slugAttempt];

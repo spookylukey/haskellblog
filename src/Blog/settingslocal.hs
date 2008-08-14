@@ -3,6 +3,8 @@ module Blog.Settings where
 sqlite_path = "/home/luke/httpd/lukeplant.me.uk/web/cgi-bin/data/test1.db"
 root_url = "/blog/"
 
+-- Testing
+testdb_sqlite_path = "/home/luke/devel/haskell/haskellblog/testsuite/test.db"
 
 -- Migration time settings:
 

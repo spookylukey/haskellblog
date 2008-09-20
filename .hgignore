@@ -1,4 +1,3 @@
-(^|/)\.bzr($|/)
 (^|/)\.hg($|/)
 (^|/)\.hgtags($|/)
 \.hi$
@@ -7,3 +6,4 @@
 \#$
 ^src/blog.php$
 ^dist/
+^testsuite/test.db$

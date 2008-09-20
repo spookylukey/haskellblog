@@ -8,7 +8,7 @@ import Data.Maybe
 data Request = Request { method :: String
                        , path :: String
                        , environment :: Map.Map String String
-                       }
+                       } deriving (Show, Read, Eq, Ord)
 
 mkRequest :: [(String, String)] -> String -> Request
 mkRequest env stdin = let envMap = Map.fromList env

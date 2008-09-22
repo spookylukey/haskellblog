@@ -12,7 +12,6 @@ import qualified Blog.Post as P
 import qualified Blog.Routes as Routes
 import qualified Blog.Settings as Settings
 import qualified Data.ByteString.Char8 as B
-import qualified Data.ByteString.Lazy as BL
 import qualified Data.ByteString.Lazy.UTF8 as UTF8
 import qualified Data.Map as Map
 -- Migration script for the old data

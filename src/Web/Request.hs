@@ -1,4 +1,4 @@
-module Web.Request (requestMethod, pathInfo, environment, mkRequest)
+module Web.Request (Request, requestMethod, pathInfo, environment, mkRequest)
 
 where
 

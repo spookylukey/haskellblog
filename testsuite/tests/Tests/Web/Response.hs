@@ -1,20 +1,26 @@
+{-# OPTIONS_GHC -fglasgow-exts -XOverloadedStrings #-}
 module Tests.Web.Response
 
 where
 
 import Web.Response
 import Test.HUnit
+import Data.ByteString.Lazy.Char8 (ByteString)
 import qualified Data.ByteString.Lazy.Char8 as BS
 
-testAddContent1 = "Hello" ~=? (BS.unpack $ content $ addContent (BS.pack "Hello") $ emptyResponse)
+import GHC.Exts( IsString(..) )
+instance IsString ByteString where
+    fromString = BS.pack
 
-testAddContent2 = "Hello world" ~=? (BS.unpack $ content $ addContent (BS.pack " world") $ addContent (BS.pack "Hello") $ emptyResponse)
+testAddContent1 = "Hello" ~=? (content $ addContent "Hello" $ emptyResponse)
 
-testBuildResponse = "hello world" ~=? (BS.unpack $ content $
-                                         buildResponse utf8HtmlResponse [
-                                                            addContent (BS.pack "hello"),
-                                                            addContent (BS.pack " world")
-                                                           ])
+testAddContent2 = "Hello world" ~=? (content $ addContent " world" $ addContent "Hello" $ emptyResponse)
+
+testBuildResponse = "hello world" ~=? (content $
+                                       buildResponse utf8HtmlResponse [
+                                                          addContent "hello",
+                                                          addContent " world"
+                                                         ])
 
 tests = test [
           testAddContent1

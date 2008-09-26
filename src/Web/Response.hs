@@ -1,4 +1,12 @@
-module Web.Response (Response, content, headers, addContent, textResponse, htmlResponse, utf8HtmlResponse, emptyResponse) where
+module Web.Response (Response,
+                     content,
+                     headers,
+                     addContent,
+                     textResponse,
+                     htmlResponse,
+                     utf8HtmlResponse,
+                     emptyResponse,
+                     buildResponse) where
 
 -- Mainly borrowed from Network.CGI.Protocol
 
@@ -10,12 +18,12 @@ import Network.CGI (ContentType(ContentType), showContentType)
 data Response = Response {
       content :: ByteString
     , headers :: Headers
-    }
+    } deriving (Show, Eq)
 
 emptyResponse = Response { content = BS.empty, headers = [] }
 
 addContent :: ByteString -> Response -> Response
-addContent c resp = resp { content = c }
+addContent c resp = resp { content =  BS.append (content resp) c }
 
 {-
 TODO
@@ -54,3 +62,8 @@ should work.
 -}
 
 utf8HtmlResponse = htmlResponse "utf-8"
+
+-- | Build a Response from an initial Response and a list of
+-- Response transformation functions
+buildResponse :: Response -> [Response -> Response] -> Response
+buildResponse rinit fs = foldl (flip ($)) rinit fs

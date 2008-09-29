@@ -5,6 +5,7 @@ module Web.Framework (
                      , default404
                      , DispatchOptions(..)
                      , defaultDispatchOptions
+                     , View
                      )
 
 where
@@ -39,7 +40,7 @@ dispatchRequest req (v:vs) = do
 -- | Handle a CGI request using a list of possible views
 -- If a view returns 'Nothing' the next will be tried,
 -- and a 404 issued if all return nothing
-dispatchCGI :: [Request -> IO (Maybe Response)] -- list of views that will be tried in order
+dispatchCGI :: [View] -- list of views functions that will be tried in order
             -> DispatchOptions                  -- options to use in dispatching
             -> IO ()
 dispatchCGI views opts = do

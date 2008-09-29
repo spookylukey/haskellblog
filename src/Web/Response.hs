@@ -6,21 +6,27 @@ module Web.Response (Response,
                      htmlResponse,
                      utf8HtmlResponse,
                      emptyResponse,
+                     formatResponse,
                      buildResponse) where
 
 -- Mainly borrowed from Network.CGI.Protocol
 
 import Data.ByteString.Lazy.Char8 (ByteString)
 import qualified Data.ByteString.Lazy.Char8 as BS
+import Data.List
 import Network.CGI.Protocol (Headers, HeaderName(HeaderName))
 import Network.CGI (ContentType(ContentType), showContentType)
 
 data Response = Response {
       content :: ByteString
     , headers :: Headers
+    , status :: Int
     } deriving (Show, Eq)
 
-emptyResponse = Response { content = BS.empty, headers = [] }
+emptyResponse = Response { content = BS.empty
+                         , headers = []
+                         , status = 200 
+                         }
 
 addContent :: ByteString -> Response -> Response
 addContent c resp = resp { content =  BS.append (content resp) c }
@@ -36,17 +42,15 @@ TODO
 -- Utility functions for typical defaults
 
 contentTypeName = HeaderName "Content-type"
-textContent charset = ContentType "text" "plain" [("charset", charset)]
-htmlContent charset = ContentType "text" "html" [("charset", charset)]
+textContent charset = "text/plain; charset=" ++ charset
+htmlContent charset = "text/html; charset=" ++ charset
 
-textResponse charset = Response {
-                         content = BS.pack ""
-                       , headers = [(contentTypeName, showContentType $ textContent charset)]
+textResponse charset = emptyResponse {
+                         headers = [(contentTypeName, textContent charset)]
                        }
 
-htmlResponse charset = Response {
-                         content = BS.pack ""
-                       , headers = [(contentTypeName, showContentType $ htmlContent charset)]
+htmlResponse charset = emptyResponse {
+                         headers = [(contentTypeName, htmlContent charset)]
                        }
 
 {-
@@ -61,9 +65,25 @@ should work.
 
 -}
 
-utf8HtmlResponse = htmlResponse "utf-8"
+-- | Create an empty response for sending HTML, UTF-8 encoding
+utf8HtmlResponse = htmlResponse "UTF-8"
 
 -- | Build a Response from an initial Response and a list of
 -- Response transformation functions
 buildResponse :: Response -> [Response -> Response] -> Response
 buildResponse rinit fs = foldl (flip ($)) rinit fs
+
+
+allHeaders resp =
+    let statusHeader = (HeaderName "Status", show $ status resp)
+    in headers resp ++ [statusHeader]
+
+-- | Convert a Response into the foratm needed for HTTP
+-- Copied from Network.CGI.Protocol, thank you Bjorn Bringert :-)
+formatResponse :: Response -> ByteString
+formatResponse resp =
+    -- NOTE: we use CRLF since lighttpd mod_fastcgi can't handle
+    -- just LF if there are CRs in the content.
+    unlinesCrLf ([BS.pack (n++": "++v) | (HeaderName n,v) <- allHeaders resp]
+                ++ [BS.empty, content resp])
+  where unlinesCrLf = BS.concat . intersperse (BS.pack "\r\n")

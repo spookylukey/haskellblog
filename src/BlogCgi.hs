@@ -1,14 +1,9 @@
--- "Hello, world" in CGI
+import Blog.Views
+import Web.Framework
 
-import Network.CGI
-import Text.XHtml
-
-page :: Html
-page = body << h1 << "Hello, blogosphere!"
-
-cgiMain :: CGI CGIResult
-cgiMain = output $ renderHtml page
-
+views = [ 
+          mainIndex 
+        ]
 
 main :: IO ()
-main = runCGI $ handleErrors cgiMain
+main = dispatchCGI views defaultDispatchOptions

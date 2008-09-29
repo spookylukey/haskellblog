@@ -17,7 +17,7 @@ import System.IO (stdout, hClose)
 import qualified Data.ByteString.Lazy.Char8 as BS
 
 data DispatchOptions = DispatchOptions {
-      response404 :: Response
+      notFoundHandler :: Request -> IO Response
 }
 
 type View = Request -> IO (Maybe Response)
@@ -27,7 +27,9 @@ default404 = buildResponse utf8HtmlResponse [
               addContent "<h1>404 Not Found</h1>\n<p>Sorry, the page you requested could not be found.</p>"
              ]
 
-defaultDispatchOptions = DispatchOptions { response404 = default404 }
+defaultDispatchOptions = DispatchOptions {
+                           notFoundHandler = const $ return $ default404
+                         }
 
 dispatchRequest :: Request -> [View] -> IO (Maybe Response)
 dispatchRequest req [] = return Nothing
@@ -46,8 +48,8 @@ dispatchCGI :: [View] -- list of views functions that will be tried in order
 dispatchCGI views opts = do
   req <- buildCGIRequest
   resp' <- dispatchRequest req views
-  let resp  = case resp' of
-              Nothing -> response404 opts
-              Just x -> x
+  resp <- case resp' of
+            Nothing -> notFoundHandler opts $ req
+            Just x -> return x
   BS.hPut stdout (formatResponse resp)
   hClose stdout

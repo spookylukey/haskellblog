@@ -25,14 +25,24 @@ testBuildResponse = "hello world" ~=? (content $
 testFormatResponse = "Content-type: text/html; charset=UTF-8\r\n\
                      \Status: 200\r\n\
                      \\r\n\
-                     \<h1>Test</h1>" ~=? (formatResponse $
-                                          buildResponse utf8HtmlResponse [
-                                                             addContent "<h1>Test</h1>"
-                                                            ])
+                     \<h1>Test</h1>" ~=? 
+                     (formatResponse $ buildResponse utf8HtmlResponse [
+                                          addContent "<h1>Test</h1>"
+                                         ])
+
+testFormatResponse2 = "Content-type: text/html; charset=UTF-8\r\n\
+                      \Status: 404\r\n\
+                      \\r\n\
+                      \<h1>404 Not Found</h1>" ~=?
+                      (formatResponse $ buildResponse utf8HtmlResponse [
+                                           addContent "<h1>404 Not Found</h1>"
+                                          , setStatus 404
+                                          ])
 
 tests = test [
           testAddContent1
         , testAddContent2
         , testBuildResponse
         , testFormatResponse
+        , testFormatResponse2
         ]

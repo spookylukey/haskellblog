@@ -7,6 +7,7 @@ module Web.Response (Response,
                      utf8HtmlResponse,
                      emptyResponse,
                      formatResponse,
+                     setStatus,
                      buildResponse) where
 
 -- Mainly borrowed from Network.CGI.Protocol
@@ -23,6 +24,10 @@ data Response = Response {
     , status :: Int
     } deriving (Show, Eq)
 
+--
+-- * Creating responses
+--
+
 emptyResponse = Response { content = BS.empty
                          , headers = []
                          , status = 200 
@@ -31,15 +36,19 @@ emptyResponse = Response { content = BS.empty
 addContent :: ByteString -> Response -> Response
 addContent c resp = resp { content =  BS.append (content resp) c }
 
+setStatus :: Int -> Response -> Response
+setStatus s resp = resp { status = s }
+
+---
+--- * Shortcuts for common defaults
+---
+
 {-
 TODO
  - add utility functions for writing HTML
  - add encoding/charset to response, so that it can automatically
    convert HTML to the correct encoding.
 -}
-
-
--- Utility functions for typical defaults
 
 contentTypeName = HeaderName "Content-type"
 textContent charset = "text/plain; charset=" ++ charset

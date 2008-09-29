@@ -10,8 +10,6 @@ module Web.Response (Response,
                      setStatus,
                      buildResponse) where
 
--- Mainly borrowed from Network.CGI.Protocol
-
 import Data.ByteString.Lazy.Char8 (ByteString)
 import qualified Data.ByteString.Lazy.Char8 as BS
 import Data.List
@@ -61,18 +59,6 @@ textResponse charset = emptyResponse {
 htmlResponse charset = emptyResponse {
                          headers = [(contentTypeName, htmlContent charset)]
                        }
-
-{-
-
-TODO
-
-utf8HtmlResponse should probably accept Html as an argument and return
-the full Response, rather than returning an empty Response.
-
-Need to think more about constructors for Responses and how the API
-should work.
-
--}
 
 -- | Create an empty response for sending HTML, UTF-8 encoding
 utf8HtmlResponse = htmlResponse "UTF-8"

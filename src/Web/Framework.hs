@@ -17,7 +17,8 @@ import System.IO (stdout, hClose)
 import qualified Data.ByteString.Lazy.Char8 as BS
 
 data DispatchOptions = DispatchOptions {
-      notFoundHandler :: Request -> IO Response
+      notFoundHandler :: Request -> IO Response -- function that will return a 404 page in the case
+                                                -- of no view functions matching
 }
 
 type View = Request -> IO (Maybe Response)

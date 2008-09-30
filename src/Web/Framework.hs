@@ -7,6 +7,7 @@ module Web.Framework (
                      , defaultDispatchOptions
                      , View
                      , matchPath
+                     , matchStringParam
                      )
 
 where
@@ -65,3 +66,6 @@ matchPath :: String -> View -> View
 matchPath path view = \req -> if path `isPrefixOf` (pathInfo req)
                               then view req
                               else return Nothing
+
+matchStringParam :: (String -> View) -> View
+matchStringParam f = \req -> f (pathInfo req) req

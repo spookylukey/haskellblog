@@ -9,6 +9,7 @@ import Web.Request
 import Web.Response
 import Data.Maybe (isNothing, isJust)
 import Control.Monad (liftM)
+import Web.Utils
 
 req1 = mkRequest [("REQUEST_METHOD","GET"),
                   ("PATH_INFO", "/posts/")] ""
@@ -18,6 +19,12 @@ resp2 = buildResponse utf8HtmlResponse [ addContent "resp2" ]
 alwaysFailView = const (return Nothing)
 alwaysSucceedView1 = const (return $ Just resp1)
 alwaysSucceedView2 = const (return $ Just resp2)
+
+viewWithStringParam1 :: String -> Request -> IO (Maybe Response)
+viewWithStringParam1 p req = return $ Just $ viewWithStringParam1' p
+viewWithStringParam1' p = buildResponse utf8HtmlResponse [
+                           addContent $ utf8 ("Got: " ++ p)
+                          ]
 
 testDispatchRequest1 = (dispatchRequest req1 [] 
                         >>= return . isNothing)
@@ -42,10 +49,15 @@ testMatchPath2 = (dispatchRequest req1 [matchPath "/posts/" alwaysSucceedView1]
                   >>= return . isJust)
                  ~? "matchPath allows dispatching if path does match"
 
+testMatchStringParam1 = (dispatchRequest req1 [matchStringParam viewWithStringParam1]
+                         >>= return . (== Just (viewWithStringParam1' "/posts/")))
+                        ~? "matchStringParam captures string and passes to view"
+
 tests = test [
          testDispatchRequest1
         , testDispatchRequest2
         , testDispatchRequest3
         , testMatchPath1
         , testMatchPath2
+        , testMatchStringParam1
         ]

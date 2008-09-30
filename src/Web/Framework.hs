@@ -6,15 +6,20 @@ module Web.Framework (
                      , DispatchOptions(..)
                      , defaultDispatchOptions
                      , View
+                     , matchPath
                      )
 
 where
 
+import Data.List (isPrefixOf)
 import Web.Response
 import Web.Request
 import Web.Utils
 import System.IO (stdout, hClose)
 import qualified Data.ByteString.Lazy.Char8 as BS
+
+
+-- * Dispatching
 
 data DispatchOptions = DispatchOptions {
       notFoundHandler :: Request -> IO Response -- function that will return a 404 page in the case
@@ -53,3 +58,10 @@ dispatchCGI views opts = do
             Nothing -> notFoundHandler opts $ req
             Just x -> return x
   BS.hPut stdout (formatResponse resp)
+
+-- * Routing mechanism
+
+matchPath :: String -> View -> View
+matchPath path view = \req -> if path `isPrefixOf` (pathInfo req)
+                              then view req
+                              else return Nothing

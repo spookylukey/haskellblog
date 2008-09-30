@@ -9,7 +9,7 @@ import Data.ByteString.Lazy.Char8 (ByteString)
 import qualified Data.ByteString.Lazy.Char8 as BS
 import Web.Utils
 
-testAddContent1 = "Hello" ~=? (content $ addContent "Hello" $ emptyResponse)
+testAddContent1 = "“Hello”" ~=? (content $ addContent "“Hello”" $ emptyResponse)
 
 testAddContent2 = "Hello world" ~=? (content $ addContent " world" $ addContent "Hello" $ emptyResponse)
 

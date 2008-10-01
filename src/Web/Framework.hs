@@ -99,13 +99,13 @@ dispatchCGI views opts = do
 -- View OR a -> View OR a -> b -> View etc,
 -- where View = Request -> IO (Maybe Response)
 
--- The left hand argument of //-> is a 'matcher' - it parses the
+-- The left hand argument of '//->' is a \'matcher\' - it parses the
 -- 'path' of the Request, optionally capturing parameters and
 -- returning a function that will adapt the right hand argument so
 -- that it has type View.
 --
--- Matchers can be composed using </>.  To match a fixed string
--- without capturing, use (fixedString "thestring"). The operators
+-- Matchers can be composed using '</>'.  To match a fixed string
+-- without capturing, use @fixedString "thestring"@. The operators
 -- </+> amd <+/> are useful to combining fixed strings with other
 -- matchers.  To match just a fixed string, you can use
 --
@@ -132,15 +132,14 @@ empty = Just
 -- | matcher that matches any remaining path
 anyPath (path, f) = Just ("", f)
 
-
 nextChunk path = let (start, end) = break (== '/') path
-                 in case end of 
+                 in case end of
                       [] -> Nothing
                       x:rest -> Just (start, rest)
 
 -- | Matcher that captures a string component followed by a forward slash
 stringParam :: (String, String -> a) -> Maybe (String, a)
-stringParam (path, f) = do  
+stringParam (path, f) = do
   (chunk, rest) <- nextChunk path
   Just (rest, f chunk)
 
@@ -153,7 +152,7 @@ intParam (path, f) = do
     [(val, "")] -> Just (rest, f val)
     otherwise -> Nothing
 
-
+-- | Combine two matchers
 (</>) :: ((String, a) -> Maybe (String, b)) -- LH matcher
       -> ((String, b) -> Maybe (String, c)) -- RH matcher
       -> ((String, a) -> Maybe (String, c))
@@ -177,6 +176,6 @@ routeTo matcher f = \req -> let match = matcher (pathInfo req, f)
                                  Just (remainder, view) -> if null remainder
                                                            then view req
                                                            else return Nothing
-
+-- | Alias for 'routeTo'
 (//->) = routeTo
 infix 2 //->

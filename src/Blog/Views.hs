@@ -7,13 +7,13 @@ import Web.Utils
 import Blog.Templates
 
 mainIndex :: Request -> IO (Maybe Response)
-mainIndex req = return $ Just $ buildResponse utf8HtmlResponse [
+mainIndex req = return $ Just $ buildResponse [
                  addHtml mainIndexPage
-                ]
+                ] utf8HtmlResponse
 
-debug path req = return $ Just $ buildResponse utf8TextResponse [
+debug path req = return $ Just $ buildResponse [
                   addContent "Path:\n"
                  , addContent $ utf8 path
                  , addContent "\n\nRequest:\n"
                  , addContent $ utf8 $ show req
-                 ]
+                 ] utf8TextResponse 

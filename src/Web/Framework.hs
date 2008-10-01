@@ -41,10 +41,10 @@ data DispatchOptions = DispatchOptions {
 
 type View = Request -> IO (Maybe Response)
 
-default404 = buildResponse utf8HtmlResponse [
+default404 = buildResponse [
               setStatus 404,
               addContent "<h1>404 Not Found</h1>\n<p>Sorry, the page you requested could not be found.</p>"
-             ]
+             ] utf8HtmlResponse
 
 defaultDispatchOptions = DispatchOptions {
                            notFoundHandler = const $ return $ default404

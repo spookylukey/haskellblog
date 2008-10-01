@@ -66,11 +66,10 @@ utf8TextResponse = textResponse "UTF-8"
 -- | Create an empty response for sending HTML, UTF-8 encoding
 utf8HtmlResponse = htmlResponse "UTF-8"
 
--- | Build a Response from an initial Response and a list of
--- Response transformation functions
-buildResponse :: Response -> [Response -> Response] -> Response
-buildResponse rinit fs = foldl (flip ($)) rinit fs
-
+-- | Build a Response from a list of Response transformation functions
+-- and an initial Response
+buildResponse :: [Response -> Response] -> Response -> Response
+buildResponse fs rinit = foldl (flip ($)) rinit fs
 
 allHeaders resp =
     let statusHeader = (HeaderName "Status", show $ status resp)

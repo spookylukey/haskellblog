@@ -14,27 +14,26 @@ testAddContent1 = "“Hello”" ~=? (content $ addContent "“Hello”" $ emptyR
 testAddContent2 = "Hello world" ~=? (content $ addContent " world" $ addContent "Hello" $ emptyResponse)
 
 testBuildResponse = "hello world" ~=? (content $
-                                       buildResponse utf8HtmlResponse [
-                                                          addContent "hello",
-                                                          addContent " world"
-                                                         ])
+                                       buildResponse [ addContent "hello"
+                                                     , addContent " world"
+                                                     ] utf8HtmlResponse)
 
 testFormatResponse = "Content-type: text/html; charset=UTF-8\r\n\
                      \Status: 200\r\n\
                      \\r\n\
-                     \<h1>Test</h1>" ~=? 
-                     (formatResponse $ buildResponse utf8HtmlResponse [
+                     \<h1>Test</h1>" ~=?
+                     (formatResponse $ buildResponse [
                                           addContent "<h1>Test</h1>"
-                                         ])
+                                         ] utf8HtmlResponse)
 
 testFormatResponse2 = "Content-type: text/html; charset=UTF-8\r\n\
                       \Status: 404\r\n\
                       \\r\n\
                       \<h1>404 Not Found</h1>" ~=?
-                      (formatResponse $ buildResponse utf8HtmlResponse [
+                      (formatResponse $ buildResponse [
                                            addContent "<h1>404 Not Found</h1>"
                                           , setStatus 404
-                                          ])
+                                          ] utf8HtmlResponse)
 
 tests = test [
           testAddContent1

@@ -12,8 +12,8 @@ import Control.Monad (liftM, (>=>))
 import Web.Utils
 
 req1 = mkGetReq "/posts/"
-resp1 = buildResponse utf8HtmlResponse [ addContent "resp1" ]
-resp2 = buildResponse utf8HtmlResponse [ addContent "resp2" ]
+resp1 = buildResponse [ addContent "resp1" ] utf8HtmlResponse
+resp2 = buildResponse [ addContent "resp2" ] utf8HtmlResponse
 
 mkGetReq path = mkRequest [("REQUEST_METHOD","GET"),
                            ("PATH_INFO", path)] ""
@@ -24,36 +24,36 @@ alwaysSucceedView2 = const (return $ Just resp2)
 
 viewWithStringParam1 :: String -> Request -> IO (Maybe Response)
 viewWithStringParam1 p req = return $ Just $ viewWithStringParam1' p
-viewWithStringParam1' p = buildResponse utf8HtmlResponse [
+viewWithStringParam1' p = buildResponse [
                            addContent $ utf8 ("Got: " ++ p)
-                          ]
+                          ] utf8HtmlResponse
 
 viewWithIntParam1 :: Int -> Request -> IO (Maybe Response)
 viewWithIntParam1 p req = return $ Just $ viewWithIntParam1' p
-viewWithIntParam1' p = buildResponse utf8HtmlResponse [
+viewWithIntParam1' p = buildResponse [
                         addContent $ utf8 ("Got integer: " ++ show p)
-                       ]
+                       ] utf8HtmlResponse
 
 viewWithIntParam2 :: Int -> Request -> IO (Maybe Response)
 viewWithIntParam2 p req = return $ Just $ viewWithIntParam2' p
-viewWithIntParam2' p = buildResponse utf8HtmlResponse [
+viewWithIntParam2' p = buildResponse [
                         addContent $ utf8 ("2: Got integer: " ++ show p)
-                       ]
+                       ] utf8HtmlResponse
 
 viewWithIntAndStringParam1 :: Int -> String -> Request -> IO (Maybe Response)
 viewWithIntAndStringParam1 i s req = return $ Just $ viewWithIntAndStringParam1' i s
-viewWithIntAndStringParam1' i s = buildResponse utf8HtmlResponse [
+viewWithIntAndStringParam1' i s = buildResponse [
                                    addContent $ utf8 ("Got integer: " ++ show i ++
                                                       " and string: " ++ s)
-                                  ]
+                                  ] utf8HtmlResponse
 
 viewWithIntStringInt1 :: Int -> String -> Int -> Request -> IO (Maybe Response)
 viewWithIntStringInt1 i s i2 req = return $ Just $ viewWithIntStringInt1' i s i2
-viewWithIntStringInt1' i s i2 = buildResponse utf8HtmlResponse [
-                                   addContent $ utf8 ("Got integer 1: " ++ show i ++
-                                                      " and string: " ++ s ++
-                                                      " and integer 2: "++ show i2)
-                                ]
+viewWithIntStringInt1' i s i2 = buildResponse [
+                                 addContent $ utf8 ("Got integer 1: " ++ show i ++
+                                                    " and string: " ++ s ++
+                                                    " and integer 2: "++ show i2)
+                                ] utf8HtmlResponse
 
 -- Some of the syntax below is complicated by the fact that the
 -- functions being tested all use the IO monad in their type

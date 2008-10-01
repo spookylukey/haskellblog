@@ -21,11 +21,11 @@ data Request = Request {
     } deriving (Show, Read, Eq, Ord)
 
 -- | Create a Request object
-mkRequest :: [(String, String)] -- association list of environment variables
-          -> ByteString -- lazy ByteString containing request body
+mkRequest :: [(String, String)] -- ^ association list of environment variables
+          -> ByteString -- ^ lazy ByteString containing request body
           -> Request
 mkRequest env body = let envMap = Map.fromList env
-                     in Request { 
+                     in Request {
                               environment = envMap
                             , requestBody = body
                             }

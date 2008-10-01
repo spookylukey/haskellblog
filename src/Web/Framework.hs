@@ -133,24 +133,26 @@ empty = Just
 anyPath (path, f) = Just ("", f)
 
 
+nextChunk path = let (start, end) = break (== '/') path
+                 in case end of 
+                      [] -> Nothing
+                      x:rest -> Just (start, rest)
+
 -- | Matcher that captures a string component followed by a forward slash
 stringParam :: (String, String -> a) -> Maybe (String, a)
-stringParam (path, f) = let (start, end) = break (== sep) path
-                        in case end of
-                             [] -> Nothing
-                             x:rest -> Just (rest, f start)
-    where sep = '/'
+stringParam (path, f) = do  
+  (chunk, rest) <- nextChunk path
+  Just (rest, f chunk)
 
 -- | Matcher that captures an integer component followed by a forward slash
 intParam :: (String, Int -> a) -> Maybe (String, a)
-intParam (path, f) = let (start, end) = break (== sep) path
-                     in case end of
-                          [] -> Nothing
-                          x:rest -> let parses = reads start :: [(Int, String)]
-                                    in case parses of
-                                         [(val, "")] -> Just (rest, f val)
-                                         otherwise -> Nothing
-    where sep = '/'
+intParam (path, f) = do
+  (chunk, rest) <- nextChunk path
+  let parses = reads chunk :: [(Int, String)]
+  case parses of
+    [(val, "")] -> Just (rest, f val)
+    otherwise -> Nothing
+
 
 (</>) :: ((String, a) -> Maybe (String, b)) -- LH matcher
       -> ((String, b) -> Maybe (String, c)) -- RH matcher

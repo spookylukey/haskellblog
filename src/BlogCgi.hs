@@ -1,8 +1,8 @@
 import Blog.Views
 import Web.Framework
 
-views = [ 
-          mainIndex 
+views = [
+          empty //-> mainIndex 
         ]
 
 main :: IO ()

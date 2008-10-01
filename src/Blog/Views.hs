@@ -7,10 +7,9 @@ import Web.Utils
 import Blog.Templates
 
 mainIndex :: Request -> IO (Maybe Response)
-mainIndex req = let resp = buildResponse utf8HtmlResponse [
-                            addHtml mainIndexPage
-                           ]
-                in return $ Just resp
+mainIndex req = return $ Just $ buildResponse utf8HtmlResponse [
+                 addHtml mainIndexPage
+                ]
 
 debug path req = return $ Just $ buildResponse utf8TextResponse [
                   addContent "Path:\n"

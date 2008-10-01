@@ -3,6 +3,7 @@ module Web.Response (Response,
                      headers,
                      addContent,
                      textResponse,
+                     utf8TextResponse,
                      htmlResponse,
                      utf8HtmlResponse,
                      emptyResponse,
@@ -59,6 +60,8 @@ textResponse charset = emptyResponse {
 htmlResponse charset = emptyResponse {
                          headers = [(contentTypeName, htmlContent charset)]
                        }
+
+utf8TextResponse = textResponse "UTF-8"
 
 -- | Create an empty response for sending HTML, UTF-8 encoding
 utf8HtmlResponse = htmlResponse "UTF-8"

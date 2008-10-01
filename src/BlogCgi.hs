@@ -1,8 +1,8 @@
 import Blog.Views
 import Web.Framework
 
-views = [
-          empty //-> mainIndex 
+views = [ empty                       //-> mainIndex 
+        , "debug/" <+/> stringParam   //-> debug
         ]
 
 main :: IO ()

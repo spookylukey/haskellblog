@@ -34,21 +34,34 @@ import qualified Data.ByteString.Lazy.Char8 as BS
 
 -- * Dispatching
 
+
 data DispatchOptions = DispatchOptions {
-      notFoundHandler :: Request -> IO Response -- function that will return a 404 page in the case
-                                                -- of no view functions matching
+      notFoundHandler :: Request -> IO Response
+    -- ^ function that will return a 404 page in the case of no view functions matching
+    , requestOptions :: RequestOptions
+    -- ^ options passed to buildCGIRequest
 }
 
 type View = Request -> IO (Maybe Response)
+
+-- * Defaults
 
 default404 = buildResponse [
               setStatus 404,
               addContent "<h1>404 Not Found</h1>\n<p>Sorry, the page you requested could not be found.</p>"
              ] utf8HtmlResponse
 
+defaultRequestOptions = RequestOptions {
+                          encoding = utf8Encoding
+                        }
+
 defaultDispatchOptions = DispatchOptions {
                            notFoundHandler = const $ return $ default404
+                         , requestOptions = defaultRequestOptions
                          }
+
+
+-- Dispatching
 
 dispatchRequest :: Request -> [View] -> IO (Maybe Response)
 dispatchRequest req [] = return Nothing
@@ -65,7 +78,7 @@ dispatchCGI :: [View] -- list of views functions that will be tried in order
             -> DispatchOptions                  -- options to use in dispatching
             -> IO ()
 dispatchCGI views opts = do
-  req <- buildCGIRequest
+  req <- buildCGIRequest (encoding $ requestOptions opts)
   resp' <- dispatchRequest req views
   resp <- case resp' of
             Nothing -> notFoundHandler opts $ req

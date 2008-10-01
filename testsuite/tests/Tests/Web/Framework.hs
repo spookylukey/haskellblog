@@ -16,7 +16,7 @@ resp1 = buildResponse [ addContent "resp1" ] utf8HtmlResponse
 resp2 = buildResponse [ addContent "resp2" ] utf8HtmlResponse
 
 mkGetReq path = mkRequest [("REQUEST_METHOD","GET"),
-                           ("PATH_INFO", path)] ""
+                           ("PATH_INFO", path)] "" utf8Encoding
 
 alwaysFailView = const (return Nothing)
 alwaysSucceedView1 = const (return $ Just resp1)

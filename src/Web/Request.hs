@@ -79,8 +79,8 @@ pathInfo request = let pi = Map.lookup "PATH_INFO" $ environment request
                                     Nothing -> ""
                                     Just ('/':rest) -> rest
                                     Just path -> path
-                       -- PATH_INFO contains Haskell strings, but this
-                       -- has may contain uninterpreted byte sequences
+                       -- PATH_INFO contains Haskell strings, but they
+                       -- may contain uninterpreted byte sequences
                        -- instead of Unicode chars.  We re-pack as
                        -- bytes (BS.pack discards anything > \255),
                        -- and then re-interpret.

@@ -116,6 +116,10 @@ dispatchCGI views opts = do
 -- > fixedString "thestring/"
 --
 -- The routing mechanism is extensible -- just define your own matchers.
+--
+-- NB. The Request object trims any leading slash on the path to normalise
+-- it, and also to simplify this parsing stage, so do not attempt to match
+-- an initial leading slash.
 
 -- | Match a string at the beginning of the path
 fixedString :: String -> (String, a) -> Maybe (String, a)
@@ -153,8 +157,8 @@ intParam (path, f) = do
     otherwise -> Nothing
 
 -- | Combine two matchers
-(</>) :: ((String, a) -> Maybe (String, b)) -- LH matcher
-      -> ((String, b) -> Maybe (String, c)) -- RH matcher
+(</>) :: ((String, a) -> Maybe (String, b)) -- ^ LH matcher
+      -> ((String, b) -> Maybe (String, c)) -- ^ RH matcher
       -> ((String, a) -> Maybe (String, c))
 (</>) = (>=>) -- It turns out that this does the job!
 infixl 3 </>

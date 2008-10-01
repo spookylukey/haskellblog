@@ -1,24 +1,36 @@
 {-# OPTIONS_GHC -fglasgow-exts -XOverloadedStrings #-}
 module Web.Framework (
+                      -- * Dispatching
                       dispatchCGI
                      , dispatchRequest
-                     , default404
                      , DispatchOptions(..)
                      , defaultDispatchOptions
+                     , default404
                      , View
-                     , matchPath
-                     , matchStringParam
+                     -- * Routing mechanism
+                     -- $routing
+                     , routeTo
+                     , (//->)
+                     -- * Matchers
+                     , fixedString
+                     , intParam
+                     , stringParam
+                     , anyPath
+                     , empty
+                     , (</>)
+                     , (</+>)
+                     , (<+/>)
                      )
 
 where
 
+import Control.Monad ((>=>))
 import Data.List (isPrefixOf)
 import Web.Response
 import Web.Request
 import Web.Utils
 import System.IO (stdout, hClose)
 import qualified Data.ByteString.Lazy.Char8 as BS
-
 
 -- * Dispatching
 
@@ -60,12 +72,109 @@ dispatchCGI views opts = do
             Just x -> return x
   BS.hPut stdout (formatResponse resp)
 
--- * Routing mechanism
+-- $routing
+--
+-- The routing mechanism has been designed so that you can write code like the following:
+--
+-- > routes = [
+-- >            empty                                  //-> indexView
+-- >          , "posts/" <+/> empty                    //-> postsView
+-- >          , intParam                               //-> viewWithIntParam
+-- >          , stringParam                            //-> viewWithStringParam
+-- >          , intParam </+> "test/"                  //-> viewWithIntParam
+-- >          , "test/" <+/> intParam                  //-> viewWithIntParam
+-- >          , intParam </> stringParam               //-> viewWithIntAndStringParam
+-- >          , intParam </> stringParam </> intParam  //-> viewWithIntStringInt
+-- >          ]
+--
+-- where:
+--
+-- >  postsView, indexView :: Request -> IO (Maybe Response)
+-- >  viewWithStringParam :: String -> Request -> IO (Maybe Response)
+-- >  viewWithIntParam :: Int -> Request -> IO (Maybe Response)
+-- >  viewWithIntAndStringParam :: Int -> String -> Request -> IO (Maybe Response)
+-- >  viewWithIntStringInt :: Int -> String -> Int -> Request -> IO (Maybe Response)
+--
+-- The right hand argument of //-> is a 'view like' function, of type
+-- View OR a -> View OR a -> b -> View etc,
+-- where View = Request -> IO (Maybe Response)
 
-matchPath :: String -> View -> View
-matchPath path view = \req -> if path `isPrefixOf` (pathInfo req)
-                              then view req
-                              else return Nothing
+-- The left hand argument of //-> is a 'matcher' - it parses the
+-- 'path' of the Request, optionally capturing parameters and
+-- returning a function that will adapt the right hand argument so
+-- that it has type View.
+--
+-- Matchers can be composed using </>.  To match a fixed string
+-- without capturing, use (fixedString "thestring"). The operators
+-- </+> amd <+/> are useful to combining fixed strings with other
+-- matchers.  To match just a fixed string, you can use
+--
+-- > "thestring/" <+/> empty
+--
+-- instead of:
+--
+-- > fixedString "thestring/"
+--
+-- The routing mechanism is extensible -- just define your own matchers.
 
-matchStringParam :: (String -> View) -> View
-matchStringParam f = \req -> f (pathInfo req) req
+-- | Match a string at the beginning of the path
+fixedString :: String -> (String, a) -> Maybe (String, a)
+fixedString s (path, f) = if s `isPrefixOf` path
+                          then Just (drop (length s) path, f)
+                          else Nothing
+
+-- | Convenience no-op matcher, useful for when you only want to match
+-- a fixed string, or to match an empty string.
+empty :: (String, a) -> Maybe (String, a)
+empty = Just
+
+
+-- | matcher that matches any remaining path
+anyPath (path, f) = Just ("", f)
+
+
+-- | Matcher that captures a string component followed by a forward slash
+stringParam :: (String, String -> a) -> Maybe (String, a)
+stringParam (path, f) = let (start, end) = break (== sep) path
+                        in case end of
+                             [] -> Nothing
+                             x:rest -> Just (rest, f start)
+    where sep = '/'
+
+-- | Matcher that captures an integer component followed by a forward slash
+intParam :: (String, Int -> a) -> Maybe (String, a)
+intParam (path, f) = let (start, end) = break (== sep) path
+                     in case end of
+                          [] -> Nothing
+                          x:rest -> let parses = reads start :: [(Int, String)]
+                                    in case parses of
+                                         [(val, "")] -> Just (rest, f val)
+                                         otherwise -> Nothing
+    where sep = '/'
+
+(</>) :: ((String, a) -> Maybe (String, b)) -- LH matcher
+      -> ((String, b) -> Maybe (String, c)) -- RH matcher
+      -> ((String, a) -> Maybe (String, c))
+(</>) = (>=>) -- It turns out that this does the job!
+infixl 3 </>
+
+-- | Convenience operator for combining a fixed string after a matcher
+matcher </+> str = matcher </> (fixedString str)
+-- | Convenience operator for combining a matcher after a fixed string
+str <+/> matcher = (fixedString str) </> matcher
+
+-- | Apply a matcher to a View (or View-like function that takes
+-- additional parameters) to get a View that only responds to the
+-- matched URLs
+routeTo :: ((String, a) -> Maybe (String, View))
+        -> a
+        -> View
+routeTo matcher f = \req -> let match = matcher (pathInfo req, f)
+                            in case match of
+                                 Nothing -> return Nothing
+                                 Just (remainder, view) -> if null remainder
+                                                           then view req
+                                                           else return Nothing
+
+(//->) = routeTo
+infix 2 //->

@@ -74,16 +74,18 @@ dispatchRequest req (v:vs) = do
 -- | Handle a CGI request using a list of possible views
 -- If a view returns 'Nothing' the next will be tried,
 -- and a 404 issued if all return nothing
-dispatchCGI :: [View] -- list of views functions that will be tried in order
-            -> DispatchOptions                  -- options to use in dispatching
+dispatchCGI :: [View]           -- ^ list of views functions that will be tried in order
+            -> DispatchOptions  -- ^ options to use in dispatching
             -> IO ()
 dispatchCGI views opts = do
-  req <- buildCGIRequest (encoding $ requestOptions opts)
+  req <- buildCGIRequest (requestOptions opts)
   resp' <- dispatchRequest req views
   resp <- case resp' of
             Nothing -> notFoundHandler opts $ req
             Just x -> return x
   BS.hPut stdout (formatResponse resp)
+
+-- Routing
 
 -- $routing
 --
@@ -113,13 +115,13 @@ dispatchCGI views opts = do
 -- where View = Request -> IO (Maybe Response)
 
 -- The left hand argument of '//->' is a \'matcher\' - it parses the
--- 'path' of the Request, optionally capturing parameters and
--- returning a function that will adapt the right hand argument so
--- that it has type View.
+-- path of the Request, optionally capturing parameters and returning
+-- a function that will adapt the right hand argument so that it has
+-- type View.
 --
 -- Matchers can be composed using '</>'.  To match a fixed string
 -- without capturing, use @fixedString "thestring"@. The operators
--- </+> amd <+/> are useful to combining fixed strings with other
+-- </+> amd <+/> are useful for combining fixed strings with other
 -- matchers.  To match just a fixed string, you can use
 --
 -- > "thestring/" <+/> empty

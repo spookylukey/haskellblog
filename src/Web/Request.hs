@@ -89,9 +89,10 @@ pathInfo request = let pi = Map.lookup "PATH_INFO" $ environment request
 
 
 -- | Creates a Request object according to the CGI protocol
-buildCGIRequest :: Encoding -> IO Request
-buildCGIRequest encoding = do
+buildCGIRequest :: RequestOptions -- ^ options which determine how the HTTP request is interpreted
+                -> IO Request
+buildCGIRequest opts = do
   env <- getEnvironment
   body <- BS.hGetContents stdin
-  return $ mkRequest env body encoding
+  return $ mkRequest env body (encoding opts)
 

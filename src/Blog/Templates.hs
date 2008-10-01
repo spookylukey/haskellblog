@@ -1,10 +1,10 @@
-module Blog.Templates 
+module Blog.Templates
 where
 
 import Text.XHtml
 
 -- Complete page template
-page ptitle pcontent = 
+page ptitle pcontent =
     header
     << (meta ! [httpequiv "Content-Type",
                 content "text/html; charset=utf-8"]
@@ -13,10 +13,7 @@ page ptitle pcontent =
                        title "RSS",
                        href "/TODO"] << ""
         +++ thelink ! [rel "StyleSheet",
-                       href "style.css",
-                       thetype "text/css"] << ""
-        +++ thelink ! [rel "StyleSheet",
-                       href "blog.css",
+                       href "/newblog.css",
                        thetype "text/css"] << ""
         +++ thelink ! [rel "shortcut icon",
                        href "/favicon.ico",
@@ -25,11 +22,17 @@ page ptitle pcontent =
        )
     +++
     body
-    << pcontent
+    << thediv ! [identifier "container"]
+           << pcontent
 
 
 -- Page specific templates
 
 mainIndexPage = page "All Unkept"
-                (h1 << "All Unkept" +++
-                 p << "This is a test")
+                (thediv ! [identifier "maintitle"]
+                            << thediv
+                                   << "All Unkept"
+                 +++
+                 thediv ! [identifier "content"]
+                            << h1 << "This is the title"
+                            +++ p << "This is a test")

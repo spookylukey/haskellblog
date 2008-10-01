@@ -63,12 +63,16 @@ defaultDispatchOptions = DispatchOptions {
 
 -- Dispatching
 
-dispatchRequest :: Request -> [View] -> IO (Maybe Response)
-dispatchRequest req [] = return Nothing
-dispatchRequest req (v:vs) = do
+-- | Used by dispatchCGI, might be useful on its own, especially in testing
+--
+-- Effectively this reduces a list of view functions so that
+-- they act as a single one
+dispatchRequest :: [View] -> View
+dispatchRequest [] req = return Nothing
+dispatchRequest (v:vs) req = do
   resp <- v req
   case resp of
-    Nothing -> dispatchRequest req vs
+    Nothing -> dispatchRequest vs req
     x -> return x
 
 -- | Handle a CGI request using a list of possible views
@@ -79,7 +83,7 @@ dispatchCGI :: [View]           -- ^ list of views functions that will be tried 
             -> IO ()
 dispatchCGI views opts = do
   req <- buildCGIRequest (requestOptions opts)
-  resp' <- dispatchRequest req views
+  resp' <- dispatchRequest views req
   resp <- case resp' of
             Nothing -> notFoundHandler opts $ req
             Just x -> return x

@@ -60,18 +60,18 @@ viewWithIntStringInt1' i s i2 = buildResponse [
 -- signatures (tho' in these tests they don't actually need any IO),
 -- and you cannot pattern match against IO actions.
 
-testDispatchRequest1 = (dispatchRequest req1 []
+testDispatchRequest1 = (dispatchRequest [] req1
                         >>= return . isNothing)
                        ~? "With no views, nothing is dispatched"
 
-testDispatchRequest2 = (dispatchRequest req1 [alwaysFailView]
+testDispatchRequest2 = (dispatchRequest  [alwaysFailView] req1
                         >>= return . isNothing)
                        ~? "Should get Nothing if all view return Nothing"
 
 testDispatchRequest3 = (do
-                         resp <- dispatchRequest req1 [alwaysFailView,
-                                                       alwaysSucceedView1,
-                                                       alwaysSucceedView2]
+                         resp <- dispatchRequest [alwaysFailView,
+                                                  alwaysSucceedView1,
+                                                  alwaysSucceedView2] req1
                          return $ (resp == (Just resp1) && resp /= (Just resp2)))
                        ~? "Dispatch should return first that succeeds"
 
@@ -104,37 +104,37 @@ routes = [
          ]
 
 testRoutes1 = (do
-                Just resp <- dispatchRequest (mkGetReq "1/") routes
+                Just resp <- dispatchRequest routes (mkGetReq "1/")
                 return $ content resp == "Got integer: 1")
                ~? "Testing int parameter dispatch"
 
 testRoutes2 = (do
-                Just resp <- dispatchRequest (mkGetReq "1/test/") routes
+                Just resp <- dispatchRequest routes (mkGetReq "1/test/")
                 return $ content resp == "2: Got integer: 1")
                ~? "Testing int parameter dispatch with fixed string"
 
 testRoutes3 = (do
-                Just resp <- dispatchRequest (mkGetReq "1/Joe/3/") routes
+                Just resp <- dispatchRequest routes (mkGetReq "1/Joe/3/")
                 return $ content resp == "Got integer 1: 1 and string: Joe and integer 2: 3")
                ~? "Testing multiparameter dispatch"
 
 testRoutes4 = (do
-                Just resp <- dispatchRequest (mkGetReq "10/foo/") routes
+                Just resp <- dispatchRequest routes (mkGetReq "10/foo/")
                 return $ content resp == "Got integer: 10 and string: foo")
                ~? "Testing stringParam dispatch"
 
 testRoutes5 = (do
-                Just resp <- dispatchRequest (mkGetReq "test/20/") routes
+                Just resp <- dispatchRequest routes (mkGetReq "test/20/")
                 return $ content resp == "2: Got integer: 20")
                ~? "Testing fixed string with integer"
 
 testRoutes6 = (do
-                Just resp <- dispatchRequest (mkGetReq "posts/") routes
+                Just resp <- dispatchRequest routes (mkGetReq "posts/")
                 return $ resp == resp2)
                ~? "Testing fixed string with empty"
 
 testRoutes7 = (do
-                Just resp <- dispatchRequest (mkGetReq "") routes
+                Just resp <- dispatchRequest routes (mkGetReq "")
                 return $ resp == resp1)
                ~? "Testing empty matcher"
 

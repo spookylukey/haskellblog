@@ -75,11 +75,11 @@ testDispatchRequest3 = (do
                          return $ (resp == (Just resp1) && resp /= (Just resp2)))
                        ~? "Dispatch should return first that succeeds"
 
-testFixedStringSucceed = ((fixedString "/posts/" `routeTo` alwaysSucceedView1 $ req1)
+testFixedStringSucceed = ((fixedString "posts/" `routeTo` alwaysSucceedView1 $ req1)
                           >>= return . (== (Just resp1)))
                          ~? "fixedString should leave view as is if the path matches completely"
 
-testFixedStringFail = ((fixedString "/bar/" `routeTo` alwaysSucceedView1 $ req1)
+testFixedStringFail = ((fixedString "bar/" `routeTo` alwaysSucceedView1 $ req1)
                           >>= return . isNothing)
                          ~? "fixedString should return Nothing if the path does not match"
 
@@ -87,7 +87,7 @@ testRouteToAnyPath = ((anyPath `routeTo` alwaysSucceedView1 $ req1)
                       >>= return . (== Just resp1))
                      ~? "routeTo leaves a view alone if matcher always succeeds"
 
-testRouteToNotAllMatched = ((fixedString "/po" `routeTo` alwaysSucceedView1 $ req1)
+testRouteToNotAllMatched = ((fixedString "po" `routeTo` alwaysSucceedView1 $ req1)
                             >>= return . isNothing)
                            ~? "routeTo does not route to a view if the match does not exhaust the path"
 

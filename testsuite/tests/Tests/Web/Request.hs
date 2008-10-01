@@ -8,9 +8,11 @@ import Test.HUnit
 import Web.Utils
 
 testMethod = "GET" ~=? requestMethod (mkRequest [("REQUEST_METHOD","GET")] "")
-testPath = "/foo/bar" ~=? pathInfo (mkRequest [("PATH_INFO", "/foo/bar")] "")
+testPath = "foo/bar" ~=? pathInfo (mkRequest [("PATH_INFO", "/foo/bar")] "")
+testPathMissing = "" ~=? pathInfo (mkRequest [] "")
 
 tests = test [
-         testMethod,
-         testPath
+          testMethod
+        , testPath
+        , testPathMissing
         ]

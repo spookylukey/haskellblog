@@ -30,9 +30,16 @@ mkRequest env body = let envMap = Map.fromList env
                             , requestBody = body
                             }
 
+-- | Returns the request method (GET, POST etc) of the request
 requestMethod :: Request -> String
 requestMethod request = fromJust $ Map.lookup "REQUEST_METHOD" $ environment request
-pathInfo request = fromJust $ Map.lookup "PATH_INFO" $ environment request
+
+-- | Returns the path info of the request, with leading forward slash removed.
+pathInfo request = let pi = Map.lookup "PATH_INFO" $ environment request
+                   in case pi of
+                        Nothing -> ""
+                        Just ('/':rest) -> rest
+                        Just path -> path
 
 
 -- | Creates a Request object according to the CGI protocol

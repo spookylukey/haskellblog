@@ -148,6 +148,9 @@ testRoutes7 = (do
                 return $ resp == resp1)
                ~? "Testing empty matcher"
 
+--testRouteUrls1 = "/" ~=? routeToUrl indexRoute
+--testRouteUrls2 = "/test/123/" ~=? routeToUrl testIntParamRoute 123
+
 tests = test [
          testDispatchRequest1
         , testDispatchRequest2

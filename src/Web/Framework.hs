@@ -20,6 +20,8 @@ module Web.Framework (
                      , (</>)
                      , (</+>)
                      , (<+/>)
+                     -- * URLs
+                     , routeToUrl
                      )
 
 where
@@ -141,19 +143,25 @@ dispatchCGI views opts = do
 -- an initial leading slash.
 
 -- | Match a string at the beginning of the path
-fixedString :: String -> (String, a) -> Maybe (String, a)
-fixedString s (path, f) = if s `isPrefixOf` path
-                          then Just (drop (length s) path, f)
-                          else Nothing
+--fixedString :: String -> (String, t1, t2) -> (Maybe (String, t1), t2)
+fixedString s (parsed, u) = let newu = mkUrlFixedString s u
+                                parse = do
+                                  (path, f) <- parsed
+                                  if s `isPrefixOf` path
+                                    then Just (drop (length s) path, f)
+                                    else Nothing
+                            in (parse, newu)
 
 -- | Convenience no-op matcher, useful for when you only want to match
--- a fixed string, or to match an empty string.
-empty :: (String, a) -> Maybe (String, a)
-empty = Just
+-- a fixed string, or to match an empty string in the context of a route
+empty :: (Maybe (String, a), b) -> (Maybe (String, a), b)
+empty = id
 
 
 -- | matcher that matches any remaining path
-anyPath (path, f) = Just ("", f)
+anyPath (Nothing, u) = (Nothing, undefined)
+anyPath (Just (path, f), u) = (Just ("", f), undefined)
+-- We can't return a URL for a route that takes arbitrary URLs, hence the 'undefined'
 
 nextChunk path = let (start, end) = break (== '/') path
                  in case end of
@@ -161,25 +169,38 @@ nextChunk path = let (start, end) = break (== '/') path
                       x:rest -> Just (start, rest)
 
 -- | Matcher that captures a string component followed by a forward slash
-stringParam :: (String, String -> a) -> Maybe (String, a)
-stringParam (path, f) = do
-  (chunk, rest) <- nextChunk path
-  Just (rest, f chunk)
+--stringParam :: (Maybe (String, String -> a), b)
+--            -> (Maybe (String, a), String -> b)
+stringParam (parsed, u) =
+  let newu = mkUrlStrParam u
+      parse = do
+        (path, f) <- parsed
+        (chunk, rest) <- nextChunk path
+        Just (rest, f chunk)
+  in (parse, newu)
 
 -- | Matcher that captures an integer component followed by a forward slash
-intParam :: (String, Int -> a) -> Maybe (String, a)
-intParam (path, f) = do
-  (chunk, rest) <- nextChunk path
-  let parses = reads chunk :: [(Int, String)]
-  case parses of
-    [(val, "")] -> Just (rest, f val)
-    otherwise -> Nothing
+--intParam :: (String, Int -> a, b) -> (Maybe (String, a), Int -> b)
+--intParam :: (Maybe (String, Int -> a), b)
+--         -> (Maybe (String, a), Int -> b)
+intParam (parsed, u) =
+  let newu = mkUrlIntParam
+      parse = do
+        (path, f) <- parsed
+        (chunk, rest) <- nextChunk path
+        let parses = reads chunk :: [(Int, String)]
+        case parses of
+          [(val, "")] -> Just (rest, f val)
+          otherwise -> Nothing
+  in (parse, newu)
+
 
 -- | Combine two matchers
-(</>) :: ((String, a) -> Maybe (String, b)) -- ^ LH matcher
-      -> ((String, b) -> Maybe (String, c)) -- ^ RH matcher
-      -> ((String, a) -> Maybe (String, c))
-(</>) = (>=>) -- It turns out that this does the job!
+(</>) :: ((Maybe(String, a), t1) -> (Maybe (String, b), t2)) -- ^ LH matcher
+      -> ((Maybe(String, b), t2) -> (Maybe (String, c), t3)) -- ^ RH matcher
+      -> ((Maybe(String, a), t1) -> (Maybe (String, c), t3))
+(</>) = flip (.)
+
 infixl 3 </>
 
 -- | Convenience operator for combining a fixed string after a matcher
@@ -190,10 +211,10 @@ str <+/> matcher = (fixedString str) </> matcher
 -- | Apply a matcher to a View (or View-like function that takes
 -- additional parameters) to get a View that only responds to the
 -- matched URLs
-routeTo :: ((String, a) -> Maybe (String, View))
+routeTo :: ((Maybe (String, a), b) -> (Maybe (String, View), b))
         -> a
         -> View
-routeTo matcher f = \req -> let match = matcher (pathInfo req, f)
+routeTo matcher f = \req -> let (match, u) = matcher (Just (pathInfo req, f), undefined)
                             in case match of
                                  Nothing -> return Nothing
                                  Just (remainder, view) -> if null remainder
@@ -202,3 +223,21 @@ routeTo matcher f = \req -> let match = matcher (pathInfo req, f)
 -- | Alias for 'routeTo'
 (//->) = routeTo
 infix 2 //->
+
+
+-- TODO: work out routeToUrl and co.
+
+-- routeToUrl empty == "/"
+-- routeToUrl (fixedString "x") == "/x"
+-- routeToUrl stringPararm "param" == "/param/"
+-- routeToUrl (fixedString "x" </> empty) == "/x"
+-- routeToUrl (empty </> empty) == "/"
+-- routeToUrl (fixedString "x" </> fixedString "y") == "/xy"
+-- routeToUrl ("foo" <+/> stringParam </+> "bar") == \s -> "/" ++ "foo" ++ s ++ "/" ++ "bar"
+
+-- | Retrieve a URL (or URL generating function) from a route
+routeToUrl matcher = undefined
+
+mkUrlStrParam u = undefined
+mkUrlIntParam u = undefined
+mkUrlFixedString s u = undefined

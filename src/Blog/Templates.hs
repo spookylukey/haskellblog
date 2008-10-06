@@ -5,10 +5,18 @@ where
 import Text.XHtml
 
 
-data PageVars t1 t2 = (HTML t1, HTML t2) => PageVars
+-- | Holds variables for the 'page' template
+--
+-- fields should be limited to type class HTML, but that makes record
+-- update syntax impossible with current GHC.
+data PageVars t1 t2 = {- (HTML t1, HTML t2) => -} PageVars
     { ptitle :: t1
     , pcontent :: t2
     }
+
+defaultPageVars = PageVars { ptitle = "All Unkept"
+                           , pcontent = ""
+                           }
 
 -- Complete page template
 page vars =
@@ -35,9 +43,8 @@ page vars =
 
 -- Page specific templates
 
-mainIndexPage = page $ PageVars
-                { ptitle = "All Unkept"
-                , pcontent = (thediv ! [identifier "maintitle"]
+mainIndexPage = page $ defaultPageVars
+                { pcontent = (thediv ! [identifier "maintitle"]
                               << thediv
                                      << "All Unkept"
                               +++

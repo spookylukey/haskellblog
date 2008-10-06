@@ -1,9 +1,5 @@
-import Blog.Views
+import Blog.Routes
 import Web.Framework
 
-views = [ empty                       //-> mainIndex
-        , "debug/" <+/> stringParam   //-> debug
-        ]
-
 main :: IO ()
-main = dispatchCGI views defaultDispatchOptions
+main = dispatchCGI routes defaultDispatchOptions

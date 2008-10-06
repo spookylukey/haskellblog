@@ -91,16 +91,26 @@ testRouteToNotAllMatched = ((fixedString "po" `routeTo` alwaysSucceedView1 $ req
                             >>= return . isNothing)
                            ~? "routeTo does not route to a view if the match does not exhaust the path"
 
+
+indexRoute                = empty
+postsRoute                = "posts/" <+/> empty
+intParamRoute             = intParam
+stringParamRoute          = stringParam
+intParamTestRoute         = intParam </+> "test/"
+testIntParamRoute         = "test/" <+/> intParam
+intStringParamRoute       = intParam </> stringParam
+intStringIntParamRoute    = intParam </> stringParam </> intParam
+
 routes = [
-           empty                                  //-> alwaysSucceedView1
-         , "posts/" <+/> empty                    //-> alwaysSucceedView2
-         , intParam                               //-> viewWithIntParam1
-         , stringParam                            //-> viewWithStringParam1
-         , intParam </+> "test/"                  //-> viewWithIntParam2
-         , "test/" <+/> intParam                  //-> viewWithIntParam2
+           indexRoute                             //-> alwaysSucceedView1
+         , postsRoute                             //-> alwaysSucceedView2
+         , intParamRoute                          //-> viewWithIntParam1
+         , stringParamRoute                       //-> viewWithStringParam1
+         , intParamTestRoute                      //-> viewWithIntParam2
+         , testIntParamRoute                      //-> viewWithIntParam2
          -- NB line below has to come after 'intParam </+> "test/"' line
-         , intParam </> stringParam               //-> viewWithIntAndStringParam1
-         , intParam </> stringParam </> intParam  //-> viewWithIntStringInt1
+         , intStringParamRoute                    //-> viewWithIntAndStringParam1
+         , intStringIntParamRoute                 //-> viewWithIntStringInt1
          ]
 
 testRoutes1 = (do

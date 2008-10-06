@@ -41,6 +41,12 @@ mainIndexPage = page $ PageVars
                               << thediv
                                      << "All Unkept"
                               +++
+                              thediv ! [identifier "toplinks"]
+                              << unordList [ hotlink "/" << "Home"
+                                           , hotlink "/categories/" << "Categories"
+                                           , hotlink "/about/" << "About"
+                                           ]
+                              +++
                               thediv ! [identifier "content"]
                                          << h1 << "This is the title"
                               +++ p << "This is a test")

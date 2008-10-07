@@ -16,6 +16,7 @@ import qualified Data.ByteString.Lazy.Char8 as BS
 import Data.List
 import Network.CGI.Protocol (Headers, HeaderName(HeaderName))
 import Network.CGI (ContentType(ContentType), showContentType)
+import Web.GenUtils (apply)
 
 data Response = Response {
       content :: ByteString
@@ -69,7 +70,7 @@ utf8HtmlResponse = htmlResponse "UTF-8"
 -- | Build a Response from a list of Response transformation functions
 -- and an initial Response
 buildResponse :: [Response -> Response] -> Response -> Response
-buildResponse fs rinit = foldl (flip ($)) rinit fs
+buildResponse = apply
 
 allHeaders resp =
     let statusHeader = (HeaderName "Status", show $ status resp)

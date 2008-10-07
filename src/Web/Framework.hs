@@ -28,7 +28,6 @@ import Control.Monad ((>=>))
 import Data.List (isPrefixOf)
 import Web.Response
 import Web.Request
-import Web.Utils
 import System.IO (stdout, hClose)
 import qualified Data.ByteString.Lazy.Char8 as BS
 

@@ -9,7 +9,7 @@ import Web.Request
 import Web.Response
 import Data.Maybe (isNothing, isJust)
 import Control.Monad (liftM, (>=>))
-import Web.Utils
+import Web.GenUtils (utf8)
 
 req1 = mkGetReq "/posts/"
 resp1 = buildResponse [ addContent "resp1" ] utf8HtmlResponse

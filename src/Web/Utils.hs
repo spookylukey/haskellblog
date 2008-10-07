@@ -1,16 +1,11 @@
-module Web.Utils where
+module Web.Utils ( addHtml
+                 )
 
-import Data.ByteString.Lazy.Char8 (ByteString)
-import qualified Data.ByteString.Lazy.UTF8 as UTF8
+where
+
 import Text.XHtml (renderHtml)
 import Web.Response (addContent)
-
-
-import GHC.Exts( IsString(..) )
-instance IsString ByteString where
-    fromString = UTF8.fromString
-
-utf8 = UTF8.fromString
+import Web.GenUtils (utf8)
 
 -- Utility functions
 addHtml html resp = addContent (utf8 $ renderHtml html) resp

@@ -5,7 +5,7 @@ where
 
 import Web.Request
 import Test.HUnit
-import Web.Utils
+import Web.GenUtils () -- for IsString instance
 
 testMethod = "GET" ~=? requestMethod (mkRequest [("REQUEST_METHOD","GET")] "" utf8Encoding)
 testPath = "foo/bar" ~=? pathInfo (mkRequest [("PATH_INFO", "/foo/bar")] "" utf8Encoding)

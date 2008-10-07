@@ -3,7 +3,8 @@ module Blog.Views where
 
 import Web.Request
 import Web.Response
-import Web.Utils
+import Web.Utils (addHtml)
+import Web.GenUtils (utf8)
 import Blog.Templates
 
 standardResponse html = buildResponse [

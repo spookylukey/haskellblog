@@ -2,6 +2,7 @@
 module Blog.Templates
 where
 
+import Blog.Links
 import Text.XHtml
 
 
@@ -49,8 +50,8 @@ mainIndexPage = page $ defaultPageVars
                                      << "All Unkept"
                               +++
                               thediv ! [identifier "toplinks"]
-                              << unordList [ hotlink "/" << "Home"
-                                           , hotlink "/categories/" << "Categories"
+                              << unordList [ hotlink indexLink << "Home"
+                                           , hotlink categoriesLink << "Categories"
                                            , hotlink "/about/" << "About"
                                            ]
                               +++

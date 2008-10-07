@@ -9,7 +9,7 @@ import qualified Blog.Category as C
 import qualified Blog.DB as DB
 import qualified Blog.Formats as Formats
 import qualified Blog.Post as P
-import qualified Blog.Routes as Routes
+import qualified Blog.Links as Links
 import qualified Blog.Settings as Settings
 import qualified Data.ByteString.Char8 as B
 import qualified Data.ByteString.Lazy.UTF8 as UTF8
@@ -99,9 +99,9 @@ main = handleSqlError $ do
   writeItems cn P.addPostCategory postCategories
 
   let postUrlMap = Map.fromList $ zip (map (show . P.uid) origPosts)
-                                      (map Routes.postLink newPosts)
+                                      (map Links.postLink newPosts)
   let categoryUrlMap = Map.fromList $ zip (map (show . C.uid) origCats)
-                                          (map Routes.categoryLink newCats)
+                                          (map Links.categoryLink newCats)
   createRedirectFile postUrlMap categoryUrlMap
   commit cn
   return ()

@@ -139,6 +139,17 @@ dispatchCGI views opts = do
 -- NB. The Request object trims any leading slash on the path to normalise
 -- it, and also to simplify this parsing stage, so do not attempt to match
 -- an initial leading slash.
+--
+-- Applying view decorator functions is also convenient with the following syntax:
+--
+-- > routes = [ "edit/post/" <+/> stringParam     //-> editPostView `with` [loginRequired]
+-- >          , ...
+-- >          ]
+--
+-- where the RHS of `with` takes a list of view transformation functions e.g.
+--
+-- > loginRequired :: View -> View
+
 
 -- | Match a string at the beginning of the path
 fixedString :: String -> (String, a) -> Maybe (String, a)

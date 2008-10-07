@@ -9,12 +9,14 @@ import Blog.Views
 
 indexRoute         = empty
 postRoute          = "posts/" <+/> stringParam
+postsRedirect      = "posts/" <+/> empty
 categoriesRoute    = "categories/" <+/> empty
 categoryRoute      = "categories/" <+/> stringParam
 debugRoute         = "debug/" <+/> stringParam
 
 routes = [ indexRoute        //-> mainIndex
          , postRoute         //-> postView
+         , postsRedirect     //-> postsRedirectView
          , categoriesRoute   //-> categoriesView
          , categoryRoute     //-> categoryView
          , debugRoute        //-> debug

@@ -6,6 +6,7 @@ import Web.Response
 import Web.Utils (addHtml)
 import Web.GenUtils (utf8)
 import Blog.Templates
+import Blog.Links
 
 standardResponse html = buildResponse [
                          addHtml html
@@ -21,6 +22,7 @@ debug path req = return $ Just $ buildResponse [
                  , addContent $ utf8 $ show req
                  ] utf8TextResponse
 
+postsRedirectView req = return $ Just $ redirectResponse indexLink :: IO (Maybe Response)
 
 -- TODO
 
@@ -29,3 +31,4 @@ dummyView req = return $ Just $ standardResponse ("TODO" :: String) :: IO (Maybe
 categoriesView = dummyView
 categoryView slug = dummyView
 postView slug = dummyView
+

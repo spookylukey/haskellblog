@@ -191,7 +191,6 @@ intParam (path, f) = do
       -> ((String, b) -> Maybe (String, c)) -- ^ RH matcher
       -> ((String, a) -> Maybe (String, c))
 (</>) = (>=>) -- It turns out that this does the job!
-infixl 3 </>
 
 -- | Convenience operator for combining a fixed string after a matcher
 matcher </+> str = matcher </> (fixedString str)
@@ -212,4 +211,3 @@ routeTo matcher f = \req -> let match = matcher (pathInfo req, f)
                                                            else return Nothing
 -- | Alias for 'routeTo'
 (//->) = routeTo
-infix 2 //->

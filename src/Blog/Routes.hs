@@ -12,14 +12,16 @@ import Blog.Views
 -- routes specified for the views.
 
 indexRoute         = empty
+indexLink          = Settings.root_url
 
 postRoute          = "posts/" <+/> stringParam
-makePostUrl p = Settings.root_url ++ "posts/" ++ (P.slug p) ++ "/"
+postLink p         = Settings.root_url ++ "posts/" ++ (P.slug p) ++ "/"
 
 categoriesRoute    = "categories/" <+/> empty
+categoriesLink     = Settings.root_url ++ "categories/"
 
 categoryRoute      = "categories/" <+/> stringParam
-makeCategoryUrl c = Settings.root_url ++ "categories/" ++ (C.slug c) ++ "/"
+categoryLink c     = Settings.root_url ++ "categories/" ++ (C.slug c) ++ "/"
 
 debugRoute         = "debug/" <+/> stringParam
 

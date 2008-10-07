@@ -99,9 +99,9 @@ main = handleSqlError $ do
   writeItems cn P.addPostCategory postCategories
 
   let postUrlMap = Map.fromList $ zip (map (show . P.uid) origPosts)
-                                      (map Routes.makePostUrl newPosts)
+                                      (map Routes.postLink newPosts)
   let categoryUrlMap = Map.fromList $ zip (map (show . C.uid) origCats)
-                                          (map Routes.makeCategoryUrl newCats)
+                                          (map Routes.categoryLink newCats)
   createRedirectFile postUrlMap categoryUrlMap
   commit cn
   return ()

@@ -1,19 +1,23 @@
-module Web.Response (Response,
-                     content,
-                     headers,
-                     addContent,
-                     textResponse,
-                     utf8TextResponse,
-                     htmlResponse,
-                     utf8HtmlResponse,
-                     emptyResponse,
-                     formatResponse,
-                     setStatus,
-                     buildResponse) where
+module Web.Response ( Response
+                    , content
+                    , headers
+                    , addContent
+                    , textResponse
+                    , utf8TextResponse
+                    , htmlResponse
+                    , utf8HtmlResponse
+                    , emptyResponse
+                    , redirectResponse
+                    , formatResponse
+                    , setStatus
+                    , setHeader
+                    , buildResponse
+                    , HeaderName(HeaderName)
+                    ) where
 
 import Data.ByteString.Lazy.Char8 (ByteString)
 import qualified Data.ByteString.Lazy.Char8 as BS
-import Data.List
+import Data.List (intersperse)
 import Network.CGI.Protocol (Headers, HeaderName(HeaderName))
 import Network.CGI (ContentType(ContentType), showContentType)
 import Web.GenUtils (apply)
@@ -30,7 +34,7 @@ data Response = Response {
 
 emptyResponse = Response { content = BS.empty
                          , headers = []
-                         , status = 200 
+                         , status = 200
                          }
 
 addContent :: ByteString -> Response -> Response
@@ -38,6 +42,12 @@ addContent c resp = resp { content =  BS.append (content resp) c }
 
 setStatus :: Int -> Response -> Response
 setStatus s resp = resp { status = s }
+
+setHeader :: String -> String -> Response -> Response
+setHeader h val resp = let headername = HeaderName h
+                           removed = filter ((/= headername) . fst) (headers resp)
+                           updated = removed ++ [(headername, val)]
+                       in resp { headers = updated }
 
 ---
 --- * Shortcuts for common defaults
@@ -85,3 +95,10 @@ formatResponse resp =
     unlinesCrLf ([BS.pack (n++": "++v) | (HeaderName n,v) <- allHeaders resp]
                 ++ [BS.empty, content resp])
   where unlinesCrLf = BS.concat . intersperse (BS.pack "\r\n")
+
+
+-- | Create an HTTP 302 redirect
+redirectResponse location =
+    buildResponse [ setStatus 302
+                  , setHeader "Location" location
+                  ] emptyResponse

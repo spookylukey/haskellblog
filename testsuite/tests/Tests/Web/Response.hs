@@ -7,6 +7,7 @@ import Web.Response
 import Test.HUnit
 import Data.ByteString.Lazy.Char8 (ByteString)
 import qualified Data.ByteString.Lazy.Char8 as BS
+import Data.List (sort)
 
 testAddContent1 = "“Hello”" ~=? (content $ addContent "“Hello”" $ emptyResponse)
 
@@ -34,10 +35,35 @@ testFormatResponse2 = "Content-type: text/html; charset=UTF-8\r\n\
                                           , setStatus 404
                                           ] utf8HtmlResponse)
 
+testSetHeader1 = [(HeaderName "Header1", "value 1")] ~=?
+                 (headers $ setHeader "Header1" "value 1" emptyResponse)
+
+testSetHeader2 = [(HeaderName "Header1", "value 1.1"),
+                  (HeaderName "Header2", "value 2")] ~=?
+                 (sort $ headers $ buildResponse [ setHeader "Header1" "value 1"
+                                                 , setHeader "Header2" "value 2"
+                                                 , setHeader "Header1" "value 1.1"
+                                                 ] emptyResponse)
+
+-- Replacement should be case insensitive
+testSetHeader3 = [(HeaderName "Header1", "value 1.1")] ~=?
+                 (sort $ headers $ buildResponse [ setHeader "Header1" "value 1"
+                                                 , setHeader "header1" "value 1.1"
+                                                 ] emptyResponse)
+
+testRedirectResponse = "Location: /foo/bar/\r\n\
+                        \Status: 302\r\n\
+                        \\r\n" ~=?
+                        (formatResponse $ redirectResponse "/foo/bar/")
+
 tests = test [
           testAddContent1
         , testAddContent2
         , testBuildResponse
         , testFormatResponse
         , testFormatResponse2
+        , testSetHeader1
+        , testSetHeader2
+        , testSetHeader3
+        , testRedirectResponse
         ]

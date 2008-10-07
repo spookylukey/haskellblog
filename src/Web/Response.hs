@@ -76,7 +76,7 @@ allHeaders resp =
     let statusHeader = (HeaderName "Status", show $ status resp)
     in headers resp ++ [statusHeader]
 
--- | Convert a Response into the foratm needed for HTTP
+-- | Convert a Response into the format needed for HTTP
 -- Copied from Network.CGI.Protocol, thank you Bjorn Bringert :-)
 formatResponse :: Response -> ByteString
 formatResponse resp =

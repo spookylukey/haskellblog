@@ -7,17 +7,10 @@ import Blog.Views
 
 -- These need to be manually synced with Blog.Links
 
-indexRoute         = empty
-postRoute          = "posts/" <+/> stringParam
-postsRedirect      = "posts/" <+/> empty
-categoriesRoute    = "categories/" <+/> empty
-categoryRoute      = "categories/" <+/> stringParam
-debugRoute         = "debug/" <+/> stringParam
-
-routes = [ indexRoute        //-> mainIndex
-         , postRoute         //-> postView
-         , postsRedirect     //-> postsRedirectView
-         , categoriesRoute   //-> categoriesView
-         , categoryRoute     //-> categoryView
-         , debugRoute        //-> debug
+routes = [ empty                                      //-> mainIndex
+         , "posts/" <+/> stringParam                  //-> postView
+         , "posts/" <+/> empty                        //-> postsRedirectView
+         , "categories/" <+/> empty                   //-> categoriesView
+         , "categories/" <+/> stringParam             //-> categoryView
+         , "debug/" <+/> stringParam                  //-> debug
          ]

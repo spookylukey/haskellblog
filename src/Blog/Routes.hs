@@ -6,14 +6,21 @@ import qualified Blog.Settings as Settings
 import Web.Framework
 import Blog.Views
 
--- TODO - a better way of generating this, something like Routes
-
 -- * Routes
 
+-- We have to manually ensure that the permalink functions match the
+-- routes specified for the views.
+
 indexRoute         = empty
+
 postRoute          = "posts/" <+/> stringParam
+makePostUrl p = Settings.root_url ++ "posts/" ++ (P.slug p) ++ "/"
+
 categoriesRoute    = "categories/" <+/> empty
+
 categoryRoute      = "categories/" <+/> stringParam
+makeCategoryUrl c = Settings.root_url ++ "categories/" ++ (C.slug c) ++ "/"
+
 debugRoute         = "debug/" <+/> stringParam
 
 routes = [ indexRoute        //-> mainIndex
@@ -22,12 +29,3 @@ routes = [ indexRoute        //-> mainIndex
          , categoryRoute     //-> categoryView
          , debugRoute        //-> debug
          ]
-
-
--- * URL functions
-
--- These provide handy wrappers for generating URLs from objects
-
-makePostUrl p = Settings.root_url ++ "posts/" ++ (P.slug p) ++ "/"
-makeCategoryUrl c = Settings.root_url ++ "categories/" ++ (C.slug c) ++ "/"
-

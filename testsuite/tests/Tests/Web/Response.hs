@@ -35,9 +35,11 @@ testFormatResponse2 = "Content-type: text/html; charset=UTF-8\r\n\
                                           , setStatus 404
                                           ] utf8HtmlResponse)
 
+-- insert
 testSetHeader1 = [(HeaderName "Header1", "value 1")] ~=?
                  (headers $ setHeader "Header1" "value 1" emptyResponse)
 
+-- update
 testSetHeader2 = [(HeaderName "Header1", "value 1.1"),
                   (HeaderName "Header2", "value 2")] ~=?
                  (sort $ headers $ buildResponse [ setHeader "Header1" "value 1"

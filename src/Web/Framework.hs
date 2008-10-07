@@ -144,7 +144,7 @@ dispatchCGI views opts = do
 
 -- | Match a string at the beginning of the path
 --fixedString :: String -> (String, t1, t2) -> (Maybe (String, t1), t2)
-fixedString s (parsed, u) = let newu = mkUrlFixedString s u
+fixedString s (parsed, u) = let newu = undefined -- ?? TODO
                                 parse = do
                                   (path, f) <- parsed
                                   if s `isPrefixOf` path
@@ -172,7 +172,7 @@ nextChunk path = let (start, end) = break (== '/') path
 --stringParam :: (Maybe (String, String -> a), b)
 --            -> (Maybe (String, a), String -> b)
 stringParam (parsed, u) =
-  let newu = mkUrlStrParam u
+  let newu = undefined -- ?? TODO
       parse = do
         (path, f) <- parsed
         (chunk, rest) <- nextChunk path
@@ -184,7 +184,7 @@ stringParam (parsed, u) =
 --intParam :: (Maybe (String, Int -> a), b)
 --         -> (Maybe (String, a), Int -> b)
 intParam (parsed, u) =
-  let newu = mkUrlIntParam
+  let newu = undefined -- ?? TODO
       parse = do
         (path, f) <- parsed
         (chunk, rest) <- nextChunk path
@@ -196,6 +196,7 @@ intParam (parsed, u) =
 
 
 -- | Combine two matchers
+
 (</>) :: ((Maybe(String, a), t1) -> (Maybe (String, b), t2)) -- ^ LH matcher
       -> ((Maybe(String, b), t2) -> (Maybe (String, c), t3)) -- ^ RH matcher
       -> ((Maybe(String, a), t1) -> (Maybe (String, c), t3))
@@ -225,19 +226,15 @@ routeTo matcher f = \req -> let (match, u) = matcher (Just (pathInfo req, f), un
 infix 2 //->
 
 
--- TODO: work out routeToUrl and co.
-
--- routeToUrl empty == "/"
--- routeToUrl (fixedString "x") == "/x"
--- routeToUrl stringPararm "param" == "/param/"
--- routeToUrl (fixedString "x" </> empty) == "/x"
--- routeToUrl (empty </> empty) == "/"
--- routeToUrl (fixedString "x" </> fixedString "y") == "/xy"
+-- TODO: work out routeToUrl and the 'TODO's above
+-- We can say this much:
+-- routeToUrl empty == ""
+-- routeToUrl (empty </> empty) == ""
+-- routeToUrl (fixedString "x") == "x"
+-- routeToUrl (fixedString "x" </> empty) == "x"
+-- routeToUrl (fixedString "x" </> fixedString "y") == "xy"
+-- routeToUrl stringParam == \x -> x
 -- routeToUrl ("foo" <+/> stringParam </+> "bar") == \s -> "/" ++ "foo" ++ s ++ "/" ++ "bar"
 
 -- | Retrieve a URL (or URL generating function) from a route
-routeToUrl matcher = undefined
-
-mkUrlStrParam u = undefined
-mkUrlIntParam u = undefined
-mkUrlFixedString s u = undefined
+routeToUrl matcher = undefined -- ?? TODO

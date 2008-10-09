@@ -43,6 +43,7 @@ Executable blog.cgi
         regex-pcre,
         regex-base,
         xhtml,
+        network,
         cgi
   Main-is: BlogCgi.hs
   hs-source-dirs: src

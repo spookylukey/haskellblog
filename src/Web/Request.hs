@@ -6,7 +6,10 @@ module Web.Request (
                    , Request
                    , RequestOptions(..)
                     -- ** Components of Request
-                   , requestMethod, pathInfo, environment
+                   , requestMethod
+                   , pathInfo
+                   , requestUriRaw
+                   , environment
                     -- ** Constructors for Request
                    , mkRequest, buildCGIRequest
                    )
@@ -72,20 +75,28 @@ mkRequest env body enc
 requestMethod :: Request -> String
 requestMethod request = fromJust $ Map.lookup "REQUEST_METHOD" $ environment request
 
--- | Returns the path info of the request, with leading forward slash removed.
+-- | Returns the path info of the request, with any leading forward slash removed,
+-- and percent encoded chars interpreted according to the encoding.
 pathInfo request = let pi = Map.lookup "PATH_INFO" $ environment request
                        -- Normalise to having no leading slash
                        adjusted = case pi of
                                     Nothing -> ""
                                     Just ('/':rest) -> rest
                                     Just path -> path
-                       -- PATH_INFO contains Haskell strings, but they
-                       -- may contain uninterpreted byte sequences
-                       -- instead of Unicode chars.  We re-pack as
-                       -- bytes (BS.pack discards anything > \255),
-                       -- and then re-interpret.
-                       bytes = BS.pack adjusted
-                   in (decoder $ requestEncoding request) bytes
+                   in repack adjusted (requestEncoding request)
+
+-- | Repacks bytes in a string according to an encoding
+--
+-- PATH_INFO and other vars contains Haskell strings, but they
+-- contain uninterpreted byte sequences instead of Unicode chars.  We
+-- re-pack as bytes (BS.pack discards anything > \255), and then
+-- re-interpret.
+repack str encoding = let bytes = BS.pack str
+                      in (decoder encoding) bytes
+
+-- | Returns the URI requested by the client, with percent encoding intact
+requestUriRaw :: Request -> Maybe String
+requestUriRaw request = Map.lookup "REQUEST_URI" $ environment request
 
 
 -- | Creates a Request object according to the CGI protocol

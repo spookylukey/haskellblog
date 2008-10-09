@@ -12,6 +12,9 @@ module Web.Request (
                    , environment
                     -- ** Constructors for Request
                    , mkRequest, buildCGIRequest
+                   -- * Escaping
+                   , escapePath
+                   , escapePathWithEnc
                    )
 
 where
@@ -21,6 +24,7 @@ import Data.ByteString.Lazy.Char8 (ByteString)
 import qualified Data.ByteString.Lazy.Char8 as BS
 import qualified Data.ByteString.Lazy.UTF8 as UTF8
 import Data.Maybe
+import Network.URI (escapeURIString, isUnescapedInURI)
 import System.Environment (getEnvironment)
 import System.IO (stdin)
 
@@ -31,6 +35,8 @@ data Encoding = Encoding {
     -- ^ descriptive name of the encoding
     , decoder :: ByteString -> String
     -- ^ convert ByteString to unicode string
+    , encoder :: String -> ByteString
+    -- ^ convert unicode string to ByteString
     }
 
 instance Eq Encoding where
@@ -44,6 +50,7 @@ instance Show Encoding where
 utf8Encoding = Encoding {
                  name = "UTF8"
                , decoder = UTF8.toString
+               , encoder = UTF8.fromString
                }
 
 
@@ -106,4 +113,16 @@ buildCGIRequest opts = do
   env <- getEnvironment
   body <- BS.hGetContents stdin
   return $ mkRequest env body (encoding opts)
+
+
+-- | Escapes a string of bytes with percent encoding
+escapePath :: ByteString -> String
+-- Borrowed from Network.URI
+escapePath bs = escapeURIString isUnescapedInURIPath $ BS.unpack bs
+  where isUnescapedInURIPath c = isUnescapedInURI c && c `notElem` "?#"
+
+-- | Escapes a unicode string with percent encoding, using the supplied
+-- bytestring/string Encoder
+escapePathWithEnc :: String -> Encoding -> String
+escapePathWithEnc s enc = escapePath (encoder enc $ s)
 

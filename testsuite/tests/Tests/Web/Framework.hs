@@ -3,6 +3,7 @@ module Tests.Web.Framework
 
 where
 
+import qualified Data.ByteString.Lazy.Char8 as BS
 import Test.HUnit
 import Web.Framework
 import Web.Request
@@ -15,8 +16,10 @@ req1 = mkGetReq "/posts/"
 resp1 = buildResponse [ addContent "resp1" ] utf8HtmlResponse
 resp2 = buildResponse [ addContent "resp2" ] utf8HtmlResponse
 
-mkGetReq path = mkRequest [("REQUEST_METHOD","GET"),
-                           ("PATH_INFO", path)] "" utf8Encoding
+mkGetReq path = mkRequest [("REQUEST_METHOD","GET")
+                          ,("PATH_INFO", path)
+                          ,("REQUEST_URI", escapePathWithEnc path utf8Encoding)
+                          ] "" utf8Encoding
 
 alwaysFailView = const (return Nothing)
 alwaysSucceedView1 = const (return $ Just resp1)

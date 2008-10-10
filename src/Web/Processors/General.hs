@@ -1,4 +1,4 @@
-module Web.Framework.Processors
+module Web.Processors.General
     ( addSlashRedirectProcessor
     )
 

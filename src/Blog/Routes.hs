@@ -3,7 +3,7 @@ module Blog.Routes where
 import Blog.Views
 import Blog.Processors
 import Web.Framework
-import Web.Framework.Processors (addSlashRedirectProcessor)
+import Web.Processors.General (addSlashRedirectProcessor)
 import Web.GenUtils (apply)
 
 -- * Routes

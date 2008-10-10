@@ -1,10 +1,10 @@
 {-# OPTIONS_GHC -fglasgow-exts -XOverloadedStrings #-}
-module Tests.Web.Framework.Processors
+module Tests.Web.Processors.General
 
 where
 
 import Data.Maybe (fromJust)
-import Web.Framework.Processors
+import Web.Processors.General
 import Web.GenUtils ()
 import Web.Response
 import Web.Request

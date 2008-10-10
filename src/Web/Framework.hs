@@ -9,7 +9,7 @@ module Web.Framework (
                      , View
                      -- * Routing mechanism
                      -- $routing
-                     , routeTo
+                     , route
                      , (//->)
                      -- * Matchers
                      , fixedString
@@ -26,13 +26,13 @@ where
 
 import Control.Monad ((>=>))
 import Data.List (isPrefixOf)
+import Web.GenUtils (apply)
 import Web.Response
 import Web.Request
 import System.IO (stdout, hClose)
 import qualified Data.ByteString.Lazy.Char8 as BS
 
 -- * Dispatching
-
 
 data DispatchOptions = DispatchOptions {
       notFoundHandler :: Request -> IO Response
@@ -58,7 +58,6 @@ defaultDispatchOptions = DispatchOptions {
                            notFoundHandler = const $ return $ default404
                          , requestOptions = defaultRequestOptions
                          }
-
 
 -- Dispatching
 
@@ -95,14 +94,14 @@ dispatchCGI views opts = do
 -- The routing mechanism has been designed so that you can write code like the following:
 --
 -- > routes = [
--- >            empty                                  //-> indexView
--- >          , "posts/" <+/> empty                    //-> postsView
--- >          , intParam                               //-> viewWithIntParam
--- >          , stringParam                            //-> viewWithStringParam
--- >          , intParam </+> "test/"                  //-> viewWithIntParam
--- >          , "test/" <+/> intParam                  //-> viewWithIntParam
--- >          , intParam </> stringParam               //-> viewWithIntAndStringParam
--- >          , intParam </> stringParam </> intParam  //-> viewWithIntStringInt
+-- >            empty                                  //-> indexView                 $ decs
+-- >          , "posts/" <+/> empty                    //-> postsView                 $ []
+-- >          , intParam                               //-> viewWithIntParam          $ []
+-- >          , stringParam                            //-> viewWithStringParam       $ []
+-- >          , intParam </+> "test/"                  //-> viewWithIntParam          $ []
+-- >          , "test/" <+/> intParam                  //-> viewWithIntParam          $ []
+-- >          , intParam </> stringParam               //-> viewWithIntAndStringParam $ []
+-- >          , intParam </> stringParam </> intParam  //-> viewWithIntStringInt      $ []
 -- >          ]
 --
 -- where:
@@ -112,6 +111,7 @@ dispatchCGI views opts = do
 -- >  viewWithIntParam :: Int -> Request -> IO (Maybe Response)
 -- >  viewWithIntAndStringParam :: Int -> String -> Request -> IO (Maybe Response)
 -- >  viewWithIntStringInt :: Int -> String -> Int -> Request -> IO (Maybe Response)
+-- >  decs :: [View -> View]
 --
 -- The right hand argument of //-> is a 'view like' function, of type
 -- View OR a -> View OR a -> b -> View etc,
@@ -133,22 +133,18 @@ dispatchCGI views opts = do
 --
 -- > fixedString "thestring/"
 --
+-- The result of the //-> operator needs to be passed a list of \'view
+-- decorator\' functions, (which may be an empty list) e.g. \'decs\'
+-- above.  These decorators take a View and return a View, or
+-- alternatively they take a View and a Request and return an IO
+-- (Maybe Response).  These means they can be used to do
+-- pre-processing of the request, and post-processing of the response.
+--
 -- The routing mechanism is extensible -- just define your own matchers.
 --
 -- NB. The Request object trims any leading slash on the path to normalise
 -- it, and also to simplify this parsing stage, so do not attempt to match
 -- an initial leading slash.
---
--- Applying view decorator functions is also convenient with the following syntax:
---
--- > routes = [ "edit/post/" <+/> stringParam     //-> editPostView `with` [loginRequired]
--- >          , ...
--- >          ]
---
--- where the RHS of `with` takes a list of view transformation functions e.g.
---
--- > loginRequired :: View -> View
-
 
 -- | Match a string at the beginning of the path
 fixedString :: String -> (String, a) -> Maybe (String, a)
@@ -199,14 +195,16 @@ str <+/> matcher = (fixedString str) </> matcher
 -- | Apply a matcher to a View (or View-like function that takes
 -- additional parameters) to get a View that only responds to the
 -- matched URLs
-routeTo :: ((String, a) -> Maybe (String, View))
-        -> a
-        -> View
-routeTo matcher f = \req -> let match = matcher (pathInfo req, f)
-                            in case match of
-                                 Nothing -> return Nothing
-                                 Just (remainder, view) -> if null remainder
-                                                           then view req
-                                                           else return Nothing
--- | Alias for 'routeTo'
-(//->) = routeTo
+route :: ((String, a) -> Maybe (String, View)) -- ^ matcher
+      -> a                                     -- ^ view-like function
+      -> [View -> View]                        -- ^ optional view decorators (processors)
+      -> View
+route matcher f decs =
+    \req -> let match = matcher (pathInfo req, f)
+            in case match of
+                 Nothing -> return Nothing
+                 Just (remainder, view) -> if null remainder
+                                           then (apply decs view) req
+                                           else return Nothing
+-- | Alias for 'route'
+(//->) = route

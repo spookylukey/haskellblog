@@ -78,32 +78,32 @@ testDispatchRequest3 = (do
                          return $ (resp == (Just resp1) && resp /= (Just resp2)))
                        ~? "Dispatch should return first that succeeds"
 
-testFixedStringSucceed = ((fixedString "posts/" `routeTo` alwaysSucceedView1 $ req1)
+testFixedStringSucceed = ((route (fixedString "posts/") alwaysSucceedView1 [] $ req1)
                           >>= return . (== (Just resp1)))
                          ~? "fixedString should leave view as is if the path matches completely"
 
-testFixedStringFail = ((fixedString "bar/" `routeTo` alwaysSucceedView1 $ req1)
+testFixedStringFail = ((route (fixedString "bar/") alwaysSucceedView1 [] $ req1)
                           >>= return . isNothing)
                          ~? "fixedString should return Nothing if the path does not match"
 
-testRouteToAnyPath = ((anyPath `routeTo` alwaysSucceedView1 $ req1)
+testRouteToAnyPath = ((route anyPath alwaysSucceedView1 [] $ req1)
                       >>= return . (== Just resp1))
                      ~? "routeTo leaves a view alone if matcher always succeeds"
 
-testRouteToNotAllMatched = ((fixedString "po" `routeTo` alwaysSucceedView1 $ req1)
+testRouteToNotAllMatched = ((route (fixedString "po") alwaysSucceedView1 [] $ req1)
                             >>= return . isNothing)
                            ~? "routeTo does not route to a view if the match does not exhaust the path"
 
 routes = [
-           empty                                  //-> alwaysSucceedView1
-         , "posts/" <+/> empty                    //-> alwaysSucceedView2
-         , intParam                               //-> viewWithIntParam1
-         , stringParam                            //-> viewWithStringParam1
-         , intParam </+> "test/"                  //-> viewWithIntParam2
-         , "test/" <+/> intParam                  //-> viewWithIntParam2
+           empty                                  //-> alwaysSucceedView1         $ []
+         , "posts/" <+/> empty                    //-> alwaysSucceedView2         $ []
+         , intParam                               //-> viewWithIntParam1          $ []
+         , stringParam                            //-> viewWithStringParam1       $ []
+         , intParam </+> "test/"                  //-> viewWithIntParam2          $ []
+         , "test/" <+/> intParam                  //-> viewWithIntParam2          $ []
          -- NB line below has to come after 'intParam </+> "test/"' line
-         , intParam </> stringParam               //-> viewWithIntAndStringParam1
-         , intParam </> stringParam </> intParam  //-> viewWithIntStringInt1
+         , intParam </> stringParam               //-> viewWithIntAndStringParam1 $ []
+         , intParam </> stringParam </> intParam  //-> viewWithIntStringInt1      $ []
          ]
 
 testRoutes1 = (do

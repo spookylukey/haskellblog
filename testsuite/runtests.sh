@@ -1,2 +1,3 @@
 #!/bin/sh
-runhaskell -i`pwd`/tests:`pwd`/../src tests/Main.hs
+DIR=`dirname $0`
+runhaskell -i$DIR/tests:$DIR/../src $DIR/tests/Main.hs

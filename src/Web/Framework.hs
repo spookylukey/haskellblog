@@ -86,6 +86,7 @@ dispatchCGI views opts = do
             Nothing -> notFoundHandler opts $ req
             Just x -> return x
   BS.hPut stdout (formatResponse resp)
+  hClose stdout
 
 -- Routing
 

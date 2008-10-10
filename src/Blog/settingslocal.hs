@@ -2,6 +2,7 @@ module Blog.Settings where
 
 sqlite_path = "/home/luke/httpd/lukeplant.me.uk/web/cgi-bin/data/test1.db"
 root_url = "/testblog/"
+prog_uri = "/cgi-bin/blog.cgi" -- Used for redirecting
 
 -- Testing
 testdb_sqlite_path = "/home/luke/devel/haskell/haskellblog/testsuite/test.db"

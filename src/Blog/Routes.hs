@@ -1,6 +1,7 @@
 module Blog.Routes where
 
 import Blog.Views
+import Blog.Processors
 import Web.Framework
 import Web.Framework.Processors (addSlashRedirectProcessor)
 import Web.GenUtils (apply)
@@ -21,6 +22,8 @@ views' = [ empty                                      //-> mainIndex            
 -- even if the matcher will not succeed, so this should only be done
 -- for processors which either require this behaviour, or are low
 -- enough overhead to be done anyway.
-procs = [addSlashRedirectProcessor]
+procs = [ addSlashRedirectProcessor
+        , canonicalUri
+        ]
 
 views = map (apply procs) views'

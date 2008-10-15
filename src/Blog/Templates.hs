@@ -39,23 +39,25 @@ page vars =
     +++
     body
     << thediv ! [identifier "container"]
-           << pcontent vars
+           << ((thediv ! [identifier "maintitle"]
+                << thediv
+                       << "All Unkept")
+               +++
+               (thediv ! [identifier "toplinks"]
+                           << unordList [ HotLink indexLink (toHtml "Home") [theclass "first"]
+                                        , hotlink categoriesLink << "Categories"
+                                        , hotlink "/about/" << "About"
+                                        ])
+               +++
+               (thediv ! [identifier "content"]
+                           << pcontent vars)
+              )
 
 
 -- Page specific templates
 
 mainIndexPage = page $ defaultPageVars
-                { pcontent = (thediv ! [identifier "maintitle"]
-                              << thediv
-                                     << "All Unkept"
-                              +++
-                              thediv ! [identifier "toplinks"]
-                              << unordList [ hotlink indexLink << "Home"
-                                           , hotlink categoriesLink << "Categories"
-                                           , hotlink "/about/" << "About"
-                                           ]
-                              +++
-                              thediv ! [identifier "content"]
-                                         << h1 << "This is the title"
-                              +++ p << "This is a test")
+                { pcontent = h1 << "This is the title"
+                             +++
+                             p << "This is a test"
                 }

@@ -15,27 +15,27 @@ data PageVars t1 t2 = {- (HTML t1, HTML t2) => -} PageVars
     , pcontent :: t2
     }
 
-defaultPageVars = PageVars { ptitle = "All Unkept"
+defaultPageVars = PageVars { ptitle = ""
                            , pcontent = ""
                            }
 
 -- Complete page template
 page vars =
-    header
-    << (meta ! [httpequiv "Content-Type",
-                content "text/html; charset=utf-8"]
-        +++ thelink ! [rel "alternate",
-                       thetype "application/rss+xml",
-                       title "RSS",
-                       href "/TODO"] << ""
-        +++ thelink ! [rel "StyleSheet",
-                       href "/newblog.css",
-                       thetype "text/css"] << ""
-        +++ thelink ! [rel "shortcut icon",
-                       href "/favicon.ico",
-                       thetype "image/x-icon"] << ""
-        +++ (thetitle << ptitle vars)
-       )
+    (header
+     << (meta ! [httpequiv "Content-Type",
+                 content "text/html; charset=utf-8"]
+         +++ thelink ! [rel "alternate",
+                        thetype "application/rss+xml",
+                        title "RSS",
+                        href "/TODO"] << ""
+         +++ thelink ! [rel "StyleSheet",
+                        href "/newblog.css",
+                        thetype "text/css"] << ""
+         +++ thelink ! [rel "shortcut icon",
+                        href "/favicon.ico",
+                        thetype "image/x-icon"] << ""
+         +++ thetitle << fulltitle
+        ))
     +++
     body
     << thediv ! [identifier "container"]
@@ -52,6 +52,10 @@ page vars =
                (thediv ! [identifier "content"]
                            << pcontent vars)
               )
+    where fulltitle = let pt = ptitle vars
+                      in if null pt
+                         then "All Unkept"
+                         else pt ++ " « All Unkept"
 
 
 -- Page specific templates
@@ -60,4 +64,12 @@ mainIndexPage = page $ defaultPageVars
                 { pcontent = h1 << "This is the title"
                              +++
                              p << "This is a test"
+                , ptitle = "This is the title"
                 }
+
+categoriesPage = page $ defaultPageVars
+                 { pcontent = h1 << "Categories"
+                              +++
+                              p << "TODO"
+                 , ptitle = "Categories"
+                 }

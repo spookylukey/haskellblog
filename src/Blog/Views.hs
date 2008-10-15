@@ -28,7 +28,7 @@ postsRedirectView req = return $ Just $ redirectResponse indexLink :: IO (Maybe 
 
 dummyView req = return $ Just $ standardResponse ("TODO" :: String) :: IO (Maybe Response)
 
-categoriesView = dummyView
+categoriesView req = return $ Just $ standardResponse categoriesPage :: IO (Maybe Response)
 categoryView slug = dummyView
 postView slug = dummyView
 

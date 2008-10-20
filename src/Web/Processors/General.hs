@@ -1,5 +1,5 @@
 module Web.Processors.General
-    ( addSlashRedirectProcessor
+    ( addSlashRedirectView
     )
 
 where
@@ -21,7 +21,7 @@ import Web.Response
 --  These are straightforward view functions which happen to work as a
 --  kind of pre-handler.  They are installed using routes, usually
 --  before all the others.  These usually do redirects, for example
---  addSlashRedirectProcessor
+--  addSlashRedirectView
 
 -- ** Response processors
 
@@ -36,11 +36,11 @@ import Web.Response
 -- TODO
 -- need to include query string, and think about how to handle
 -- POSTs etc
-addSlashRedirectProcessor view req =
+addSlashRedirectView :: Request -> IO (Maybe Response)
+addSlashRedirectView req =
     let uri = requestUriRaw req
-    in case uri of
-        Nothing -> view req -- Can't do a redirect if we don't know original URI
-        Just "" -> view req -- Don't redirect if empty
-        Just x ->  if not ("/" `isSuffixOf` x)
-                   then return $ Just $ redirectResponse (x ++ "/")
-                   else view req
+    in return $ case uri of
+                  Nothing ->  Nothing -- Can't do a redirect if we don't know original URI
+                  Just "" ->  Nothing -- Don't redirect if empty
+                  Just x | ("/" `isSuffixOf` x) -> Nothing -- slash is already there
+                  Just x  ->  Just $ redirectResponse (x ++ "/")

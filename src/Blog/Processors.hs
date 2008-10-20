@@ -8,11 +8,12 @@ import Web.Response
 import qualified Blog.Settings as Settings
 
 
-canonicalUri view req =
+canonicalUri :: Request -> IO (Maybe Response)
+canonicalUri req =
     let uri' = requestUriRaw req
-    in case uri' of
-         Nothing -> view req
-         Just uri -> if Settings.prog_uri `isPrefixOf` uri
+    in return $ case uri' of
+                  Nothing -> Nothing
+                  Just uri -> if Settings.prog_uri `isPrefixOf` uri
                      then let canonUri = Settings.root_url ++ drop (length Settings.prog_uri + length "/") uri
-                          in return $ Just $ redirectResponse canonUri
-                     else view req
+                          in Just $ redirectResponse canonUri
+                     else Nothing

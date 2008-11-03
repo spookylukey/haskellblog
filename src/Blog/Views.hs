@@ -1,10 +1,10 @@
 {-# OPTIONS_GHC -fglasgow-exts -XOverloadedStrings #-}
 module Blog.Views where
 
-import Web.Request
-import Web.Response
-import Web.Utils (addHtml)
-import Web.GenUtils (utf8)
+import Ella.Request
+import Ella.Response
+import Ella.Utils (addHtml)
+import Ella.GenUtils (utf8)
 import Blog.Templates
 import Blog.Links
 

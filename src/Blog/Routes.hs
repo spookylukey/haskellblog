@@ -2,9 +2,9 @@ module Blog.Routes where
 
 import Blog.Views
 import Blog.Processors
-import Web.Framework
-import Web.Processors.General (addSlashRedirectView)
-import Web.GenUtils (apply)
+import Ella.Framework
+import Ella.Processors.General (addSlashRedirectView)
+import Ella.GenUtils (apply)
 
 -- * Routes
 

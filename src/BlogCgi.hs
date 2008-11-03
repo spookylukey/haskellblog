@@ -1,5 +1,5 @@
 import Blog.Routes
-import Web.Framework
+import Ella.Framework
 
 main :: IO ()
 main = dispatchCGI views defaultDispatchOptions

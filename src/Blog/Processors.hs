@@ -3,8 +3,8 @@ module Blog.Processors
     ) where
 
 import Data.List (isPrefixOf)
-import Web.Request
-import Web.Response
+import Ella.Request
+import Ella.Response
 import qualified Blog.Settings as Settings
 
 

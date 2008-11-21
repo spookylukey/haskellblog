@@ -10,40 +10,40 @@ Build-Type:     Simple
 
 Executable migrate
   Build-Depends:
-        base,
-        haskell98,
-        HDBC-sqlite3,
-        HDBC,
+        base == 3.*,
+        haskell98 >= 1.0.1,
+        HDBC-sqlite3 >= 1.1.4,
+        HDBC >= 1.1.5,
         containers,
         utf8-string,
         regex-pcre,
-        template,
+        template >= 0.1.1.1,
         regex-base,
-        bytestring
+        bytestring >= 0.9.1
   Main-is: Migrate.hs
   hs-source-dirs: src
 
 Executable installdb
   Build-Depends:
-        base,
-        haskell98,
-        HDBC-sqlite3,
-        HDBC
+        base == 3.*,
+        haskell98 >= 1.0.1,
+        HDBC-sqlite3 >= 1.1.4,
+        HDBC >= 1.1.5
   Main-is: Installdb.hs
   hs-source-dirs: src
 
 Executable blog.cgi
   Build-Depends:
-        base,
-        haskell98,
-        HDBC-sqlite3,
-        HDBC,
+        base == 3.*,
+        haskell98 >= 1.0.1,
+        HDBC-sqlite3 >= 1.1.4,
+        HDBC >= 1.1.5,
         containers,
         utf8-string,
         regex-pcre,
         regex-base,
         xhtml,
-        bytestring,
-        ella
+        bytestring >= 0.9.1,
+        ella >= 0.1.1
   Main-is: BlogCgi.hs
   hs-source-dirs: src

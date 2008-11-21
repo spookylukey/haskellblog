@@ -5,7 +5,7 @@ root_url = "/testblog/"
 prog_uri = "/cgi-bin/blog.cgi" -- Used for redirecting
 
 -- Testing
-testdb_sqlite_path = "/home/luke/devel/haskell/haskellblog/testsuite/test.db"
+testdb_sqlite_path = "/home/luke/devel/haskell/blog/testsuite/test.db"
 
 -- Migration time settings:
 

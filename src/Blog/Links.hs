@@ -8,7 +8,7 @@ import qualified Blog.Settings as Settings
 -- live in the same module due to an import cycle when the link
 -- functions are used in the templates and views.
 
-indexLink          = Settings.root_url
-postLink p         = Settings.root_url ++ "posts/" ++ (P.slug p) ++ "/"
-categoriesLink     = Settings.root_url ++ "categories/"
-categoryLink c     = Settings.root_url ++ "categories/" ++ (C.slug c) ++ "/"
+indexUrl          = Settings.root_url
+postUrl p         = Settings.root_url ++ "posts/" ++ (P.slug p) ++ "/"
+categoriesUrl     = Settings.root_url ++ "categories/"
+categoryUrl c     = Settings.root_url ++ "categories/" ++ (C.slug c) ++ "/"

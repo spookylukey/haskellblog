@@ -9,7 +9,7 @@ import Ella.GenUtils (utf8)
 import Blog.Templates
 import Blog.Links
 import Blog.DB (connect)
-import Blog.Post (getPostBySlug)
+import Blog.Post (getPostBySlug, getCategoriesForPost)
 
 standardResponse html = buildResponse [
                          addHtml html
@@ -25,7 +25,7 @@ debug path req = return $ Just $ buildResponse [
                  , addContent $ utf8 $ show req
                  ] utf8TextResponse
 
-postsRedirectView req = return $ Just $ redirectResponse indexLink :: IO (Maybe Response)
+postsRedirectView req = return $ Just $ redirectResponse indexUrl :: IO (Maybe Response)
 
 -- TODO
 
@@ -39,4 +39,6 @@ postView slug req = do
   mp <- getPostBySlug cn slug
   case mp of
     Nothing -> return $ Just $ default404 -- preferred to 'Nothing'
-    Just post -> return $ Just $ standardResponse $ postPage post
+    Just post -> do
+            cats <- getCategoriesForPost cn post
+            return $ Just $ standardResponse $ postPage post cats

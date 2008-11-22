@@ -20,3 +20,9 @@ addCategory cn c =  do theslug <- makeCategorySlug cn c
                        return c2 { uid = fromSql $ newid }
 
 makeCategorySlug cn cat = makeSlugGeneric cn (name cat) "categories"
+
+makeCategory row =
+    Category { uid = fromSql (row !! 0)
+             , name = fromSql (row !! 1)
+             , slug = fromSql (row !! 2)
+             }

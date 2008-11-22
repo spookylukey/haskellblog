@@ -3,10 +3,13 @@ module Blog.Templates
 where
 
 import Blog.Links
+import Data.List (intersperse)
 import Text.XHtml
 import qualified Blog.Post as P
 import qualified Blog.Category as C
-
+import System.Locale (defaultTimeLocale)
+import System.Time.Utils (epochToClockTime)
+import System.Time (toUTCTime, formatCalendarTime)
 
 -- | Holds variables for the 'page' template
 --
@@ -46,13 +49,14 @@ page vars =
                        << "All Unkept")
                +++
                (thediv ! [identifier "toplinks"]
-                           << unordList [ HotLink indexLink (toHtml "Home") [theclass "first"]
-                                        , hotlink categoriesLink << "Categories"
+                           << unordList [ HotLink indexUrl (toHtml "Home") [theclass "first"]
+                                        , hotlink categoriesUrl << "Categories"
                                         , hotlink "/about/" << "About"
                                         ])
                +++
                (thediv ! [identifier "content"]
-                           << pcontent vars)
+                << (thediv ! [identifier "contentinner"]
+                           << pcontent vars))
               )
     where fulltitle = let pt = ptitle vars
                       in if null pt
@@ -76,16 +80,32 @@ categoriesPage = page $ defaultPageVars
                  , ptitle = "Categories"
                  }
 
-postPage post =
+postPage post categories =
     page $ defaultPageVars
-             { pcontent = formatPost post
+             { pcontent = formatPost post categories
              , ptitle = P.title post
              }
 
-formatPost post =
+
+
+formatPost post categories =
     (h1 << P.title post
+     +++
+     (thediv ! [theclass "timestamp"]
+      << ("Posted: "
+          ++
+          (showDate $ P.timestamp post)))
+     +++
+     (thediv ! [theclass "postcategories"]
+      << ((toHtml "Categories: ")
+          +++
+          (intersperse (toHtml ", ") $ map toHtml $ map categoryLink categories)))
      +++
      (thediv ! [theclass "post"]
       << (primHtml $ P.post_formatted post)
      )
     )
+
+categoryLink c = hotlink (categoryUrl c) << (C.name c)
+
+showDate timestamp = formatCalendarTime defaultTimeLocale  "%Y-%m-%d" (toUTCTime $ epochToClockTime timestamp)

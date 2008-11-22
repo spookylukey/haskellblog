@@ -3,6 +3,7 @@ module Blog.Post where
 import Database.HDBC
 import Blog.DBUtils (makeSlugGeneric)
 import qualified Blog.DB as DB
+import qualified Blog.Category as C
 
 data Post = Post {
       uid :: Int,
@@ -71,3 +72,8 @@ makePost row =
          , timestamp = fromSql (row !! 8)
          , comments_open = fromSql (row !! 9)
          }
+
+getCategoriesForPost cn post = do
+  let qry = "SELECT categories.id, categories.name, categories.slug FROM categories INNER JOIN post_categories ON categories.id = post_categories.category_id WHERE post_categories.post_id = ?;"
+  res <- quickQuery cn qry [toSql $ uid post]
+  return $ map C.makeCategory res

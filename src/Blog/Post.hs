@@ -51,3 +51,23 @@ addPostCategory cn pc = do { DB.doInsert cn "post_categories"
                              [toSql $ fst pc,
                               toSql $ snd pc];
                              return pc; }
+
+getPostBySlug cn slug = do
+  let qry = "SELECT id, title, slug, post_raw, post_formatted, summary_raw, summary_formatted, format_id, timestamp, comments_open FROM posts WHERE slug = ?;"
+  res <- quickQuery cn qry [toSql slug]
+  case res of
+    [] -> return Nothing
+    (postdata:_) -> return $ Just $ makePost postdata
+
+makePost row =
+    Post { uid = fromSql (row !! 0)
+         , title = fromSql (row !! 1)
+         , slug = fromSql (row !! 2)
+         , post_raw = fromSql (row !! 3)
+         , post_formatted = fromSql (row !! 4)
+         , summary_raw = fromSql (row !! 5)
+         , summary_formatted = fromSql (row !! 6)
+         , format_id = fromSql (row !! 7)
+         , timestamp = fromSql (row !! 8)
+         , comments_open = fromSql (row !! 9)
+         }

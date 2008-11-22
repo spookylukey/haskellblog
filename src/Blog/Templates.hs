@@ -4,6 +4,8 @@ where
 
 import Blog.Links
 import Text.XHtml
+import qualified Blog.Post as P
+import qualified Blog.Category as C
 
 
 -- | Holds variables for the 'page' template
@@ -61,10 +63,10 @@ page vars =
 -- Page specific templates
 
 mainIndexPage = page $ defaultPageVars
-                { pcontent = h1 << "This is the title"
+                { pcontent = h1 << "Recent posts"
                              +++
                              p << "This is a test"
-                , ptitle = "This is the title"
+                , ptitle = ""
                 }
 
 categoriesPage = page $ defaultPageVars
@@ -73,3 +75,17 @@ categoriesPage = page $ defaultPageVars
                               p << "TODO"
                  , ptitle = "Categories"
                  }
+
+postPage post =
+    page $ defaultPageVars
+             { pcontent = formatPost post
+             , ptitle = P.title post
+             }
+
+formatPost post =
+    (h1 << P.title post
+     +++
+     (thediv ! [theclass "post"]
+      << (primHtml $ P.post_formatted post)
+     )
+    )

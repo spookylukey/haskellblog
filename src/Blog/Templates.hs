@@ -39,20 +39,21 @@ page vars =
          +++ thelink ! [rel "shortcut icon",
                         href "/favicon.ico",
                         thetype "image/x-icon"] << ""
+         +++ primHtml "<!--[if lte IE 6]><link rel=\"stylesheet\" href=\"/newblog_IE6.css\" type=\"text/css\" /><![endif]-->"
          +++ thetitle << fulltitle
         ))
     +++
     body
     << thediv ! [identifier "container"]
-           << ((thediv ! [identifier "maintitle"]
-                << thediv
-                       << "All Unkept")
-               +++
-               (thediv ! [identifier "toplinks"]
+           << ((thediv ! [identifier "toplinks"]
                            << unordList [ HotLink indexUrl (toHtml "Home") [theclass "first"]
                                         , hotlink categoriesUrl << "Categories"
                                         , hotlink "/about/" << "About"
                                         ])
+               +++
+               (thediv ! [identifier "maintitle"]
+                << thediv
+                       << "All Unkept")
                +++
                (thediv ! [identifier "content"]
                 << (thediv ! [identifier "contentinner"]

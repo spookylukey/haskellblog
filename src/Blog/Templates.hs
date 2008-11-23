@@ -67,12 +67,20 @@ page vars =
 
 -- Page specific templates
 
-mainIndexPage = page $ defaultPageVars
-                { pcontent = h1 << "Recent posts"
-                             +++
-                             p << "This is a test"
-                , ptitle = ""
-                }
+mainIndexPage posts =
+    page $ defaultPageVars
+             { pcontent = h1 << "Recent posts"
+                          +++
+                          do post <- posts
+                             return (
+                                     (thediv ! [ theclass "summarylink" ]
+                                      << postLink post)
+                                     +++
+                                     (thediv ! [ theclass "summary" ]
+                                      << (primHtml $ P.summary_formatted post))
+                                    )
+             , ptitle = ""
+             }
 
 categoriesPage = page $ defaultPageVars
                  { pcontent = h1 << "Categories"
@@ -100,7 +108,7 @@ formatPost post categories =
      (thediv ! [theclass "postcategories"]
       << ((toHtml "Categories: ")
           +++
-          (intersperse (toHtml ", ") $ map toHtml $ map categoryLink categories)))
+          (intersperse (toHtml ", ") $ map categoryLink categories)))
      +++
      (thediv ! [theclass "post"]
       << (primHtml $ P.post_formatted post)
@@ -116,6 +124,9 @@ custom404page = page $ defaultPageVars { pcontent = h1 << "404 Not Found"
 
 -- Utilities
 
-categoryLink c = hotlink (categoryUrl c) << (C.name c)
+categoryLink c = toHtml $ hotlink (categoryUrl c) << (C.name c)
+
+postLink p = toHtml $ hotlink (postUrl p) << (P.title p)
+
 
 showDate timestamp = formatCalendarTime defaultTimeLocale  "%Y-%m-%d" (toUTCTime $ epochToClockTime timestamp)

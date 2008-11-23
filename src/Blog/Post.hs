@@ -53,9 +53,17 @@ addPostCategory cn pc = do { DB.doInsert cn "post_categories"
                               toSql $ snd pc];
                              return pc; }
 
+
+-- We optimise queries by removing items that are not actually used and replacing them with ''
+-- (we can then use the same 'makePost' function)
+getPostByIdQuery        = "SELECT id, title, slug, post_raw, post_formatted, summary_raw, summary_formatted, format_id, timestamp, comments_open FROM posts WHERE id = ?;"
+getPostBySlugQuery      = "SELECT id, title, slug, '',       post_formatted, '',          '',                '',        timestamp, comments_open FROM posts WHERE slug = ?;"
+getRecentPostQueries    = "SELECT id, title, slug, '',       '',             '',          summary_formatted, '',        timestamp, ''            FROM posts ORDER BY timestamp DESC LIMIT 20;"
+
+getCategoriesForPostQuery = "SELECT categories.id, categories.name, categories.slug FROM categories INNER JOIN post_categories ON categories.id = post_categories.category_id WHERE post_categories.post_id = ?;"
+
 getPostBySlug cn slug = do
-  let qry = "SELECT id, title, slug, post_raw, post_formatted, summary_raw, summary_formatted, format_id, timestamp, comments_open FROM posts WHERE slug = ?;"
-  res <- quickQuery cn qry [toSql slug]
+  res <- quickQuery cn getPostBySlugQuery [toSql slug]
   case res of
     [] -> return Nothing
     (postdata:_) -> return $ Just $ makePost postdata
@@ -73,7 +81,10 @@ makePost row =
          , comments_open = fromSql (row !! 9)
          }
 
+getRecentPosts cn = do
+  res <- quickQuery cn getRecentPostQueries []
+  return $ map makePost res
+
 getCategoriesForPost cn post = do
-  let qry = "SELECT categories.id, categories.name, categories.slug FROM categories INNER JOIN post_categories ON categories.id = post_categories.category_id WHERE post_categories.post_id = ?;"
-  res <- quickQuery cn qry [toSql $ uid post]
+  res <- quickQuery cn getCategoriesForPostQuery [toSql $ uid post]
   return $ map C.makeCategory res

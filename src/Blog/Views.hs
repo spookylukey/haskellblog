@@ -9,14 +9,17 @@ import Ella.GenUtils (utf8, with)
 import Blog.Templates
 import Blog.Links
 import Blog.DB (connect)
-import Blog.Post (getPostBySlug, getCategoriesForPost)
+import Blog.Post (getPostBySlug, getCategoriesForPost, getRecentPosts)
 
 standardResponse html = buildResponse [
                          addHtml html
                         ] utf8HtmlResponse
 
 mainIndex :: Request -> IO (Maybe Response)
-mainIndex req = return $ Just $ standardResponse mainIndexPage
+mainIndex req = do
+  cn <- connect
+  posts <- getRecentPosts cn
+  return $ Just $ standardResponse $ mainIndexPage posts
 
 debug path req = return $ Just $ buildResponse [
                   addContent "Path:\n"

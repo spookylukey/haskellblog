@@ -107,6 +107,15 @@ formatPost post categories =
      )
     )
 
+
+custom404page = page $ defaultPageVars { pcontent = h1 << "404 Not Found"
+                                                    +++
+                                                    p << "Sorry, the page you requested could not be found"
+                                       , ptitle = "404 Not Found"
+                                       }
+
+-- Utilities
+
 categoryLink c = hotlink (categoryUrl c) << (C.name c)
 
 showDate timestamp = formatCalendarTime defaultTimeLocale  "%Y-%m-%d" (toUTCTime $ epochToClockTime timestamp)

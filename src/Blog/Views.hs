@@ -5,7 +5,7 @@ import Ella.Framework (default404)
 import Ella.Request
 import Ella.Response
 import Ella.Utils (addHtml)
-import Ella.GenUtils (utf8)
+import Ella.GenUtils (utf8, with)
 import Blog.Templates
 import Blog.Links
 import Blog.DB (connect)
@@ -29,6 +29,10 @@ postsRedirectView req = return $ Just $ redirectResponse indexUrl :: IO (Maybe R
 
 -- TODO
 
+custom404 = with (standardResponse custom404page) [
+             setStatus 404
+            ]
+
 dummyView req = return $ Just $ standardResponse ("TODO" :: String) :: IO (Maybe Response)
 
 categoriesView req = return $ Just $ standardResponse categoriesPage :: IO (Maybe Response)
@@ -38,7 +42,7 @@ postView slug req = do
   cn <- connect
   mp <- getPostBySlug cn slug
   case mp of
-    Nothing -> return $ Just $ default404 -- preferred to 'Nothing'
+    Nothing -> return $ Just $ custom404 -- preferred to 'Nothing'
     Just post -> do
             cats <- getCategoriesForPost cn post
             return $ Just $ standardResponse $ postPage post cats

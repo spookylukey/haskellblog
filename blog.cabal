@@ -23,15 +23,6 @@ Executable migrate
   Main-is: Migrate.hs
   hs-source-dirs: src
 
-Executable installdb
-  Build-Depends:
-        base == 3.*,
-        haskell98 >= 1.0.1,
-        HDBC-sqlite3 >= 1.1.4,
-        HDBC >= 1.1.5
-  Main-is: Installdb.hs
-  hs-source-dirs: src
-
 Executable blog.cgi
   Build-Depends:
         base == 3.*,

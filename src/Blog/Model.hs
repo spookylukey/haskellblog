@@ -1,7 +1,7 @@
 module Blog.Model ( addPost
                   , addCategory
-                  , makePostSlug
                   , addPostCategory
+                  , addComment
                   , getPostBySlug
                   , getRecentPosts
                   , getCategoriesForPost
@@ -15,6 +15,11 @@ import qualified Blog.Category as Ct
 import qualified Blog.Comment as Cm
 
 ------ Create -------
+getDbId cn =
+    do
+      [[newid]] <- quickQuery' cn "SELECT last_insert_rowid();" []
+      return $ fromSql newid
+
 addPost cn p = do theslug <- makePostSlug cn p
                   let p2 = p { P.slug = theslug }
                   DB.doInsert cn "posts" [
@@ -38,8 +43,8 @@ addPost cn p = do theslug <- makePostSlug cn p
                          toSql $ P.timestamp p2,
                          toSql $ P.comments_open p2
                         ]
-                  [[newid]] <- quickQuery' cn "SELECT last_insert_rowid();" []
-                  return p2 { P.uid = fromSql $ newid }
+                  newid <- getDbId cn
+                  return p2 { P.uid = newid }
 
 makePostSlug cn p = makeSlugGeneric cn (P.title p) "posts"
 
@@ -50,8 +55,8 @@ addCategory cn c =  do theslug <- makeCategorySlug cn c
                               "slug"]
                              [toSql $ Ct.name c2,
                               toSql $ Ct.slug c2]
-                       [[newid]] <- quickQuery cn "SELECT last_insert_rowid();" [];
-                       return c2 { Ct.uid = fromSql $ newid }
+                       newid <- getDbId cn
+                       return c2 { Ct.uid = newid }
 
 makeCategorySlug cn cat = makeSlugGeneric cn (Ct.name cat) "categories"
 
@@ -61,6 +66,28 @@ addPostCategory cn pc = do { DB.doInsert cn "post_categories"
                              [toSql $ fst pc,
                               toSql $ snd pc];
                              return pc; }
+
+
+addComment cn cm = do
+  DB.doInsert cn "comments" [
+                    "post_id"
+                   , "timestamp"
+                   , "name"
+                   , "email"
+                   , "text_raw"
+                   , "text_formatted"
+                   , "format_id"
+                   ] [
+                    toSql $ Cm.post_id cm
+                   , toSql $ Cm.timestamp cm
+                   , toSql $ Cm.name cm
+                   , toSql $ Cm.email cm
+                   , toSql $ Cm.text_raw cm
+                   , toSql $ Cm.text_formatted cm
+                   , toSql $ Cm.format_id cm
+                   ]
+  newid <- getDbId cn
+  return cm { Cm.uid = newid }
 
 -------- Queries -----------
 

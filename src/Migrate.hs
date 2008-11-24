@@ -40,23 +40,24 @@ makeItems filename constructor = do
 
 -- Reading functions
 readCategories = makeItems "categories.txt" mkCat
-    where mkCat row = C.Category { C.uid = read (row !! 0),
-                                   C.name = row !! 1,
-                                   C.slug = ""}
+    where mkCat row = C.Category { C.uid = read (row !! 0)
+                                 , C.name = row !! 1
+                                 , C.slug = ""
+                                 }
 
 readPosts = makeItems "posts.txt" mkPost
             >>= mapM addFullText
             >>= return . sortBy (comparing P.timestamp)
-    where mkPost row = P.Post { P.uid = read (row !! 0),
-                                P.title = row !! 1,
-                                P.slug = "",
-                                P.post_raw = "",
-                                P.post_formatted = "",
-                                P.summary_raw = row !! 4,
-                                P.summary_formatted = row !! 4,
-                                P.format_id = Formats.rawhtml,
-                                P.timestamp = read (row !! 2),
-                                P.comments_open = True
+    where mkPost row = P.Post { P.uid = read (row !! 0)
+                              , P.title = row !! 1
+                              , P.slug = ""
+                              , P.post_raw = ""
+                              , P.post_formatted = ""
+                              , P.summary_raw = row !! 4
+                              , P.summary_formatted = row !! 4
+                              , P.format_id = Formats.rawhtml
+                              , P.timestamp = read (row !! 2)
+                              , P.comments_open = True
                               }
           addFullText p = do let dataFile = Settings.old_data_path ++ "posts/" ++ (show $ P.uid p)
                              f <- readFile dataFile
@@ -96,10 +97,8 @@ makePHPMap amap = "array(" ++
 
 createRedirectFile postUrlMap categoryUrlMap = do
     tpl <- readTemplate Settings.redirect_file_template
-    let ctx = Map.fromList ([(utf8 "postIdsToUrls",
-                              utf8 $ makePHPMap postUrlMap),
-                             (utf8 "categoryIdsToUrls",
-                              utf8 $ makePHPMap categoryUrlMap)])
+    let ctx = Map.fromList [(utf8 "postIdsToUrls", utf8 $ makePHPMap postUrlMap)
+                           ,(utf8 "categoryIdsToUrls", utf8 $ makePHPMap categoryUrlMap)]
     renderToFile Settings.redirect_file_output tpl ctx
 
 main = handleSqlError $ do

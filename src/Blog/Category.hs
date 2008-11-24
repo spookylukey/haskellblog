@@ -9,20 +9,3 @@ data Category = Category { uid :: Int,
                            slug :: String
                          } deriving (Show, Eq)
 
-addCategory cn c =  do theslug <- makeCategorySlug cn c
-                       let c2 = c { slug = theslug }
-                       DB.doInsert cn "categories"
-                             ["name",
-                              "slug"]
-                             [toSql $ name c2,
-                              toSql $ slug c2]
-                       [[newid]] <- quickQuery cn "SELECT last_insert_rowid();" [];
-                       return c2 { uid = fromSql $ newid }
-
-makeCategorySlug cn cat = makeSlugGeneric cn (name cat) "categories"
-
-makeCategory row =
-    Category { uid = fromSql (row !! 0)
-             , name = fromSql (row !! 1)
-             , slug = fromSql (row !! 2)
-             }

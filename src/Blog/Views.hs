@@ -9,7 +9,7 @@ import Ella.GenUtils (utf8, with)
 import Blog.Templates
 import Blog.Links
 import Blog.DB (connect)
-import Blog.Post (getPostBySlug, getCategoriesForPost, getRecentPosts)
+import Blog.Model (getPostBySlug, getCategoriesForPost, getRecentPosts)
 
 standardResponse html = buildResponse [
                          addHtml html

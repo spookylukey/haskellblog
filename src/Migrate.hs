@@ -1,3 +1,4 @@
+import Blog.Model
 import Blog.Utils (regexReplace, split)
 import Data.Maybe (fromJust)
 import Data.Ord (comparing)
@@ -88,16 +89,16 @@ createRedirectFile postUrlMap categoryUrlMap = do
 main = handleSqlError $ do
   cn <- DB.connect
   origCats <- readCategories
-  newCats <- writeItems cn C.addCategory origCats
+  newCats <- writeItems cn addCategory origCats
   origPosts <- readPosts
-  newPosts <- writeItems cn P.addPost origPosts
+  newPosts <- writeItems cn addPost origPosts
   -- we need the new/old IDs of posts/categories to rewrite comments tables
   -- and the post/categories m2m
   let post_id_map = Map.fromList $ zip (map P.uid origPosts) (map P.uid newPosts)
   let cat_id_map = Map.fromList $ zip (map C.uid origCats) (map C.uid newCats)
   postCategories' <- readPostCategories
   let postCategories = correctIds postCategories' post_id_map cat_id_map
-  writeItems cn P.addPostCategory postCategories
+  writeItems cn addPostCategory postCategories
 
   let postUrlMap = Map.fromList $ zip (map (show . P.uid) origPosts)
                                       (map Links.postUrl newPosts)

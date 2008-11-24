@@ -9,7 +9,7 @@ import Ella.GenUtils (utf8, with)
 import Blog.Templates
 import Blog.Links
 import Blog.DB (connect)
-import Blog.Model (getPostBySlug, getCategoriesForPost, getRecentPosts, getCommentsForPost)
+import Blog.Model (getPostBySlug, getCategoriesForPost, getRecentPosts, getCommentsForPost, getRelatedPosts)
 
 standardResponse html = buildResponse [
                          addHtml html
@@ -47,6 +47,7 @@ postView slug req = do
     Just post -> do
             cats <- getCategoriesForPost cn post
             comments <- getCommentsForPost cn post
-            return $ Just $ standardResponse $ postPage post cats comments
+            related <- getRelatedPosts cn post cats
+            return $ Just $ standardResponse $ postPage post cats comments related
 
 aboutView = dummyView

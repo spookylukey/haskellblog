@@ -6,6 +6,7 @@ module Blog.Model ( addPost
                   , getRecentPosts
                   , getCategoriesForPost
                   , getCommentsForPost
+                  , getRelatedPosts
                   ) where
 
 import Database.HDBC
@@ -14,6 +15,7 @@ import qualified Blog.DB as DB
 import qualified Blog.Post as P
 import qualified Blog.Category as Ct
 import qualified Blog.Comment as Cm
+import qualified Data.List as List
 
 ------ Create -------
 getDbId cn =
@@ -98,12 +100,20 @@ addComment cn cm = do
 -- (we can then use the same 'makePost' function)
 getPostByIdQuery        = "SELECT id, title, slug, post_raw, post_formatted, summary_raw, summary_formatted, format_id, timestamp, comments_open FROM posts WHERE id = ?;"
 getPostBySlugQuery      = "SELECT id, title, slug, '',       post_formatted, '',          '',                '',        timestamp, comments_open FROM posts WHERE slug = ?;"
-getRecentPostQueries    = "SELECT id, title, slug, '',       '',             '',          summary_formatted, '',        timestamp, ''            FROM posts ORDER BY timestamp DESC LIMIT 20;"
+getRecentPostsQuery     = "SELECT id, title, slug, '',       '',             '',          summary_formatted, '',        timestamp, ''            FROM posts ORDER BY timestamp DESC LIMIT 20;"
+
+
+getRelatedPostsQuery ids= "SELECT DISTINCT id, title, slug,'', '',           '',          '',                '',               '', ''            FROM posts INNER JOIN (SELECT post_id, COUNT(post_id) c from post_categories WHERE category_id IN " ++ sqlInIds ids ++ " GROUP BY post_id) as t2 ON posts.id = t2.post_id AND posts.id <> ?  ORDER BY c DESC, timestamp DESC LIMIT 6;"
 
 getCategoriesForPostQuery = "SELECT categories.id, categories.name, categories.slug FROM categories INNER JOIN post_categories ON categories.id = post_categories.category_id WHERE post_categories.post_id = ? ORDER BY categories.slug;"
 
 getCommentByIdQuery      = "SELECT id, post_id, timestamp, name, email, text_raw, text_formatted, format_id FROM comments WHERE id = ?;"
 getCommentsForPostQuery  = "SELECT id, '',      timestamp, name, email, '',       text_formatted, ''        FROM comments WHERE post_id = ? ORDER BY timestamp ASC;"
+
+
+-- SQL stuff
+sqlInIds :: [Int] -> String
+sqlInIds ids = "(" ++ (concat $ List.intersperse "," $ map show ids) ++ ")"
 
 ---- Constructors ----
 
@@ -146,7 +156,7 @@ getPostBySlug cn slug = do
     (postdata:_) -> return $ Just $ makePost postdata
 
 getRecentPosts cn = do
-  res <- quickQuery' cn getRecentPostQueries []
+  res <- quickQuery' cn getRecentPostsQuery []
   return $ map makePost res
 
 getCategoriesForPost cn post = do
@@ -156,3 +166,8 @@ getCategoriesForPost cn post = do
 getCommentsForPost cn post = do
   res <- quickQuery' cn getCommentsForPostQuery [toSql $ P.uid post]
   return $ map makeComment res
+
+getRelatedPosts cn post categories = do
+  let ids = map (Ct.uid) categories
+  res <- quickQuery' cn (getRelatedPostsQuery ids) [toSql $ P.uid post]
+  return $ map makePost res

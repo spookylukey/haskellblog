@@ -8,6 +8,7 @@ import Text.XHtml
 import qualified Blog.Post as P
 import qualified Blog.Category as C
 import qualified Blog.Comment as Cm
+import qualified Blog.Settings as Settings
 import System.Locale (defaultTimeLocale)
 import System.Time.Utils (epochToClockTime)
 import System.Time (toUTCTime, formatCalendarTime)
@@ -98,9 +99,9 @@ categoriesPage = page $ defaultPageVars
                  , ptitle = "Categories"
                  }
 
-postPage post categories comments =
+postPage post categories comments related =
     page $ defaultPageVars
-             { pcontent = formatPost post categories comments
+             { pcontent = formatPost post categories comments related
              , ptitle = P.title post
              }
 
@@ -123,13 +124,21 @@ metaInfoLine post categories divclass =
     )
 
 
-formatPost post categories comments =
+formatPost post categories comments otherposts =
     (h1 ! [theclass "posttitle"] << P.title post
      +++
      metaInfoLine post categories "metainfo"
      +++
      (thediv ! [theclass "post"]
       << (primHtml $ P.post_formatted post)
+     )
+     +++
+     (if null otherposts
+      then thediv << ""
+      else (thediv ! [theclass "related"]
+            << ((h1 << "Related:")
+                +++ (unordList $ map formatRelated otherposts))
+           )
      )
      +++
      (thediv ! [theclass "comments"]
@@ -140,14 +149,27 @@ formatPost post categories comments =
      )
     )
 
+commentclass comment = "comment" ++
+    if (Cm.name comment == Settings.blog_author_name)
+       then " author"
+       else ""
+
 formatComment comment =
-    (thediv ! [theclass "comment"] <<
-     ((thediv ! [theclass "commentby"] << formatName (Cm.name comment))
+    (thediv ! [theclass (commentclass comment)] <<
+     (
+      (thediv ! [theclass "commentby"] <<
+       (thespan << (formatName $ Cm.name comment)
+        +++
+        (thespan ! [theclass "timestamp"] << showDate (Cm.timestamp comment))
+       )
+      )
       +++
-      (thediv ! [theclass "commenttext"]
-       << (primHtml $ Cm.text_formatted comment))
+      (thediv ! [theclass "commenttext"] <<
+       (primHtml $ Cm.text_formatted comment))
      )
     )
+
+formatRelated = postLink
 
 formatName name = if null name
                   then "Anonymous Coward"
@@ -166,4 +188,4 @@ categoryLink c = toHtml $ hotlink (categoryUrl c) << (C.name c)
 postLink p = toHtml $ hotlink (postUrl p) << (P.title p)
 
 
-showDate timestamp = formatCalendarTime defaultTimeLocale  "%Y-%m-%d" (toUTCTime $ epochToClockTime timestamp)
+showDate timestamp = formatCalendarTime defaultTimeLocale  "%Y-%m-%d %H:%M" (toUTCTime $ epochToClockTime timestamp)

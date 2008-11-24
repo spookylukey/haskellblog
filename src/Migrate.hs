@@ -47,6 +47,7 @@ readCategories = makeItems "categories.txt" mkCat
 
 readPosts = makeItems "posts.txt" mkPost
             >>= mapM addFullText
+            >>= mapM (return . fixEmptyFullTexts)
             >>= return . sortBy (comparing P.timestamp)
     where mkPost row = P.Post { P.uid = read (row !! 0)
                               , P.title = row !! 1
@@ -64,6 +65,11 @@ readPosts = makeItems "posts.txt" mkPost
                              let fixed = fixCodes f
                              return p { P.post_raw = fixed,
                                         P.post_formatted = fixed }
+          fixEmptyFullTexts p = if null $ P.post_raw p
+                                then p { P.post_raw = P.summary_raw p
+                                       , P.post_formatted = P.summary_formatted p
+                                       }
+                                else p
           -- Fix dodgy stuff, and reinterpret as UTF8
           fixCodes txt = UTF8.toString $ regexReplace (BL.pack "&#10;") (BL.pack "\n") (BL.pack txt)
 

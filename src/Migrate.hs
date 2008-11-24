@@ -11,7 +11,6 @@ import qualified Blog.Formats as Formats
 import qualified Blog.Post as P
 import qualified Blog.Links as Links
 import qualified Blog.Settings as Settings
-import qualified Data.ByteString.Char8 as BS
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.ByteString.Lazy.UTF8 as UTF8
 import qualified Data.Map as Map
@@ -61,7 +60,7 @@ readPosts = makeItems "posts.txt" mkPost
                              return p { P.post_raw = fixed,
                                         P.post_formatted = fixed }
           -- Fix dodgy stuff, and reinterpret as UTF8
-          fixCodes txt = UTF8.toString $ BL.pack $ BS.unpack $ regexReplace (BS.pack "&#10;") (BS.pack "\n") (BS.pack txt)
+          fixCodes txt = UTF8.toString $ regexReplace (BL.pack "&#10;") (BL.pack "\n") (BL.pack txt)
 
 readPostCategories = makeItems "postcategories.txt" mkPostCategory
     where mkPostCategory row = (read (row !! 0),

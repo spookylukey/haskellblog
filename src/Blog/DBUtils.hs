@@ -3,11 +3,11 @@ module Blog.DBUtils where
 import Blog.Utils (regexReplace)
 import Database.HDBC
 import GHC.Unicode (toLower)
-import qualified Data.ByteString.Char8 as B
+import qualified Data.ByteString.Lazy.Char8 as BL
 
-slugFromTitle title = map toLower $ B.unpack $
-                      regexReplace (B.pack "-+$") (B.pack "") $
-                      regexReplace (B.pack "[^A-Za-z0-9]+") (B.pack "-") (B.pack title)
+slugFromTitle title = map toLower $ BL.unpack $
+                      regexReplace (BL.pack "-+$") (BL.pack "") $
+                      regexReplace (BL.pack "[^A-Za-z0-9]+") (BL.pack "-") (BL.pack title)
 
 makeSlugGeneric cn title table = makeSlugGeneric' cn (slugFromTitle title) table 1
 makeSlugGeneric' cn slugBase table iter = do

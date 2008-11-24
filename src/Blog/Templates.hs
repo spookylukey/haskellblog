@@ -48,7 +48,7 @@ page vars =
            << ((thediv ! [identifier "toplinks"]
                            << unordList [ HotLink indexUrl (toHtml "Home") [theclass "first"]
                                         , hotlink categoriesUrl << "Categories"
-                                        , hotlink "/about/" << "About"
+                                        , hotlink aboutUrl << "About"
                                         ])
                +++
                (thediv ! [identifier "maintitle"]
@@ -58,6 +58,14 @@ page vars =
                (thediv ! [identifier "content"]
                 << (thediv ! [identifier "contentinner"]
                            << pcontent vars))
+               +++
+               (thediv ! [identifier "footer"]
+                << unordList [ hotlink "/" << "Main site"
+                             , hotlink aboutUrl << "About blog"
+                             , hotlink "/personal.html" << "About me"
+                             , hotlink "/softprojects.html" << "Software"
+                             ]
+               )
               )
     where fulltitle = let pt = ptitle vars
                       in if null pt

@@ -12,3 +12,4 @@ indexUrl          = Settings.root_url
 postUrl p         = Settings.root_url ++ "posts/" ++ (P.slug p) ++ "/"
 categoriesUrl     = Settings.root_url ++ "categories/"
 categoryUrl c     = Settings.root_url ++ "categories/" ++ (C.slug c) ++ "/"
+aboutUrl          = Settings.root_url ++ "about/"

@@ -47,3 +47,5 @@ postView slug req = do
     Just post -> do
             cats <- getCategoriesForPost cn post
             return $ Just $ standardResponse $ postPage post cats
+
+aboutView = dummyView

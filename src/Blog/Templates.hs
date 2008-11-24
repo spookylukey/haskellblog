@@ -96,19 +96,28 @@ postPage post categories =
              }
 
 
+categoryLinks categories =
+    intersperse (toHtml ", ") $ map categoryLink categories
+
+metaInfoLine post categories divclass =
+    (thediv ! [theclass divclass]
+     << ("Posted in: "
+         +++
+         categoryLinks categories
+         +++
+         (toHtml " | ")
+         +++
+         (thespan ! [theclass "timestamp"]
+          << (showDate $ P.timestamp post)
+         )
+        )
+    )
+
 
 formatPost post categories =
-    (h1 << P.title post
+    (h1 ! [theclass "posttitle"] << P.title post
      +++
-     (thediv ! [theclass "timestamp"]
-      << ("Posted: "
-          ++
-          (showDate $ P.timestamp post)))
-     +++
-     (thediv ! [theclass "postcategories"]
-      << ((toHtml "Categories: ")
-          +++
-          (intersperse (toHtml ", ") $ map categoryLink categories)))
+     metaInfoLine post categories "metainfo"
      +++
      (thediv ! [theclass "post"]
       << (primHtml $ P.post_formatted post)

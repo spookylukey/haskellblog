@@ -30,8 +30,6 @@ debug path req = return $ Just $ buildResponse [
 
 postsRedirectView req = return $ Just $ redirectResponse indexUrl :: IO (Maybe Response)
 
--- TODO
-
 custom404 = with (standardResponse custom404page) [
              setStatus 404
             ]

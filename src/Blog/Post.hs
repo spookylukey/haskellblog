@@ -60,7 +60,7 @@ getPostByIdQuery        = "SELECT id, title, slug, post_raw, post_formatted, sum
 getPostBySlugQuery      = "SELECT id, title, slug, '',       post_formatted, '',          '',                '',        timestamp, comments_open FROM posts WHERE slug = ?;"
 getRecentPostQueries    = "SELECT id, title, slug, '',       '',             '',          summary_formatted, '',        timestamp, ''            FROM posts ORDER BY timestamp DESC LIMIT 20;"
 
-getCategoriesForPostQuery = "SELECT categories.id, categories.name, categories.slug FROM categories INNER JOIN post_categories ON categories.id = post_categories.category_id WHERE post_categories.post_id = ?;"
+getCategoriesForPostQuery = "SELECT categories.id, categories.name, categories.slug FROM categories INNER JOIN post_categories ON categories.id = post_categories.category_id WHERE post_categories.post_id = ? ORDER BY categories.slug;"
 
 getPostBySlug cn slug = do
   res <- quickQuery' cn getPostBySlugQuery [toSql slug]

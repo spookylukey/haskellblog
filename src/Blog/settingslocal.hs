@@ -1,7 +1,7 @@
 module Blog.Settings where
 
 sqlite_path = "/home/luke/httpd/lukeplant.me.uk/web/cgi-bin/data/test1.db"
-root_url = "/testblog/"
+root_url = "/blog/"
 prog_uri = "/cgi-bin/blog.cgi" -- Used for redirecting
 
 -- Testing

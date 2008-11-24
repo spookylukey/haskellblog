@@ -5,6 +5,7 @@ module Blog.Model ( addPost
                   , getPostBySlug
                   , getRecentPosts
                   , getCategoriesForPost
+                  , getCommentsForPost
                   ) where
 
 import Database.HDBC
@@ -101,6 +102,8 @@ getRecentPostQueries    = "SELECT id, title, slug, '',       '',             '',
 
 getCategoriesForPostQuery = "SELECT categories.id, categories.name, categories.slug FROM categories INNER JOIN post_categories ON categories.id = post_categories.category_id WHERE post_categories.post_id = ? ORDER BY categories.slug;"
 
+getCommentByIdQuery      = "SELECT id, post_id, timestamp, name, email, text_raw, text_formatted, format_id FROM comments WHERE id = ?;"
+getCommentsForPostQuery  = "SELECT id, '',      timestamp, name, email, '',       text_formatted, ''        FROM comments WHERE post_id = ? ORDER BY timestamp ASC;"
 
 ---- Constructors ----
 
@@ -123,6 +126,17 @@ makeCategory row =
                 , Ct.slug = fromSql (row !! 2)
                 }
 
+makeComment row =
+    Cm.Comment { Cm.uid = fromSql (row !! 0)
+               , Cm.post_id = fromSql (row !! 1)
+               , Cm.timestamp = fromSql (row !! 2)
+               , Cm.name = fromSql (row !! 3)
+               , Cm.email = fromSql (row !! 4)
+               , Cm.text_raw = fromSql (row !! 5)
+               , Cm.text_formatted = fromSql (row !! 6)
+               , Cm.format_id = fromSql (row !! 7)
+               }
+
 ---- Public API for queries ----
 
 getPostBySlug cn slug = do
@@ -138,3 +152,7 @@ getRecentPosts cn = do
 getCategoriesForPost cn post = do
   res <- quickQuery' cn getCategoriesForPostQuery [toSql $ P.uid post]
   return $ map makeCategory res
+
+getCommentsForPost cn post = do
+  res <- quickQuery' cn getCommentsForPostQuery [toSql $ P.uid post]
+  return $ map makeComment res

@@ -7,6 +7,7 @@ import Data.List (intersperse)
 import Text.XHtml
 import qualified Blog.Post as P
 import qualified Blog.Category as C
+import qualified Blog.Comment as Cm
 import System.Locale (defaultTimeLocale)
 import System.Time.Utils (epochToClockTime)
 import System.Time (toUTCTime, formatCalendarTime)
@@ -97,9 +98,9 @@ categoriesPage = page $ defaultPageVars
                  , ptitle = "Categories"
                  }
 
-postPage post categories =
+postPage post categories comments =
     page $ defaultPageVars
-             { pcontent = formatPost post categories
+             { pcontent = formatPost post categories comments
              , ptitle = P.title post
              }
 
@@ -122,7 +123,7 @@ metaInfoLine post categories divclass =
     )
 
 
-formatPost post categories =
+formatPost post categories comments =
     (h1 ! [theclass "posttitle"] << P.title post
      +++
      metaInfoLine post categories "metainfo"
@@ -130,8 +131,27 @@ formatPost post categories =
      (thediv ! [theclass "post"]
       << (primHtml $ P.post_formatted post)
      )
+     +++
+     (thediv ! [theclass "comments"]
+      << (h1 << "Comments:")
+             +++ if null comments
+                 then p << "No comments."
+                 else thediv << map formatComment comments
+     )
     )
 
+formatComment comment =
+    (thediv ! [theclass "comment"] <<
+     ((thediv ! [theclass "commentby"] << formatName (Cm.name comment))
+      +++
+      (thediv ! [theclass "commenttext"]
+       << (primHtml $ Cm.text_formatted comment))
+     )
+    )
+
+formatName name = if null name
+                  then "Anonymous Coward"
+                  else name
 
 custom404page = page $ defaultPageVars { pcontent = h1 << "404 Not Found"
                                                     +++

@@ -142,10 +142,11 @@ formatPost post categories comments otherposts =
      )
      +++
      (thediv ! [theclass "comments"]
-      << (h1 << "Comments:")
-             +++ if null comments
-                 then p << "No comments."
-                 else thediv << map formatComment comments
+      << ((h1 << "Comments:")
+          +++ if null comments
+              then p << "No comments."
+              else thediv << map formatComment comments
+         )
      )
     )
 
@@ -158,9 +159,9 @@ formatComment comment =
     (thediv ! [theclass (commentclass comment)] <<
      (
       (thediv ! [theclass "commentby"] <<
-       (thespan << (formatName $ Cm.name comment)
-        +++
-        (thespan ! [theclass "timestamp"] << showDate (Cm.timestamp comment))
+       ((thespan ! [theclass "timestamp"] << showDate (Cm.timestamp comment))
+         +++
+         (thespan << (formatName $ Cm.name comment))
        )
       )
       +++

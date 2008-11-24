@@ -107,6 +107,20 @@ createRedirectFile postUrlMap categoryUrlMap = do
                            ,(utf8 "categoryIdsToUrls", utf8 $ makePHPMap categoryUrlMap)]
     renderToFile Settings.redirect_file_output tpl ctx
 
+-- Misc fixes
+-- Titles of all article have HTML in them, which is difficult to fix
+-- up.  They are only announcements, so we just delete.
+articlePosts = "select posts.id FROM posts INNER JOIN post_categories ON posts.id = post_categories.post_id INNER JOIN categories ON post_categories.category_id = categories.id WHERE categories.slug = 'articles';"
+deletePost = "DELETE FROM posts WHERE id = ?;";
+deletePC   = "DELETE FROM post_categories WHERE post_id = ?;"
+deleteArticlePosts cn = do
+  ids' <- quickQuery cn articlePosts []
+  let ids = map (fromSql . head) ids' :: [Int]
+  mapM_ (\x -> quickQuery cn deletePost [toSql $ x]) ids
+  mapM_ (\x -> quickQuery cn deletePC [toSql $ x]) ids
+
+
+-- Main
 main = handleSqlError $ do
   cn <- DB.connect
   -- Categories
@@ -129,6 +143,9 @@ main = handleSqlError $ do
   comments' <- readComments
   let comments = correctCommentPostIds comments' post_id_map
   writeItems cn addComment comments
+
+  -- misc fixes
+  deleteArticlePosts cn
 
   -- Redirect file
   let postUrlMap = Map.fromList $ zip (map (show . P.uid) origPosts)

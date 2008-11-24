@@ -41,7 +41,7 @@ addPost cn p = do theslug <- makePostSlug cn p
                          toSql $ timestamp p2,
                          toSql $ comments_open p2
                         ]
-                  [[newid]] <- quickQuery cn "SELECT last_insert_rowid();" []
+                  [[newid]] <- quickQuery' cn "SELECT last_insert_rowid();" []
                   return p2 { uid = fromSql $ newid }
 
 makePostSlug cn p = makeSlugGeneric cn (title p) "posts"
@@ -63,7 +63,7 @@ getRecentPostQueries    = "SELECT id, title, slug, '',       '',             '',
 getCategoriesForPostQuery = "SELECT categories.id, categories.name, categories.slug FROM categories INNER JOIN post_categories ON categories.id = post_categories.category_id WHERE post_categories.post_id = ?;"
 
 getPostBySlug cn slug = do
-  res <- quickQuery cn getPostBySlugQuery [toSql slug]
+  res <- quickQuery' cn getPostBySlugQuery [toSql slug]
   case res of
     [] -> return Nothing
     (postdata:_) -> return $ Just $ makePost postdata
@@ -82,9 +82,9 @@ makePost row =
          }
 
 getRecentPosts cn = do
-  res <- quickQuery cn getRecentPostQueries []
+  res <- quickQuery' cn getRecentPostQueries []
   return $ map makePost res
 
 getCategoriesForPost cn post = do
-  res <- quickQuery cn getCategoriesForPostQuery [toSql $ uid post]
+  res <- quickQuery' cn getCategoriesForPostQuery [toSql $ uid post]
   return $ map C.makeCategory res

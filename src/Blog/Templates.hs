@@ -159,7 +159,7 @@ formatComment comment =
     (thediv ! [theclass (commentclass comment)] <<
      (
       (thediv ! [theclass "commentby"] <<
-       ((thespan ! [theclass "timestamp"] << showDate (Cm.timestamp comment))
+       ((thespan ! [theclass "timestamp"] << (" " ++ showDate (Cm.timestamp comment) ++ " "))
          +++
          (thespan << (formatName $ Cm.name comment))
        )
@@ -168,7 +168,7 @@ formatComment comment =
       (thediv ! [theclass "commenttext"] <<
        (primHtml $ Cm.text_formatted comment))
      )
-    )
+    ) +++ hr
 
 formatRelated = postLink
 

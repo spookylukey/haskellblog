@@ -1,7 +1,7 @@
 {-# OPTIONS_GHC -fglasgow-exts -XOverloadedStrings #-}
 module Blog.Views where
 
-import Ella.Framework (default404)
+import Ella.Framework (default404, View)
 import Ella.Request
 import Ella.Response
 import Ella.Utils (addHtml)
@@ -59,9 +59,11 @@ postsRedirectView req = return $ Just $ redirectResponse indexUrl :: IO (Maybe R
 categoriesView req = return $ Just $ standardResponse categoriesPage :: IO (Maybe Response)
 
 -- View that shows posts for an individual category
+categoryView :: String -> View
 categoryView slug = dummyView
 
 -- View that shows individual post
+postView :: String -> View
 postView slug req = do
   cn <- connect
   mp <- getPostBySlug cn slug

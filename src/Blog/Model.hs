@@ -107,7 +107,7 @@ getRecentPostsQuery     = "SELECT id, title, slug, '',       '',             '',
 
 -- Used to get post related to a post, ordered to favour posts with
 -- more matching categories and close in time to the original post
-getRelatedPostsQuery ids = "SELECT id, title, slug, '',       '',             '',          '',                '',               '', ''            FROM posts INNER JOIN (SELECT post_id, COUNT(post_id) AS c from post_categories WHERE category_id IN " ++ sqlInIds ids ++ " GROUP BY post_id) as t2 ON posts.id = t2.post_id AND posts.id <> ? ORDER BY c DESC, abs(posts.timestamp - ?) ASC LIMIT 6;"
+getRelatedPostsQuery ids = "SELECT id, title, slug, '',       '',             '',          '',                '',               '', ''            FROM posts INNER JOIN (SELECT post_id, COUNT(post_id) AS c from post_categories WHERE category_id IN " ++ sqlInIds ids ++ " GROUP BY post_id) as t2 ON posts.id = t2.post_id AND posts.id <> ? ORDER BY c DESC, abs(posts.timestamp - ?) ASC $LIMITOFFSET;"
 
 getCategoriesForPostQuery = "SELECT categories.id, categories.name, categories.slug FROM categories INNER JOIN post_categories ON categories.id = post_categories.category_id WHERE post_categories.post_id = ? ORDER BY categories.slug;"
 
@@ -183,6 +183,7 @@ getCommentsForPost cn post = do
 
 getRelatedPosts cn post categories = do
   let ids = map (Ct.uid) categories
-  res <- quickQuery' cn (getRelatedPostsQuery ids) [ toSql $ P.uid post
-                                                   , toSql $ P.timestamp post ]
+  let q = addLimitOffset (getRelatedPostsQuery ids) (makePagingLimitOffset 1 7)
+  res <- quickQuery' cn q [ toSql $ P.uid post
+                          , toSql $ P.timestamp post ]
   return $ map makePost res

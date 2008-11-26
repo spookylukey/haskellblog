@@ -11,11 +11,13 @@ module Blog.Model ( addPost
 
 import Database.HDBC
 import Blog.DBUtils (makeSlugGeneric)
+import Blog.Utils (regexReplace)
 import qualified Blog.DB as DB
 import qualified Blog.Post as P
 import qualified Blog.Category as Ct
 import qualified Blog.Comment as Cm
 import qualified Data.List as List
+import qualified Data.ByteString.Lazy.Char8 as BL
 
 ------ Create -------
 getDbId cn =
@@ -100,7 +102,7 @@ addComment cn cm = do
 -- (we can then use the same 'makePost' function)
 getPostByIdQuery        = "SELECT id, title, slug, post_raw, post_formatted, summary_raw, summary_formatted, format_id, timestamp, comments_open FROM posts WHERE id = ?;"
 getPostBySlugQuery      = "SELECT id, title, slug, '',       post_formatted, '',          '',                '',        timestamp, comments_open FROM posts WHERE slug = ?;"
-getRecentPostsQuery     = "SELECT id, title, slug, '',       '',             '',          summary_formatted, '',        timestamp, ''            FROM posts ORDER BY timestamp DESC LIMIT 20;"
+getRecentPostsQuery     = "SELECT id, title, slug, '',       '',             '',          summary_formatted, '',        timestamp, ''            FROM posts ORDER BY timestamp DESC $LIMITOFFSET;"
 
 
 -- Used to get post related to a post, ordered to favour posts with
@@ -116,6 +118,15 @@ getCommentsForPostQuery  = "SELECT id, '',      timestamp, name, email, '',     
 -- SQL stuff
 sqlInIds :: [Int] -> String
 sqlInIds ids = "(" ++ (concat $ List.intersperse "," $ map show ids) ++ ")"
+
+addLimitOffset sql limitOffset =
+    BL.unpack $ regexReplace (" \\$LIMITOFFSET") (BL.pack $ " " ++ limitOffset) (BL.pack sql)
+
+-- return 'LIMIT/OFFSET' for a page (1 indexed)
+makePagingLimitOffset page size =
+    let limit = size
+        offset = (page - 1) * size
+    in "LIMIT " ++ (show limit) ++ " OFFSET " ++ (show offset)
 
 ---- Constructors ----
 
@@ -157,8 +168,9 @@ getPostBySlug cn slug = do
     [] -> return Nothing
     (postdata:_) -> return $ Just $ makePost postdata
 
-getRecentPosts cn = do
-  res <- quickQuery' cn getRecentPostsQuery []
+getRecentPosts cn p = do
+  let q = addLimitOffset getRecentPostsQuery (makePagingLimitOffset p 20)
+  res <- quickQuery' cn q []
   return $ map makePost res
 
 getCategoriesForPost cn post = do

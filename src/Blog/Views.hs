@@ -5,12 +5,12 @@ import Ella.Framework (default404)
 import Ella.Request
 import Ella.Response
 import Ella.Utils (addHtml)
-import Ella.GenUtils (utf8, with)
+import Ella.GenUtils (utf8, with, exactParse)
 import Blog.Templates
 import Blog.Links
 import Blog.DB (connect)
 import Blog.Model (getPostBySlug, getCategoriesForPost, getRecentPosts, getCommentsForPost, getRelatedPosts)
-
+import Maybe (fromMaybe)
 
 ---- Utilities
 
@@ -30,11 +30,18 @@ dummyView req = return $ Just $ standardResponse ("TODO" :: String) :: IO (Maybe
 
 ---- Views
 
+-- | parse a value (packed in a Just) or return a default
+--
+-- This is useful in dealing with 'Maybe' vals returned from
+-- getGET, getPOST etc.
+parseOrDefault v d = fromMaybe d (v >>= exactParse)
+
 -- View for the main page
 mainIndex :: Request -> IO (Maybe Response)
 mainIndex req = do
+  let page = (getGET "p" req) `parseOrDefault` 1 :: Int
   cn <- connect
-  posts <- getRecentPosts cn
+  posts <- getRecentPosts cn page
   return $ Just $ standardResponse $ mainIndexPage posts
 
 -- View to help with debugging

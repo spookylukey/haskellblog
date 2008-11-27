@@ -10,21 +10,15 @@ module Blog.Model ( addPost
                   ) where
 
 import Database.HDBC
-import Blog.DBUtils (makeSlugGeneric)
+import Blog.DBUtils (makeSlugGeneric, pagedQuery, sqlInIds, getDbId)
 import Blog.Utils (regexReplace)
 import qualified Blog.DB as DB
 import qualified Blog.Post as P
 import qualified Blog.Category as Ct
 import qualified Blog.Comment as Cm
-import qualified Data.List as List
 import qualified Data.ByteString.Lazy.Char8 as BL
 
 ------ Create -------
-getDbId cn =
-    do
-      [[newid]] <- quickQuery' cn "SELECT last_insert_rowid();" []
-      return $ fromSql newid
-
 addPost cn p = do theslug <- makePostSlug cn p
                   let p2 = p { P.slug = theslug }
                   DB.doInsert cn "posts" [
@@ -115,31 +109,6 @@ getCommentByIdQuery      = "SELECT id, post_id, timestamp, name, email, text_raw
 getCommentsForPostQuery  = "SELECT id, '',      timestamp, name, email, '',       text_formatted, ''        FROM comments WHERE post_id = ? ORDER BY timestamp ASC;"
 
 
--- SQL stuff
-sqlInIds :: [Int] -> String
-sqlInIds ids = "(" ++ (concat $ List.intersperse "," $ map show ids) ++ ")"
-
-addLimitOffset sql limitOffset =
-    BL.unpack $ regexReplace (" \\$LIMITOFFSET") (BL.pack $ " " ++ limitOffset) (BL.pack sql)
-
--- return 'LIMIT/OFFSET' for a page (1 indexed), with an extra row
--- which allows us to tell if there are more records
-makePagingLimitOffset page size =
-    let limit = size + 1
-        offset = (page - 1) * size
-    in "LIMIT " ++ (show limit) ++ " OFFSET " ++ (show offset)
-
--- | Get a page of results, and a boolean which is True if there are more rows
---
--- The query must contain "$LIMITOFFSET" in an appropriate place to be replaced
--- with the actual limit/offset clause
-pagedQuery cn sql params page pagesize =
-    let limitOffset = makePagingLimitOffset page pagesize
-        q = addLimitOffset sql limitOffset
-    in do
-      res <- quickQuery' cn q params
-      let (recs,rest) = splitAt pagesize res
-      return (recs, not $ null rest)
 
 ---- Constructors ----
 
@@ -175,24 +144,30 @@ makeComment row =
 
 ---- Public API for queries ----
 
+getPostBySlug :: (SqlType a, IConnection conn) => conn -> a -> IO (Maybe P.Post)
 getPostBySlug cn slug = do
   res <- quickQuery' cn getPostBySlugQuery [toSql slug]
   case res of
     [] -> return Nothing
     (postdata:_) -> return $ Just $ makePost postdata
 
+getRecentPosts :: (IConnection conn) => conn -> Int -> IO ([P.Post], Bool)
 getRecentPosts cn page = do
   (res,more) <- pagedQuery cn getRecentPostsQuery [] page 20
   return (map makePost res, more)
 
+getCategoriesForPost :: (IConnection conn) => conn -> P.Post -> IO [Ct.Category]
 getCategoriesForPost cn post = do
   res <- quickQuery' cn getCategoriesForPostQuery [toSql $ P.uid post]
   return $ map makeCategory res
 
+getCommentsForPost :: (IConnection conn) => conn -> P.Post -> IO [Cm.Comment]
 getCommentsForPost cn post = do
   res <- quickQuery' cn getCommentsForPostQuery [toSql $ P.uid post]
   return $ map makeComment res
 
+getRelatedPosts :: (IConnection conn) =>
+                   conn -> P.Post -> [Ct.Category] -> IO [P.Post]
 getRelatedPosts cn post categories = do
   let ids = map (Ct.uid) categories
   (res,_) <- pagedQuery cn (getRelatedPostsQuery ids) [ toSql $ P.uid post

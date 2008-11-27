@@ -77,20 +77,45 @@ page vars =
 
 -- Page specific templates
 
-mainIndexPage posts =
+mainIndexPage posts curpage moreposts =
     page $ defaultPageVars
-             { pcontent = h1 << "Recent posts"
-                          +++
-                          do post <- posts
-                             return (
-                                     (thediv ! [ theclass "summarylink" ]
-                                      << postLink post)
-                                     +++
-                                     (thediv ! [ theclass "summary" ]
-                                      << (primHtml $ P.summary_formatted post))
-                                    )
+             { pcontent = formatIndex posts curpage moreposts
              , ptitle = ""
              }
+
+formatIndex :: [P.Post] -> Int -> Bool -> Html
+formatIndex posts page shownext =
+    (h1 << "Recent posts")
+    +++
+    (do post <- posts
+        return (
+                (thediv ! [ theclass "summarylink" ]
+                 << postLink post)
+                +++
+                (thediv ! [ theclass "summary" ]
+                 << (primHtml $ P.summary_formatted post))
+               )
+    ) +++ (
+           pagingLinks indexUrl page shownext
+          )
+
+-- TODO - fix this to be able to work with URLs that have query
+-- strings already.
+pagingLinks :: String -> Int -> Bool -> Html
+pagingLinks url page shownext =
+    (thediv ! [theclass "paginglinks"]
+     << ((if page > 1
+          then makeLink url (page - 1) "<< Back"
+          else thespan << "<< Back")
+         +++
+         (toHtml " | ")
+         +++
+         (if shownext
+          then makeLink url (page + 1) "Next >>"
+          else thespan << "Next >>")
+        )
+     )
+    where makeLink url page text = toHtml (hotlink (url ++ "?p=" ++ (show page)) << text)
 
 categoriesPage = page $ defaultPageVars
                  { pcontent = h1 << "Categories"

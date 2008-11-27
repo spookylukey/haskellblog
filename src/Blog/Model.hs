@@ -122,11 +122,24 @@ sqlInIds ids = "(" ++ (concat $ List.intersperse "," $ map show ids) ++ ")"
 addLimitOffset sql limitOffset =
     BL.unpack $ regexReplace (" \\$LIMITOFFSET") (BL.pack $ " " ++ limitOffset) (BL.pack sql)
 
--- return 'LIMIT/OFFSET' for a page (1 indexed)
+-- return 'LIMIT/OFFSET' for a page (1 indexed), with an extra row
+-- which allows us to tell if there are more records
 makePagingLimitOffset page size =
-    let limit = size
+    let limit = size + 1
         offset = (page - 1) * size
     in "LIMIT " ++ (show limit) ++ " OFFSET " ++ (show offset)
+
+-- | Get a page of results, and a boolean which is True if there are more rows
+--
+-- The query must contain "$LIMITOFFSET" in an appropriate place to be replaced
+-- with the actual limit/offset clause
+pagedQuery cn sql params page pagesize =
+    let limitOffset = makePagingLimitOffset page pagesize
+        q = addLimitOffset sql limitOffset
+    in do
+      res <- quickQuery' cn q params
+      let (recs,rest) = splitAt pagesize res
+      return (recs, not $ null rest)
 
 ---- Constructors ----
 
@@ -168,10 +181,9 @@ getPostBySlug cn slug = do
     [] -> return Nothing
     (postdata:_) -> return $ Just $ makePost postdata
 
-getRecentPosts cn p = do
-  let q = addLimitOffset getRecentPostsQuery (makePagingLimitOffset p 20)
-  res <- quickQuery' cn q []
-  return $ map makePost res
+getRecentPosts cn page = do
+  (res,more) <- pagedQuery cn getRecentPostsQuery [] page 20
+  return (map makePost res, more)
 
 getCategoriesForPost cn post = do
   res <- quickQuery' cn getCategoriesForPostQuery [toSql $ P.uid post]
@@ -183,7 +195,6 @@ getCommentsForPost cn post = do
 
 getRelatedPosts cn post categories = do
   let ids = map (Ct.uid) categories
-  let q = addLimitOffset (getRelatedPostsQuery ids) (makePagingLimitOffset 1 7)
-  res <- quickQuery' cn q [ toSql $ P.uid post
-                          , toSql $ P.timestamp post ]
+  (res,_) <- pagedQuery cn (getRelatedPostsQuery ids) [ toSql $ P.uid post
+                                                      , toSql $ P.timestamp post ] 1 7
   return $ map makePost res

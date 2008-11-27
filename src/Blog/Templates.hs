@@ -77,6 +77,10 @@ page vars =
 
 -- Page specific templates
 
+mainIndexPage :: [P.Post]      -- ^ list of posts to display
+              -> Int           -- ^ current page number being displayed
+              -> Bool          -- ^ True if there are more pages to display
+              -> Html
 mainIndexPage posts curpage moreposts =
     page $ defaultPageVars
              { pcontent = formatIndex posts curpage moreposts
@@ -124,6 +128,11 @@ categoriesPage = page $ defaultPageVars
                  , ptitle = "Categories"
                  }
 
+postPage :: P.Post        -- ^ The Post to display
+         -> [C.Category]  -- ^ Categories the post is in
+         -> [Cm.Comment]  -- ^ Comments belonging to the poast
+         -> [P.Post]      -- ^ Related posts
+         -> Html
 postPage post categories comments related =
     page $ defaultPageVars
              { pcontent = formatPost post categories comments related

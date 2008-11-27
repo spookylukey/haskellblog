@@ -105,7 +105,10 @@ formatIndex posts page shownext =
 
 -- TODO - fix this to be able to work with URLs that have query
 -- strings already.
-pagingLinks :: String -> Int -> Bool -> Html
+pagingLinks :: String     -- ^ Base URL
+            -> Int        -- ^ Current page
+            -> Bool       -- ^ True if there is another page
+            -> Html
 pagingLinks url page shownext =
     (thediv ! [theclass "paginglinks"]
      << ((if page > 1

@@ -126,12 +126,18 @@ pagingLinks url page shownext =
      )
     where makeLink url page text = toHtml (hotlink (url ++ "?p=" ++ (show page)) << text)
 
-categoriesPage = page $ defaultPageVars
-                 { pcontent = h1 << "Categories"
-                              +++
-                              p << "TODO"
-                 , ptitle = "Categories"
-                 }
+categoriesPage :: [C.Category] -> Html
+categoriesPage cats =
+    page $ defaultPageVars
+             { pcontent = h1 << "Categories"
+                          +++
+                          (map formatCategoryLink cats)
+             , ptitle = "Categories"
+             }
+
+formatCategoryLink cat =
+    (thediv ! [theclass "category"]
+     << categoryLink cat)
 
 postPage :: P.Post        -- ^ The Post to display
          -> [C.Category]  -- ^ Categories the post is in

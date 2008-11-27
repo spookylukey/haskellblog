@@ -52,7 +52,10 @@ debug path req = return $ Just $ buildResponse [
 postsRedirectView req = return $ Just $ redirectResponse indexUrl :: IO (Maybe Response)
 
 -- View that shows an overview of categories
-categoriesView req = return $ Just $ standardResponse categoriesPage :: IO (Maybe Response)
+categoriesView req = do
+  cn <- connect
+  cats <- getCategories cn
+  return $ Just $ standardResponse $ categoriesPage cats
 
 -- View that shows posts for an individual category
 categoryView :: String -> View

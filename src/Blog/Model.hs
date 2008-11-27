@@ -7,6 +7,7 @@ module Blog.Model ( addPost
                   , getCategoriesForPost
                   , getCommentsForPost
                   , getRelatedPosts
+                  , getCategories
                   , getCategoriesBulk
                   ) where
 
@@ -104,6 +105,7 @@ getRecentPostsQuery     = "SELECT id, title, slug, '',       '',             '',
 -- more matching categories and close in time to the original post
 getRelatedPostsQuery ids = "SELECT id, title, slug, '',       '',             '',          '',                '',               '', ''            FROM posts INNER JOIN (SELECT post_id, COUNT(post_id) AS c from post_categories WHERE category_id IN " ++ sqlInIds ids ++ " GROUP BY post_id) as t2 ON posts.id = t2.post_id AND posts.id <> ? ORDER BY c DESC, abs(posts.timestamp - ?) ASC $LIMITOFFSET;"
 
+getCategoriesQuery        = "SELECT categories.id, categories.name, categories.slug FROM categories ORDER BY slug;"
 getCategoriesForPostQuery = "SELECT categories.id, categories.name, categories.slug FROM categories INNER JOIN post_categories ON categories.id = post_categories.category_id WHERE post_categories.post_id = ? ORDER BY categories.slug;"
 getCategoriesBulkQuery ids= "SELECT categories.id, categories.name, categories.slug, post_categories.post_id FROM categories INNER JOIN post_categories ON categories.id = post_categories.category_id WHERE post_categories.post_id IN " ++ sqlInIds ids ++ " ORDER BY categories.slug;"
 
@@ -156,6 +158,11 @@ getRecentPosts :: (IConnection conn) => conn -> Int -> IO ([P.Post], Bool)
 getRecentPosts cn page = do
   (res,more) <- pagedQuery cn getRecentPostsQuery [] page 20
   return (map makePost res, more)
+
+getCategories :: (IConnection conn) => conn -> IO [Ct.Category]
+getCategories cn = do
+  res <- quickQuery' cn getCategoriesQuery []
+  return $ map makeCategory res
 
 getCategoriesForPost :: (IConnection conn) => conn -> P.Post -> IO [Ct.Category]
 getCategoriesForPost cn post = do

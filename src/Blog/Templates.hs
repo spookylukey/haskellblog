@@ -77,24 +77,26 @@ page vars =
 
 -- Page specific templates
 
-mainIndexPage :: [P.Post]      -- ^ list of posts to display
-              -> Int           -- ^ current page number being displayed
-              -> Bool          -- ^ True if there are more pages to display
+mainIndexPage :: [(P.Post, [C.Category])] -- ^ list of posts (wtth their categories) to display
+              -> Int                      -- ^ current page number being displayed
+              -> Bool                     -- ^ True if there are more pages to display
               -> Html
-mainIndexPage posts curpage moreposts =
+mainIndexPage postInfo curpage moreposts =
     page $ defaultPageVars
-             { pcontent = formatIndex posts curpage moreposts
+             { pcontent = formatIndex postInfo curpage moreposts
              , ptitle = ""
              }
 
-formatIndex :: [P.Post] -> Int -> Bool -> Html
-formatIndex posts page shownext =
+formatIndex :: [(P.Post, [C.Category])] -> Int -> Bool -> Html
+formatIndex postInfo page shownext =
     (h1 << "Recent posts")
     +++
-    (do post <- posts
+    (do (post, cats) <- postInfo
         return (
                 (thediv ! [ theclass "summarylink" ]
                  << postLink post)
+                +++
+                (metaInfoLine post cats "metainfoindex")
                 +++
                 (thediv ! [ theclass "summary" ]
                  << (primHtml $ P.summary_formatted post))

@@ -7,6 +7,7 @@ module Blog.Model ( addPost
                   , getCategoriesForPost
                   , getCommentsForPost
                   , getRelatedPosts
+                  , getCategoriesBulk
                   ) where
 
 import Database.HDBC
@@ -104,10 +105,10 @@ getRecentPostsQuery     = "SELECT id, title, slug, '',       '',             '',
 getRelatedPostsQuery ids = "SELECT id, title, slug, '',       '',             '',          '',                '',               '', ''            FROM posts INNER JOIN (SELECT post_id, COUNT(post_id) AS c from post_categories WHERE category_id IN " ++ sqlInIds ids ++ " GROUP BY post_id) as t2 ON posts.id = t2.post_id AND posts.id <> ? ORDER BY c DESC, abs(posts.timestamp - ?) ASC $LIMITOFFSET;"
 
 getCategoriesForPostQuery = "SELECT categories.id, categories.name, categories.slug FROM categories INNER JOIN post_categories ON categories.id = post_categories.category_id WHERE post_categories.post_id = ? ORDER BY categories.slug;"
+getCategoriesBulkQuery ids= "SELECT categories.id, categories.name, categories.slug, post_categories.post_id FROM categories INNER JOIN post_categories ON categories.id = post_categories.category_id WHERE post_categories.post_id IN " ++ sqlInIds ids ++ " ORDER BY categories.slug;"
 
 getCommentByIdQuery      = "SELECT id, post_id, timestamp, name, email, text_raw, text_formatted, format_id FROM comments WHERE id = ?;"
 getCommentsForPostQuery  = "SELECT id, '',      timestamp, name, email, '',       text_formatted, ''        FROM comments WHERE post_id = ? ORDER BY timestamp ASC;"
-
 
 
 ---- Constructors ----
@@ -165,6 +166,21 @@ getCommentsForPost :: (IConnection conn) => conn -> P.Post -> IO [Cm.Comment]
 getCommentsForPost cn post = do
   res <- quickQuery' cn getCommentsForPostQuery [toSql $ P.uid post]
   return $ map makeComment res
+
+-- | Gets the categories for a list of posts.  Results are returned
+-- as a list of list of categories
+getCategoriesBulk :: (IConnection conn) =>
+                     conn                  -- ^ connection
+                  -> [P.Post]              -- ^ list of posts
+                  -> IO [[Ct.Category]]
+getCategoriesBulk cn posts = do
+  let ids = map (P.uid) posts
+  res <- quickQuery' cn (getCategoriesBulkQuery ids) []
+  -- Create (Category, post id) pairs:
+  let cats = map (\r -> (makeCategory r, (fromSql $ r !! 3) :: Int)) res
+  -- split them up according to ids
+  return [ [ cat | (cat, pid) <- cats, P.uid p == pid ] | p <- posts]
+
 
 getRelatedPosts :: (IConnection conn) =>
                    conn -> P.Post -> [Ct.Category] -> IO [P.Post]

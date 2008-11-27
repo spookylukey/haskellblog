@@ -10,7 +10,7 @@ import Ella.GenUtils (utf8, with, exactParse)
 import Blog.Templates
 import Blog.Links
 import Blog.DB (connect)
-import Blog.Model (getPostBySlug, getCategoriesForPost, getRecentPosts, getCommentsForPost, getRelatedPosts)
+import Blog.Model
 import Maybe (fromMaybe)
 
 ---- Utilities
@@ -37,7 +37,8 @@ mainIndex req = do
   let page = (getGET "p" req) `captureOrDefault` 1 :: Int
   cn <- connect
   (posts,more) <- getRecentPosts cn page
-  return $ Just $ standardResponse $ mainIndexPage posts page more
+  cats <- getCategoriesBulk cn posts
+  return $ Just $ standardResponse $ mainIndexPage (zip posts cats) page more
 
 -- View to help with debugging
 debug path req = return $ Just $ buildResponse [

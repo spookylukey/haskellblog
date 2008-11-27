@@ -7,8 +7,10 @@ module Blog.Model ( addPost
                   , getCategoriesForPost
                   , getCommentsForPost
                   , getRelatedPosts
+                  , getCategoryBySlug
                   , getCategories
                   , getCategoriesBulk
+                  , getPostsForCategory
                   ) where
 
 import Database.HDBC
@@ -18,6 +20,7 @@ import qualified Blog.DB as DB
 import qualified Blog.Post as P
 import qualified Blog.Category as Ct
 import qualified Blog.Comment as Cm
+import qualified Blog.Settings as Settings
 import qualified Data.ByteString.Lazy.Char8 as BL
 
 ------ Create -------
@@ -99,12 +102,13 @@ addComment cn cm = do
 getPostByIdQuery        = "SELECT id, title, slug, post_raw, post_formatted, summary_raw, summary_formatted, format_id, timestamp, comments_open FROM posts WHERE id = ?;"
 getPostBySlugQuery      = "SELECT id, title, slug, '',       post_formatted, '',          '',                '',        timestamp, comments_open FROM posts WHERE slug = ?;"
 getRecentPostsQuery     = "SELECT id, title, slug, '',       '',             '',          summary_formatted, '',        timestamp, ''            FROM posts ORDER BY timestamp DESC $LIMITOFFSET;"
-
+getPostsForCategoryQuery= "SELECT id, title, slug, '',       '',             '',          summary_formatted, '',        timestamp, ''            FROM posts INNER JOIN post_categories ON posts.id = post_categories.post_id WHERE post_categories.category_id = ? ORDER BY timestamp DESC $LIMITOFFSET;"
 
 -- Used to get post related to a post, ordered to favour posts with
 -- more matching categories and close in time to the original post
 getRelatedPostsQuery ids = "SELECT id, title, slug, '',       '',             '',          '',                '',               '', ''            FROM posts INNER JOIN (SELECT post_id, COUNT(post_id) AS c from post_categories WHERE category_id IN " ++ sqlInIds ids ++ " GROUP BY post_id) as t2 ON posts.id = t2.post_id AND posts.id <> ? ORDER BY c DESC, abs(posts.timestamp - ?) ASC $LIMITOFFSET;"
 
+getCategoryBySlugQuery    = "SELECT categories.id, categories.name, categories.slug FROM categories WHERE slug = ?;"
 getCategoriesQuery        = "SELECT categories.id, categories.name, categories.slug FROM categories ORDER BY slug;"
 getCategoriesForPostQuery = "SELECT categories.id, categories.name, categories.slug FROM categories INNER JOIN post_categories ON categories.id = post_categories.category_id WHERE post_categories.post_id = ? ORDER BY categories.slug;"
 getCategoriesBulkQuery ids= "SELECT categories.id, categories.name, categories.slug, post_categories.post_id FROM categories INNER JOIN post_categories ON categories.id = post_categories.category_id WHERE post_categories.post_id IN " ++ sqlInIds ids ++ " ORDER BY categories.slug;"
@@ -156,8 +160,20 @@ getPostBySlug cn slug = do
 
 getRecentPosts :: (IConnection conn) => conn -> Int -> IO ([P.Post], Bool)
 getRecentPosts cn page = do
-  (res,more) <- pagedQuery cn getRecentPostsQuery [] page 20
+  (res,more) <- pagedQuery cn getRecentPostsQuery [] page Settings.post_page_size
   return (map makePost res, more)
+
+getPostsForCategory :: (IConnection conn) => conn -> Ct.Category -> Int -> IO ([P.Post], Bool)
+getPostsForCategory cn cat curpage = do
+  (res,more) <- pagedQuery cn getPostsForCategoryQuery [toSql $ Ct.uid cat] curpage Settings.post_page_size
+  return (map makePost res, more)
+
+getCategoryBySlug :: (IConnection conn) => conn -> String -> IO (Maybe Ct.Category)
+getCategoryBySlug cn slug = do
+  res <- quickQuery' cn getCategoryBySlugQuery [toSql slug]
+  case res of
+    [] -> return Nothing
+    (rs:_) -> return $ Just $ makeCategory rs
 
 getCategories :: (IConnection conn) => conn -> IO [Ct.Category]
 getCategories cn = do

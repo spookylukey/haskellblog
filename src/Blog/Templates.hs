@@ -96,7 +96,7 @@ mainIndexPage postInfo curpage moreposts =
              }
 
 formatIndex :: [(P.Post, [C.Category])] -> Int -> Bool -> Html
-formatIndex postInfo page shownext =
+formatIndex postInfo curpage shownext =
     (h1 << "Recent posts")
     +++
     (do (post, cats) <- postInfo
@@ -110,7 +110,7 @@ formatIndex postInfo page shownext =
                  << (primHtml $ P.summary_formatted post))
                )
     ) +++ (
-           pagingLinks indexUrl page shownext
+           pagingLinks indexUrl curpage shownext
           )
 
 categoriesPage :: [C.Category] -> Html
@@ -125,6 +125,29 @@ categoriesPage cats =
 formatCategoryLink cat =
     (thediv ! [theclass "category"]
      << categoryLink cat)
+
+categoryPage :: C.Category -> [P.Post] -> Int -> Bool -> Html
+categoryPage cat posts curpage moreposts =
+    page $ defaultPageVars
+         { pcontent = formatCategoryIndex cat posts curpage moreposts
+         , ptitle = C.name cat
+         }
+
+formatCategoryIndex cat posts curpage moreposts = 
+    (h1 << ("Category: " ++ C.name cat))
+    +++
+    (do post <- posts
+        return (
+                (thediv ! [ theclass "summarylink" ]
+                 << postLink post)
+                +++
+                (thediv ! [ theclass "summary" ]
+                 << (primHtml $ P.summary_formatted post))
+               )
+    ) +++ (
+           pagingLinks (categoryUrl cat) curpage moreposts
+          )
+
 
 postPage :: P.Post        -- ^ The Post to display
          -> [C.Category]  -- ^ Categories the post is in

@@ -32,13 +32,13 @@ dummyView req = return $ Just $ standardResponse ("TODO" :: String) :: IO (Maybe
 ---- Views
 
 -- View for the main page
-mainIndex :: Request -> IO (Maybe Response)
+mainIndex :: View
 mainIndex req = do
-  let page = (getGET "p" req) `captureOrDefault` 1 :: Int
+  let curpage = getPage req
   cn <- connect
-  (posts,more) <- getRecentPosts cn page
+  (posts,more) <- getRecentPosts cn curpage
   cats <- getCategoriesBulk cn posts
-  return $ Just $ standardResponse $ mainIndexPage (zip posts cats) page more
+  return $ Just $ standardResponse $ mainIndexPage (zip posts cats) curpage more
 
 -- View to help with debugging
 debug path req = return $ Just $ buildResponse [
@@ -52,6 +52,7 @@ debug path req = return $ Just $ buildResponse [
 postsRedirectView req = return $ Just $ redirectResponse indexUrl :: IO (Maybe Response)
 
 -- View that shows an overview of categories
+categoriesView :: View
 categoriesView req = do
   cn <- connect
   cats <- getCategories cn
@@ -59,7 +60,15 @@ categoriesView req = do
 
 -- View that shows posts for an individual category
 categoryView :: String -> View
-categoryView slug = dummyView
+categoryView slug req = do
+  let curpage = getPage req
+  cn <- connect
+  mcat <- getCategoryBySlug cn slug
+  case mcat of
+    Nothing -> return $ Just $ custom404
+    Just cat -> do
+              (posts,more) <- getPostsForCategory cn cat (getPage req)
+              return $ Just $ standardResponse $ categoryPage cat posts curpage more
 
 -- View that shows individual post
 postView :: String -> View
@@ -75,3 +84,7 @@ postView slug req = do
             return $ Just $ standardResponse $ postPage post cats comments related
 
 aboutView = dummyView
+
+-- Utilities
+
+getPage req = (getGET "p" req) `captureOrDefault` 1 :: Int

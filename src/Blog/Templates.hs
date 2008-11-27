@@ -77,6 +77,14 @@ page vars =
 
 -- Page specific templates
 
+custom404page =
+    page $ defaultPageVars
+             { pcontent = h1 << "404 Not Found"
+                          +++
+                          p << "Sorry, the page you requested could not be found"
+             , ptitle = "404 Not Found"
+             }
+
 mainIndexPage :: [(P.Post, [C.Category])] -- ^ list of posts (wtth their categories) to display
               -> Int                      -- ^ current page number being displayed
               -> Bool                     -- ^ True if there are more pages to display
@@ -105,27 +113,6 @@ formatIndex postInfo page shownext =
            pagingLinks indexUrl page shownext
           )
 
--- TODO - fix this to be able to work with URLs that have query
--- strings already.
-pagingLinks :: String     -- ^ Base URL
-            -> Int        -- ^ Current page
-            -> Bool       -- ^ True if there is another page
-            -> Html
-pagingLinks url page shownext =
-    (thediv ! [theclass "paginglinks"]
-     << ((if page > 1
-          then makeLink url (page - 1) "<< Back"
-          else thespan << "<< Back")
-         +++
-         (toHtml " | ")
-         +++
-         (if shownext
-          then makeLink url (page + 1) "Next >>"
-          else thespan << "Next >>")
-        )
-     )
-    where makeLink url page text = toHtml (hotlink (url ++ "?p=" ++ (show page)) << text)
-
 categoriesPage :: [C.Category] -> Html
 categoriesPage cats =
     page $ defaultPageVars
@@ -149,25 +136,6 @@ postPage post categories comments related =
              { pcontent = formatPost post categories comments related
              , ptitle = P.title post
              }
-
-
-categoryLinks categories =
-    intersperse (toHtml ", ") $ map categoryLink categories
-
-metaInfoLine post categories divclass =
-    (thediv ! [theclass divclass]
-     << ("Posted in: "
-         +++
-         categoryLinks categories
-         +++
-         (toHtml " | ")
-         +++
-         (thespan ! [theclass "timestamp"]
-          << (showDate $ P.timestamp post)
-         )
-        )
-    )
-
 
 formatPost post categories comments otherposts =
     (h1 ! [theclass "posttitle"] << P.title post
@@ -217,21 +185,52 @@ formatComment comment =
 
 formatRelated = postLink
 
+-- General HTML fragments
+
+-- TODO - fix this to be able to work with URLs that have query
+-- strings already.
+pagingLinks :: String     -- ^ Base URL
+            -> Int        -- ^ Current page
+            -> Bool       -- ^ True if there is another page
+            -> Html
+pagingLinks url page shownext =
+    (thediv ! [theclass "paginglinks"]
+     << ((if page > 1
+          then makeLink url (page - 1) "<< Back"
+          else thespan << "<< Back")
+         +++
+         (toHtml " | ")
+         +++
+         (if shownext
+          then makeLink url (page + 1) "Next >>"
+          else thespan << "Next >>")
+        )
+     )
+    where makeLink url page text = toHtml (hotlink (url ++ "?p=" ++ (show page)) << text)
+
+categoryLinks categories =
+    intersperse (toHtml ", ") $ map categoryLink categories
+
+metaInfoLine post categories divclass =
+    (thediv ! [theclass divclass]
+     << ("Posted in: "
+         +++
+         categoryLinks categories
+         +++
+         (toHtml " | ")
+         +++
+         (thespan ! [theclass "timestamp"]
+          << (showDate $ P.timestamp post)
+         )
+        )
+    )
+
 formatName name = if null name
                   then "Anonymous Coward"
                   else name
 
-custom404page = page $ defaultPageVars { pcontent = h1 << "404 Not Found"
-                                                    +++
-                                                    p << "Sorry, the page you requested could not be found"
-                                       , ptitle = "404 Not Found"
-                                       }
-
--- Utilities
-
 categoryLink c = toHtml $ hotlink (categoryUrl c) << (C.name c)
 
 postLink p = toHtml $ hotlink (postUrl p) << (P.title p)
-
 
 showDate timestamp = formatCalendarTime defaultTimeLocale  "%Y-%m-%d %H:%M" (toUTCTime $ epochToClockTime timestamp)

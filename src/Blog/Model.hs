@@ -151,7 +151,7 @@ makeComment row =
 
 ---- Public API for queries ----
 
-getPostBySlug :: (SqlType a, IConnection conn) => conn -> a -> IO (Maybe P.Post)
+getPostBySlug :: (IConnection conn) => conn -> String -> IO (Maybe P.Post)
 getPostBySlug cn slug = do
   res <- quickQuery' cn getPostBySlugQuery [toSql slug]
   case res of

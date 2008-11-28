@@ -208,6 +208,17 @@ formatComment comment =
 
 formatRelated = postLink
 
+aboutPage post =
+    page $ defaultPageVars
+             { pcontent = (h1 << "About this blog")
+                          +++
+                          (thediv ! [theclass "post"]
+                                      << (primHtml $ P.post_formatted post)
+                          )
+             , ptitle = "About"
+             }
+
+
 -- General HTML fragments
 
 -- TODO - fix this to be able to work with URLs that have query

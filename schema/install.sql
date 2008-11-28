@@ -46,3 +46,14 @@
     format_id INTEGER REFERENCES format(id)
   );
 
+
+CREATE UNIQUE INDEX post_slug_index ON posts (slug);
+CREATE UNIQUE INDEX post_id_index ON posts (id);
+CREATE INDEX post_ts_index ON posts (timestamp);
+CREATE UNIQUE INDEX category_id_index ON categories (id);
+CREATE UNIQUE INDEX category_slug_index ON categories (slug);
+CREATE INDEX postcat_pid_index ON post_categories (post_id);
+CREATE INDEX postcat_cid_index ON post_categories (category_id);
+CREATE UNIQUE INDEX comment_id_index ON comments (id);
+CREATE INDEX comment_pid_index ON comments (post_id);
+CREATE INDEX comment_ts_index ON comments (timestamp);

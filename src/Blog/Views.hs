@@ -26,9 +26,6 @@ custom404 = with (standardResponse custom404page) [
              setStatus 404
             ]
 
--- Temporary view
-dummyView req = return $ Just $ standardResponse ("TODO" :: String) :: IO (Maybe Response)
-
 ---- Views
 
 -- View for the main page
@@ -83,7 +80,10 @@ postView slug req = do
             related <- getRelatedPosts cn post cats
             return $ Just $ standardResponse $ postPage post cats comments related
 
-aboutView = dummyView
+aboutView req = do
+  cn <- connect
+  Just post <- getPostBySlug cn "about"
+  return $ Just $ standardResponse $ aboutPage post
 
 -- Utilities
 

@@ -184,7 +184,46 @@ formatPost post categories comments otherposts =
               else thediv << map formatComment comments
          )
      )
+     +++
+     (if P.comments_open post
+      then (thediv ! [identifier "addcomment"]
+            << ((h1 << "Add comment:")
+                +++
+                commentForm post
+               )
+           )
+      else (hr +++ p << "Closed for comments.")
+     )
     )
+
+commentForm post =
+    form << (
+             (table <<
+              (
+               (tr <<
+                (td << "Name:"
+                 +++
+                 td << input ! [thetype "text", maxlength 30, size "15"]
+                )
+               )
+               +++
+               (tr <<
+                (td << "Email:"
+                 +++
+                 td << input ! [thetype "text", maxlength 30, size "15"]
+                )
+               )
+              )
+             )
+             +++
+             (textarea ! [rows "10", cols "50"] << "")
+             +++
+             br
+             +++
+             (submit "post" "Post")
+             +++
+             (submit "preview" "Preview")
+            )
 
 commentclass comment = "comment" ++
     if (Cm.name comment == Settings.blog_author_name)

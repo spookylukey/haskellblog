@@ -194,17 +194,24 @@ commentclass comment = "comment" ++
 formatComment comment =
     (thediv ! [theclass (commentclass comment)] <<
      (
-      (thediv ! [theclass "commentby"] <<
-       ((thespan ! [theclass "timestamp"] << (" " ++ showDate (Cm.timestamp comment) ++ " "))
-         +++
-         (thespan << (formatName $ Cm.name comment))
+      (thediv ! [theclass "introline"] <<
+       (
+        (thespan << "On ")
+        +++
+        (thespan ! [theclass "timestamp"] << (showDate (Cm.timestamp comment)))
+        +++
+        (thespan << ", ")
+        +++
+        (thespan ! [theclass "commentby"] << (formatName $ Cm.name comment))
+        +++
+        (thespan << " wrote:")
        )
       )
       +++
       (thediv ! [theclass "commenttext"] <<
-       (primHtml $ Cm.text_formatted comment))
-     )
-    ) +++ hr
+                 (primHtml $ Cm.text_formatted comment))
+      )
+     ) +++ hr
 
 formatRelated = postLink
 
@@ -267,4 +274,4 @@ categoryLink c = toHtml $ hotlink (categoryUrl c) << (C.name c)
 
 postLink p = toHtml $ hotlink (postUrl p) << (P.title p)
 
-showDate timestamp = formatCalendarTime defaultTimeLocale  "%Y-%m-%d %H:%M" (toUTCTime $ epochToClockTime timestamp)
+showDate timestamp = formatCalendarTime defaultTimeLocale  "%e %B %Y" (toUTCTime $ epochToClockTime timestamp)

@@ -2,6 +2,7 @@
 module Blog.Templates
 where
 
+import Blog.Forms (emailWidget, nameWidget)
 import Blog.Links
 import Data.List (intersperse)
 import Text.XHtml
@@ -197,33 +198,30 @@ formatPost post categories comments otherposts =
     )
 
 commentForm post =
-    form << (
-             (table <<
-              (
-               (tr <<
-                (td << "Name:"
-                 +++
-                 td << input ! [thetype "text", maxlength 30, size "15"]
-                )
-               )
-               +++
-               (tr <<
-                (td << "Email:"
-                 +++
-                 td << input ! [thetype "text", maxlength 30, size "15"]
-                )
-               )
-              )
-             )
-             +++
-             (textarea ! [rows "10", cols "50"] << "")
-             +++
-             br
-             +++
-             (submit "post" "Post")
-             +++
-             (submit "preview" "Preview")
-            )
+    form ! [method "post", action "#addcomment"]
+    << (
+        (table <<
+         (
+          (tr <<
+           (td << "Name:"
+            +++
+            td << nameWidget
+           ))
+          +++
+          (tr <<
+           (td << "Email:"
+            +++
+            td << emailWidget
+           ))))
+        +++
+        (textarea ! [rows "10", cols "50"] << "")
+        +++
+        br
+        +++
+        (submit "post" "Post")
+        +++
+        (submit "preview" "Preview")
+       )
 
 commentclass comment = "comment" ++
     if (Cm.name comment == Settings.blog_author_name)

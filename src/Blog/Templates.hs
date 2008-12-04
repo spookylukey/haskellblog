@@ -2,7 +2,7 @@
 module Blog.Templates
 where
 
-import Blog.Forms (emailWidget, nameWidget)
+import Blog.Forms (emailWidget, nameWidget, messageWidget)
 import Blog.Links
 import Ella.Forms.Widgets (makeLabel)
 import Data.List (intersperse)
@@ -215,7 +215,7 @@ commentForm post =
             td << emailWidget
            ))))
         +++
-        (textarea ! [rows "10", cols "50"] << "")
+        messageWidget
         +++
         br
         +++

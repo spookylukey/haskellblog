@@ -4,6 +4,7 @@ where
 
 import Blog.Forms (emailWidget, nameWidget)
 import Blog.Links
+import Ella.Forms.Widgets (makeLabel)
 import Data.List (intersperse)
 import Text.XHtml
 import qualified Blog.Post as P
@@ -203,13 +204,13 @@ commentForm post =
         (table <<
          (
           (tr <<
-           (td << "Name:"
+           (td << makeLabel "Name:" nameWidget
             +++
             td << nameWidget
            ))
           +++
           (tr <<
-           (td << "Email:"
+           (td << makeLabel "Email:" emailWidget
             +++
             td << emailWidget
            ))))

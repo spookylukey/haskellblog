@@ -64,11 +64,28 @@ page vars =
                            << pcontent vars))
                +++
                (thediv ! [identifier "footer"]
-                << unordList [ hotlink "/" << "Main site"
-                             , hotlink aboutUrl << "About blog"
-                             , hotlink "/personal.html" << "About me"
-                             , hotlink "/softprojects.html" << "Software"
-                             ]
+                << (h1 << "Links"
+                    +++
+                    (thediv ! [theclass "bloglinks"]
+                     << (h2 << "Blog links"
+                        +++
+                         unordList [ hotlink indexUrl << "Index"
+                                   , hotlink feedsUrl << "Feeds"
+                                   , hotlink categoriesUrl << "Categories"
+                                   , hotlink aboutUrl << "About blog"
+                                   ])
+                    )
+                    +++
+                    (thediv ! [theclass "sitelinks"]
+                     << (h2 << "Also on this site"
+                        +++
+                         unordList [ hotlink "/" << "Index"
+                                   , hotlink "/softprojects.html" << "Software"
+                                   , hotlink "/bibleverses/" << "Bible memorisation"
+                                   , hotlink "/personal.html" << "About me"
+                                   ])
+                    )
+                   )
                )
               )
     where fulltitle = let pt = ptitle vars
@@ -253,14 +270,14 @@ formatComment comment =
 
 formatRelated = postLink
 
-aboutPage post =
+infoPage post =
     page $ defaultPageVars
-             { pcontent = (h1 << "About this blog")
+             { pcontent = (h1 << P.title post)
                           +++
                           (thediv ! [theclass "post"]
                                       << (primHtml $ P.post_formatted post)
                           )
-             , ptitle = "About"
+             , ptitle = P.title post
              }
 
 

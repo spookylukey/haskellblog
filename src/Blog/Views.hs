@@ -80,10 +80,13 @@ postView slug req = do
             related <- getRelatedPosts cn post cats
             return $ Just $ standardResponse $ postPage post cats comments related
 
-aboutView req = do
+infoPageView slug req = do
   cn <- connect
-  Just post <- getPostBySlug cn "about"
-  return $ Just $ standardResponse $ aboutPage post
+  Just post <- getPostBySlug cn slug
+  return $ Just $ standardResponse $ infoPage post
+
+aboutView = infoPageView "about"
+feedsView = infoPageView "feeds"
 
 -- Utilities
 

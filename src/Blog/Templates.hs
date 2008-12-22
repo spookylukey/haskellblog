@@ -67,7 +67,7 @@ page vars =
                 << (h1 << "Links"
                     +++
                     (thediv ! [theclass "bloglinks"]
-                     << (h2 << "Blog links"
+                     << (h2 << "Blog links:"
                         +++
                          unordList [ hotlink indexUrl << "Index"
                                    , hotlink feedsUrl << "Feeds"
@@ -77,7 +77,7 @@ page vars =
                     )
                     +++
                     (thediv ! [theclass "sitelinks"]
-                     << (h2 << "Also on this site"
+                     << (h2 << "Also on this site:"
                         +++
                          unordList [ hotlink "/" << "Index"
                                    , hotlink "/softprojects.html" << "Software"

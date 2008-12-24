@@ -91,4 +91,4 @@ infoPageView slug req = do
 
 -- Utilities
 
-getPage req = (getGET "p" req) `captureOrDefault` 1 :: Int
+getPage req = (getGET req "p") `captureOrDefault` 1 :: Int

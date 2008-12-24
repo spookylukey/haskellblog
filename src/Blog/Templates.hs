@@ -52,6 +52,7 @@ page vars =
            << ((thediv ! [identifier "toplinks"]
                            << unordList [ HotLink indexUrl (toHtml "Home") [theclass "first"]
                                         , hotlink categoriesUrl << "Categories"
+                                        , hotlink feedsUrl << "Feeds"
                                         , hotlink aboutUrl << "About"
                                         ])
                +++

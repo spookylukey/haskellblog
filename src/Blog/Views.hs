@@ -83,14 +83,11 @@ postView slug req = do
   where
     handleUserComment cn post req = return (undefined, undefined)
 
-
+-- | View that shows a post as a static information page -- no comments etc.
 infoPageView slug req = do
   cn <- connect
   Just post <- getPostBySlug cn slug
   return $ Just $ standardResponse $ infoPage post
-
-aboutView = infoPageView "about"
-feedsView = infoPageView "feeds"
 
 -- Utilities
 

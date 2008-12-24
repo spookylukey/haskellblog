@@ -67,7 +67,7 @@ categoryView slug req = do
               (posts,more) <- getPostsForCategory cn cat (getPage req)
               return $ Just $ standardResponse $ categoryPage cat posts curpage more
 
--- View that shows individual post
+-- | View that shows individual post
 postView :: String -> View
 postView slug req = do
   cn <- connect
@@ -75,10 +75,14 @@ postView slug req = do
   case mp of
     Nothing -> return $ Just $ custom404 -- preferred to 'Nothing'
     Just post -> do
+            (commentData, commentStage) <- handleUserComment cn post req
             cats <- getCategoriesForPost cn post
             comments <- getCommentsForPost cn post
             related <- getRelatedPosts cn post cats
-            return $ Just $ standardResponse $ postPage post cats comments related
+            return $ Just $ standardResponse $ postPage post commentData commentStage cats comments related
+  where
+    handleUserComment cn post req = return (undefined, undefined)
+
 
 infoPageView slug req = do
   cn <- connect

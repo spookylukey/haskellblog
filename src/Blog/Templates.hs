@@ -2,7 +2,7 @@
 module Blog.Templates
 where
 
-import Blog.Forms (emailWidget, nameWidget, messageWidget)
+import Blog.Forms (emailWidget, nameWidget, messageWidget, CommentStage(..))
 import Blog.Links
 import Ella.Forms.Widgets (makeLabel)
 import Data.List (intersperse)
@@ -170,11 +170,13 @@ formatCategoryIndex cat posts curpage moreposts =
 
 
 postPage :: P.Post        -- ^ The Post to display
+         -> ()            -- ^ Data for the comment form (TODO)
+         -> CommentStage  -- ^ What stage comment submission is at
          -> [C.Category]  -- ^ Categories the post is in
          -> [Cm.Comment]  -- ^ Comments belonging to the poast
          -> [P.Post]      -- ^ Related posts
          -> Html
-postPage post categories comments related =
+postPage post commentData commentStage categories comments related =
     page $ defaultPageVars
              { pcontent = formatPost post categories comments related
              , ptitle = P.title post

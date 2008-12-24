@@ -27,3 +27,10 @@ messageWidget = Textarea { value = ""
                          , name = "message"
                          , identifier = "id_message"
                          }
+
+-- | Enum for the different stages of submitting a comment
+data CommentStage = NoComment
+                  | CommentPreview
+                  | CommentInvalid
+                  | CommentAccepted
+                    deriving (Eq, Ord, Enum, Read, Show)

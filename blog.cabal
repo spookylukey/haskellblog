@@ -30,6 +30,7 @@ Executable blog.cgi
         HDBC-sqlite3 >= 1.1.4,
         HDBC >= 1.1.5,
         containers,
+        unix >= 2.3.0.0,
         utf8-string,
         regex-pcre,
         regex-base,

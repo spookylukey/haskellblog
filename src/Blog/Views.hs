@@ -11,7 +11,8 @@ import Blog.Templates
 import Blog.Links
 import Blog.DB (connect)
 import Blog.Model
-import Maybe (fromMaybe)
+import Blog.Forms (CommentStage(..), validateComment)
+import Maybe (fromMaybe, isJust)
 
 ---- Utilities
 
@@ -75,13 +76,32 @@ postView slug req = do
   case mp of
     Nothing -> return $ Just $ custom404 -- preferred to 'Nothing'
     Just post -> do
-            (commentData, commentStage) <- handleUserComment cn post req
+            (commentStage, commentData, commentErrors) <- handleUserComment cn post req
             cats <- getCategoriesForPost cn post
             comments <- getCommentsForPost cn post
             related <- getRelatedPosts cn post cats
-            return $ Just $ standardResponse $ postPage post commentData commentStage cats comments related
+            return $ Just $ standardResponse $ postPage post commentStage commentData commentErrors cats comments related
   where
-    handleUserComment cn post req = return (undefined, undefined)
+    handleUserComment cn post req =
+        case requestMethod req of
+          "POST" -> do
+            (commentData, commentErrors) <- validateComment (getPOST req) post
+            commentStage <-
+                do
+                  if isJust (getPOST req "submit")
+                     then if null commentErrors
+                          then
+                              do
+                                addComment cn commentData
+                                return CommentAccepted
+                          else
+                              return CommentInvalid
+                     -- Just assume 'preview' if not 'submit'
+                     else return CommentPreview
+            return (commentStage, commentData, commentErrors)
+
+          _ -> return (NoComment, undefined, undefined)
+
 
 -- | View that shows a post as a static information page -- no comments etc.
 infoPageView slug req = do

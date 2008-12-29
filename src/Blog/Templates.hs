@@ -170,13 +170,14 @@ formatCategoryIndex cat posts curpage moreposts =
 
 
 postPage :: P.Post        -- ^ The Post to display
-         -> ()            -- ^ Data for the comment form (TODO)
          -> CommentStage  -- ^ What stage comment submission is at
+         -> Cm.Comment    -- ^ Data for the comment form
+         -> [String]      -- ^ Validation errors for comment
          -> [C.Category]  -- ^ Categories the post is in
          -> [Cm.Comment]  -- ^ Comments belonging to the poast
          -> [P.Post]      -- ^ Related posts
          -> Html
-postPage post commentData commentStage categories comments related =
+postPage post commentStage commentData commentErrors categories comments related =
     page $ defaultPageVars
              { pcontent = formatPost post categories comments related
              , ptitle = P.title post

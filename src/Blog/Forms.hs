@@ -12,7 +12,7 @@ import Ella.Param (captureOrDefault)
 
 import qualified Blog.Comment as Cm
 import qualified Blog.Post as P
-import Blog.Formats (plaintext)
+import Blog.Formats (Format(..), getFormatter)
 
 import Data.Maybe (fromJust)
 import System.Posix.Time (epochTime)
@@ -56,7 +56,7 @@ emptyComment = Cm.Comment {
                , email = ""
                , text_raw = ""
                , text_formatted = undefined
-               , format_id = undefined
+               , format = undefined
                }
 
 
@@ -79,6 +79,7 @@ validateComment postedData blogpost =
                    (if null name
                    then ["'Name' is a required field."]
                    else [])
+      let format = Plaintext
 
       return (Cm.Comment {
                       uid = undefined
@@ -87,7 +88,7 @@ validateComment postedData blogpost =
                     , name = name
                     , email = email
                     , text_raw = text
-                    , text_formatted = text -- TODO fix, security
-                    , format_id = plaintext
+                    , text_formatted = getFormatter format $ text
+                    , format = format
                     }, errors)
 

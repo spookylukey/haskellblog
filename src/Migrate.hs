@@ -56,7 +56,7 @@ readPosts = makeItems "posts.txt" mkPost
                               , P.post_formatted = ""
                               , P.summary_raw = row !! 4
                               , P.summary_formatted = row !! 4
-                              , P.format_id = Formats.rawhtml
+                              , P.format = Formats.Rawhtml
                               , P.timestamp = read (row !! 2)
                               , P.comments_open = True
                               }
@@ -86,7 +86,7 @@ readComments = makeItems "comments.txt" mkComment
                                      , Cm.email = row !! 4
                                      , Cm.text_raw = row !! 5
                                      , Cm.text_formatted = row !! 5
-                                     , Cm.format_id = Formats.rawhtml
+                                     , Cm.format = Formats.Rawhtml
                                      }
 -- Writing
 

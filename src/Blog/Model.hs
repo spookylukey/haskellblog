@@ -43,7 +43,7 @@ addPost cn p = do theslug <- makePostSlug cn p
                          toSql $ P.post_formatted p2,
                          toSql $ P.summary_raw p2,
                          toSql $ P.summary_formatted p2,
-                         toSql $ P.format_id p2,
+                         toSql $ fromEnum $ P.format p2,
                          toSql $ P.timestamp p2,
                          toSql $ P.comments_open p2
                         ]
@@ -88,7 +88,7 @@ addComment cn cm = do
                    , toSql $ Cm.email cm
                    , toSql $ Cm.text_raw cm
                    , toSql $ Cm.text_formatted cm
-                   , toSql $ Cm.format_id cm
+                   , toSql $ fromEnum $ Cm.format cm
                    ]
   newid <- getDbId cn
   return cm { Cm.uid = newid }
@@ -127,7 +127,7 @@ makePost row =
            , P.post_formatted = fromSql (row !! 4)
            , P.summary_raw = fromSql (row !! 5)
            , P.summary_formatted = fromSql (row !! 6)
-           , P.format_id = fromSql (row !! 7)
+           , P.format = toEnum $ fromSql (row !! 7)
            , P.timestamp = fromSql (row !! 8)
            , P.comments_open = fromSql (row !! 9)
            }
@@ -146,7 +146,7 @@ makeComment row =
                , Cm.email = fromSql (row !! 4)
                , Cm.text_raw = fromSql (row !! 5)
                , Cm.text_formatted = fromSql (row !! 6)
-               , Cm.format_id = fromSql (row !! 7)
+               , Cm.format = toEnum $ fromSql (row !! 7)
                }
 
 ---- Public API for queries ----

@@ -1,5 +1,7 @@
 module Blog.Post where
 
+import Blog.Formats (Format)
+
 data Post = Post {
       uid :: Int,
       title :: String,
@@ -8,7 +10,7 @@ data Post = Post {
       post_formatted :: String,
       summary_raw :: String,
       summary_formatted :: String,
-      format_id :: Int,
+      format :: Format,
       timestamp :: Int,
       comments_open :: Bool
     } deriving (Show, Eq)

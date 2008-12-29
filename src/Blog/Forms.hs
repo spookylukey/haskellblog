@@ -8,13 +8,15 @@ import Ella.Forms.Widgets.TextInput (TextInput(..))
 import Ella.Forms.Widgets.Textarea  (Textarea(..))
 import qualified Ella.Forms.Widgets.TextInput as TI
 import qualified Ella.Forms.Widgets.Textarea as TA
+import Ella.Param (captureOrDefault)
+
 import qualified Blog.Comment as Cm
 import qualified Blog.Post as P
 import Blog.Formats (plaintext)
 
 import Data.Maybe (fromJust)
 import System.Posix.Time (epochTime)
-
+import System.Posix.Types
 
 nameWidget = TextInput { value = ""
                        , size = Just 20
@@ -45,6 +47,19 @@ data CommentStage = NoComment
                     deriving (Eq, Ord, Enum, Read, Show)
 
 
+-- | An empty comment used for populating the default form.
+emptyComment = Cm.Comment {
+                 uid = undefined
+               , post_id = undefined
+               , timestamp = undefined
+               , name = ""
+               , email = ""
+               , text_raw = ""
+               , text_formatted = undefined
+               , format_id = undefined
+               }
+
+
 -- | extract the posted data from a POST request and build
 -- a Comment from it, returning a Comment and a list of validaion errors
 validateComment postedData blogpost =
@@ -54,16 +69,25 @@ validateComment postedData blogpost =
     -- TODO - actual validation on fields
     -- TODO - addCommentToPost utility
       ts <- epochTime
-      let text = fromJust $ postedData "message"
-      let errors = []
+      let text = postedData "message" `captureOrDefault` ""
+      let name = postedData "name" `captureOrDefault` ""
+      let email = postedData "email" `captureOrDefault` ""
+      let errors = (if null text
+                   then ["'Message' is a required field."]
+                   else [])
+                   ++
+                   (if null name
+                   then ["'Name' is a required field."]
+                   else [])
+
       return (Cm.Comment {
-                      Cm.uid = undefined
-                    , Cm.post_id = P.uid blogpost
-                    , Cm.timestamp = ts
-                    , Cm.name = fromJust $ Map.lookup "name" postedData
-                    , Cm.email = fromJust $ Map.lookup "name" postedData
-                    , Cm.text_raw = text
-                    , Cm.text_formatted = text -- TODO fix, security
-                    , Cm.format_id = plaintext
+                      uid = undefined
+                    , post_id = P.uid blogpost
+                    , timestamp = floor $ toRational ts
+                    , name = name
+                    , email = email
+                    , text_raw = text
+                    , text_formatted = text -- TODO fix, security
+                    , format_id = plaintext
                     }, errors)
 

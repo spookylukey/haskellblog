@@ -5,6 +5,7 @@ where
 import Blog.Forms (emailWidget, nameWidget, messageWidget, CommentStage(..))
 import Blog.Links
 import Ella.Forms.Widgets (makeLabel)
+import Ella.Forms.Base
 import Data.List (intersperse)
 import Text.XHtml
 import qualified Blog.Post as P
@@ -179,11 +180,11 @@ postPage :: P.Post        -- ^ The Post to display
          -> Html
 postPage post commentStage commentData commentErrors categories comments related =
     page $ defaultPageVars
-             { pcontent = formatPost post categories comments related
+             { pcontent = formatPost post commentStage commentData commentErrors categories comments related
              , ptitle = P.title post
              }
 
-formatPost post categories comments otherposts =
+formatPost post commentStage commentData commentErrors categories comments otherposts =
     (h1 ! [theclass "posttitle"] << P.title post
      +++
      metaInfoLine post categories "metainfo"
@@ -212,14 +213,33 @@ formatPost post categories comments otherposts =
       then (thediv ! [identifier "addcomment"]
             << ((h1 << "Add comment:")
                 +++
-                commentForm post
+                commentForm post commentStage commentData commentErrors
                )
            )
       else (hr +++ p << "Closed for comments.")
      )
     )
 
-commentForm post =
+commentForm post commentStage commentData errors =
+    (case commentStage of
+       CommentPreview ->
+           (h2 << "Preview")
+           +++
+           (thediv ! [theclass "commentpreview"]
+            <<
+            formatComment commentData)
+
+       CommentAccepted ->
+           (thediv ! [theclass "accepted"]
+            << "Comment added, thank you.")
+
+       CommentInvalid ->
+           (thediv ! [theclass "validationerror"]
+            << unordList errors)
+
+       _ -> noHtml
+    )
+    +++
     form ! [method "post", action "#addcomment"]
     << (
         (table <<
@@ -227,20 +247,20 @@ commentForm post =
           (tr <<
            (td << makeLabel "Name:" nameWidget
             +++
-            td << nameWidget
+            td << setVal (Cm.name commentData) nameWidget
            ))
           +++
           (tr <<
            (td << makeLabel "Email:" emailWidget
             +++
-            td << emailWidget
+            td << setVal (Cm.email commentData) emailWidget
            ))))
         +++
-        messageWidget
+        setVal (Cm.text_raw commentData) messageWidget
         +++
         br
         +++
-        (submit "post" "Post")
+        (submit "submit" "Post")
         +++
         (submit "preview" "Preview")
        )

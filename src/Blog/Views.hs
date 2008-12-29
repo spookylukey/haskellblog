@@ -11,7 +11,8 @@ import Blog.Templates
 import Blog.Links
 import Blog.DB (connect)
 import Blog.Model
-import Blog.Forms (CommentStage(..), validateComment)
+import Blog.Forms (CommentStage(..), validateComment, emptyComment)
+
 import Maybe (fromMaybe, isJust)
 
 ---- Utilities
@@ -86,21 +87,18 @@ postView slug req = do
         case requestMethod req of
           "POST" -> do
             (commentData, commentErrors) <- validateComment (getPOST req) post
-            commentStage <-
-                do
-                  if isJust (getPOST req "submit")
-                     then if null commentErrors
-                          then
-                              do
-                                addComment cn commentData
-                                return CommentAccepted
-                          else
-                              return CommentInvalid
-                     -- Just assume 'preview' if not 'submit'
-                     else return CommentPreview
-            return (commentStage, commentData, commentErrors)
+            if null commentErrors
+               then if isJust (getPOST req "submit")
+                    then
+                        do
+                          addComment cn commentData
+                          return (CommentAccepted, emptyComment, [])
+                          -- Just assume 'preview' if not 'submit'
+                    else return (CommentPreview, commentData, commentErrors)
+               else
+                   return (CommentInvalid, commentData, commentErrors)
 
-          _ -> return (NoComment, undefined, undefined)
+          _ -> return (NoComment, emptyComment, [])
 
 
 -- | View that shows a post as a static information page -- no comments etc.

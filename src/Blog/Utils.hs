@@ -17,11 +17,11 @@ regexReplace ::
     -> BL.ByteString
 regexReplace !regex !replacement !text = go text []
  where go str res =
-         if BL.null str
-             then BL.concat . reverse $ res
-             else case (str =~~ regex) :: Maybe (BL.ByteString, BL.ByteString, BL.ByteString) of
-               Nothing -> BL.concat . reverse $ (str:res)
-               Just (bef, _ , aft) -> go aft (replacement:bef:res)
+           if BL.null str
+           then BL.concat . reverse $ res
+           else case (str =~~ regex) :: Maybe (BL.ByteString, BL.ByteString, BL.ByteString) of
+                  Nothing -> BL.concat . reverse $ (str:res)
+                  Just (bef, _ , aft) -> go aft (replacement:bef:res)
 
 -- | Regex replace, with a function to transform matched strings
 regexReplaceCustom ::
@@ -32,11 +32,11 @@ regexReplaceCustom ::
   -> BL.ByteString
 regexReplaceCustom !regex replacef !text = go text []
  where go str res =
-         if BL.null str
-             then BL.concat . reverse $ res
-             else case (str =~~ regex) :: Maybe (BL.ByteString, BL.ByteString, BL.ByteString) of
-               Nothing -> BL.concat . reverse $ (str:res)
-               Just (bef, match , aft) -> go aft (replacef(match):bef:res)
+           if BL.null str
+           then BL.concat . reverse $ res
+           else case (str =~~ regex) :: Maybe (BL.ByteString, BL.ByteString, BL.ByteString) of
+                  Nothing -> BL.concat . reverse $ (str:res)
+                  Just (bef, match , aft) -> go aft (replacef(match):bef:res)
 
 split :: String -> Char -> [String]
 split [] delim = [""]

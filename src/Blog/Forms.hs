@@ -4,20 +4,23 @@ module Blog.Forms
 
 where
 
+import Blog.Formats (Format(..), getFormatter)
+import Control.Monad (liftM)
+import Data.Maybe (fromJust)
 import Ella.Forms.Widgets.TextInput (TextInput(..))
 import Ella.Forms.Widgets.Textarea  (Textarea(..))
-import qualified Ella.Forms.Widgets.TextInput as TI
-import qualified Ella.Forms.Widgets.Textarea as TA
-import Ella.Param (captureOrDefault)
-
-import qualified Blog.Comment as Cm
-import qualified Blog.Post as P
-import Blog.Formats (Format(..), getFormatter)
-
-import Data.Maybe (fromJust)
-import qualified Data.Map as Map
+import Ella.GenUtils (exactParse)
+import Ella.Param (captureOrDefault, Param(..))
 import System.Posix.Time (epochTime)
 import System.Posix.Types
+import qualified Blog.Comment as Cm
+import qualified Blog.Post as P
+import qualified Data.Map as Map
+import qualified Ella.Forms.Widgets.RadioButtonList as RBL
+import qualified Ella.Forms.Widgets.TextInput as TI
+import qualified Ella.Forms.Widgets.Textarea as TA
+import qualified Text.XHtml as X
+
 
 nameWidget = TextInput { value = ""
                        , size = Just 20
@@ -32,6 +35,15 @@ emailWidget = TextInput { value = ""
                         , name = "email"
                         , identifier = "id_email"
                         }
+
+commentAllowedFormats =  [Plaintext, RST]
+
+formatWidget = RBL.RadioButtonList { value = ""
+                                   , name = "format"
+                                   , identifier = "id_format"
+                                   , values = map (show . fromEnum) commentAllowedFormats
+                                   , captions = map X.toHtml ["Plain text", "Restructured text"]
+                                   }
 
 messageWidget = Textarea { value = ""
                          , cols = Just 60
@@ -57,9 +69,13 @@ emptyComment = Cm.Comment {
                , email = ""
                , text_raw = ""
                , text_formatted = undefined
-               , format = undefined
+               , format = Plaintext
                }
 
+instance Param Format where
+    -- Read integer then convert.
+    -- TODO error handling for out of bounds.
+    capture s = liftM toEnum $ exactParse s
 
 -- | extract the posted data from a POST request and build
 -- a Comment from it, returning a Comment and a list of validation errors
@@ -84,10 +100,13 @@ validateComment postedData blogpost =
       let text = postedData "message" `captureOrDefault` ""
       let name = postedData "name" `captureOrDefault` ""
       let email = postedData "email" `captureOrDefault` ""
+      let format = postedData "format" `captureOrDefault` Plaintext
       let errors = (if null text
                    then [("message", "'Message' is a required field.")]
-                   else [])
-      let format = Plaintext
+                   else []) ++
+                   (if not $ format `elem` commentAllowedFormats
+                    then [("format", "Please choose a format from the list")]
+                    else [])
 
       return (Cm.Comment {
                       uid = undefined

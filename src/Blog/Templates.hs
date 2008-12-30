@@ -2,7 +2,7 @@
 module Blog.Templates
 where
 
-import Blog.Forms (emailWidget, nameWidget, messageWidget, CommentStage(..))
+import Blog.Forms (emailWidget, nameWidget, messageWidget, formatWidget, CommentStage(..))
 import Blog.Links
 import Ella.Forms.Widgets (makeLabel)
 import Ella.Forms.Base
@@ -255,6 +255,12 @@ commentForm post commentStage commentData errors =
            (td << makeLabel "Email:" emailWidget
             +++
             td << setVal (Cm.email commentData) emailWidget
+           ))
+          +++
+          (tr <<
+           (td << "Format:"
+            +++
+            td << setVal (show $ fromEnum $ Cm.format commentData) formatWidget
            ))))
         +++
         setVal (Cm.text_raw commentData) messageWidget

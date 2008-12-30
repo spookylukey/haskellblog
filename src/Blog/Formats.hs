@@ -52,8 +52,8 @@ formatPlaintext :: String -> String
 formatPlaintext s = utf8 >>>
                     escapeHtml >>>
                     normaliseCRLF >>>
-                    nl2br >>>
                     linkify >>>
+                    nl2br >>>
                     preserveLeadingWhitespace >>>
                     UTF8.toString
                     $ s

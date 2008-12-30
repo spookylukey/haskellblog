@@ -17,7 +17,12 @@ testFormatPlaintextLink2 = "<a href=\"http://foo.com/\">http://foo.com/</a> x" ~
 testFormatPlaintextLink3 = "<a href=\"http://foo.com/bar?what=why\">http://foo.com/bar?what=why</a> x" ~=?
                            pt "http://foo.com/bar?what=why x"
 
+testFormatPlaintextLink4 = "<a href=\"http://foo.com/\">http://foo.com/</a><br />\n" ~=?
+                           pt "http://foo.com/\n"
+
 tests = test [ testFormatPlaintext
              , testFormatPlaintextLink1
              , testFormatPlaintextLink2
-             , testFormatPlaintextLink3]
+             , testFormatPlaintextLink3
+             , testFormatPlaintextLink4
+             ]

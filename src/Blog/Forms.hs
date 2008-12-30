@@ -66,18 +66,14 @@ validateComment postedData blogpost =
     do
     -- TODO - protect name -- some names are reversed for logged in users.
     -- TODO - posts that are closed for comments
-    -- TODO - actual validation on fields
     -- TODO - addCommentToPost utility
+    -- TODO - nicer mechanism for validation
       ts <- epochTime
       let text = postedData "message" `captureOrDefault` ""
       let name = postedData "name" `captureOrDefault` ""
       let email = postedData "email" `captureOrDefault` ""
       let errors = (if null text
                    then ["'Message' is a required field."]
-                   else [])
-                   ++
-                   (if null name
-                   then ["'Name' is a required field."]
                    else [])
       let format = Plaintext
 

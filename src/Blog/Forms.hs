@@ -65,11 +65,21 @@ emptyComment = Cm.Comment {
 -- a Comment from it, returning a Comment and a list of validation errors
 validateComment postedData blogpost =
     do
-    -- TODO - protect name -- some names are reversed for logged in users.
+    -- TODO - protect name -- some names are reserved for logged in users.
     -- TODO - posts that are closed for comments
     -- TODO - nicer mechanism for validation
     -- TODO - validate lengths of fields
     -- TODO - CSRF protection
+
+    -- TODO - Spam protection
+    --    Method - add 10 second minimum time for adding comment.  On
+    --             first request, send back field with hash of time +
+    --             IP address + secret, and field with time only. Time
+    --             and hash fields are propagated if the user presses
+    --             preview.  If hash doesn't match when user presses
+    --             submit or if timedelta less than 10 seconds,
+    --             emit validation error.
+
       ts <- epochTime
       let text = postedData "message" `captureOrDefault` ""
       let name = postedData "name" `captureOrDefault` ""

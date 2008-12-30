@@ -40,6 +40,7 @@ Executable blog.cgi
         old-time >= 1.0.0.0,
         old-locale >= 1.0.0.0,
         MissingH >= 1.0.2,
+        pandoc >= 1.1,
         ella >= 0.1.1
   Main-is: BlogCgi.hs
   hs-source-dirs: src

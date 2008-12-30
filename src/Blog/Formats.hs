@@ -22,15 +22,35 @@ data Format = Rawhtml | Plaintext
 formatRawhtml :: String -> String
 formatRawhtml = id
 
+
+url_regex =
+    "https?://"                                    ++ -- http:// or https://
+    "(?:(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}|"       ++ -- domain...
+    "localhost|"                                   ++ --localhost...
+    "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})"   ++ -- ...or ip
+    "(?::\\d+)?"                                   ++ -- optional port
+    "(?:/\\S+|/?)"
+
+escapeHtml = regexReplace "&" (BL.pack "&amp;") >>>
+             regexReplace "<" (BL.pack "&lt;") >>>
+             regexReplace ">" (BL.pack "&gt;")
+
+escapeQuotes = regexReplace "\"" (BL.pack "&quot;")
+
+linkify = regexReplaceCustom url_regex (\s -> (BL.pack "<a href=\"") `BL.append` (escapeQuotes s) `BL.append` (BL.pack "\">") `BL.append` s `BL.append` (BL.pack "</a>"))
+
+preserveLeadingWhitespace = regexReplaceCustom "^(\\s+)" (regexReplace " " (BL.pack "&nbsp;"))
+
+nl2br = regexReplace "\n" (BL.pack "<br />\n")
+
 formatPlaintext :: String -> String
-formatPlaintext s = regexReplace "&" (BL.pack "&amp;") >>>
-                    regexReplace "<" (BL.pack "&lt;") >>>
-                    regexReplace ">" (BL.pack "&gt;") >>>
-                    regexReplace "\n" (BL.pack "<br />\n") >>>
-                    regexReplaceCustom "^(\\s+)"
-                                           (regexReplace " " (BL.pack "&nbsp;")) >>>
+formatPlaintext s = utf8 >>>
+                    escapeHtml >>>
+                    nl2br >>>
+                    linkify >>>
+                    preserveLeadingWhitespace >>>
                     UTF8.toString
-                    $ (utf8 s)
+                    $ s
 
 formatters :: Array Format (String -> String)
 formatters = array (Rawhtml, Plaintext)

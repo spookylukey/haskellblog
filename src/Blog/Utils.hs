@@ -22,6 +22,9 @@ regexReplace !regex !replacement !text = go text []
            else case (str =~~ regex) :: Maybe (BL.ByteString, BL.ByteString, BL.ByteString) of
                   Nothing -> BL.concat . reverse $ (str:res)
                   Just (bef, _ , aft) -> go aft (replacement:bef:res)
+-- Could be implemented like this:
+-- > regexReplace r rep t = regexReplaceCustom r (const rep) t
+
 
 -- | Regex replace, with a function to transform matched strings
 regexReplaceCustom ::

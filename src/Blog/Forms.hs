@@ -15,6 +15,7 @@ import qualified Blog.Post as P
 import Blog.Formats (Format(..), getFormatter)
 
 import Data.Maybe (fromJust)
+import qualified Data.Map as Map
 import System.Posix.Time (epochTime)
 import System.Posix.Types
 
@@ -61,19 +62,20 @@ emptyComment = Cm.Comment {
 
 
 -- | extract the posted data from a POST request and build
--- a Comment from it, returning a Comment and a list of validaion errors
+-- a Comment from it, returning a Comment and a list of validation errors
 validateComment postedData blogpost =
     do
     -- TODO - protect name -- some names are reversed for logged in users.
     -- TODO - posts that are closed for comments
-    -- TODO - addCommentToPost utility
     -- TODO - nicer mechanism for validation
+    -- TODO - validate lengths of fields
+    -- TODO - CSRF protection
       ts <- epochTime
       let text = postedData "message" `captureOrDefault` ""
       let name = postedData "name" `captureOrDefault` ""
       let email = postedData "email" `captureOrDefault` ""
       let errors = (if null text
-                   then ["'Message' is a required field."]
+                   then [("message", "'Message' is a required field.")]
                    else [])
       let format = Plaintext
 
@@ -86,5 +88,5 @@ validateComment postedData blogpost =
                     , text_raw = text
                     , text_formatted = getFormatter format $ text
                     , format = format
-                    }, errors)
+                    }, Map.fromList errors)
 

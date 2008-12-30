@@ -1,6 +1,7 @@
 {-# OPTIONS_GHC -fglasgow-exts -XOverloadedStrings #-}
 module Blog.Views where
 
+import qualified Data.Map as Map
 import Ella.Framework (default404, View)
 import Ella.Param (captureOrDefault)
 import Ella.Request
@@ -87,18 +88,18 @@ postView slug req = do
         case requestMethod req of
           "POST" -> do
             (commentData, commentErrors) <- validateComment (getPOST req) post
-            if null commentErrors
+            if Map.null commentErrors
                then if isJust (getPOST req "submit")
                     then
                         do
                           addComment cn commentData
-                          return (CommentAccepted, emptyComment, [])
+                          return (CommentAccepted, emptyComment, Map.empty)
                           -- Just assume 'preview' if not 'submit'
                     else return (CommentPreview, commentData, commentErrors)
                else
                    return (CommentInvalid, commentData, commentErrors)
 
-          _ -> return (NoComment, emptyComment, [])
+          _ -> return (NoComment, emptyComment, Map.empty)
 
 
 -- | View that shows a post as a static information page -- no comments etc.

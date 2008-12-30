@@ -7,6 +7,7 @@ import Blog.Links
 import Ella.Forms.Widgets (makeLabel)
 import Ella.Forms.Base
 import Data.List (intersperse)
+import qualified Data.Map as Map
 import Text.XHtml
 import qualified Blog.Post as P
 import qualified Blog.Category as C
@@ -173,7 +174,7 @@ formatCategoryIndex cat posts curpage moreposts =
 postPage :: P.Post        -- ^ The Post to display
          -> CommentStage  -- ^ What stage comment submission is at
          -> Cm.Comment    -- ^ Data for the comment form
-         -> [String]      -- ^ Validation errors for comment
+         -> Map.Map String String -- ^ Validation errors for comment
          -> [C.Category]  -- ^ Categories the post is in
          -> [Cm.Comment]  -- ^ Comments belonging to the poast
          -> [P.Post]      -- ^ Related posts
@@ -235,7 +236,7 @@ commentForm post commentStage commentData errors =
 
        CommentInvalid ->
            (thediv ! [theclass "validationerror"]
-            << unordList errors)
+            << unordList (Map.elems errors))
 
        _ -> noHtml
     )

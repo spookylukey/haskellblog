@@ -104,10 +104,39 @@ postView slug req = do
 
 
 -- | View that shows a post as a static information page -- no comments etc.
+infoPageView :: String -> View
 infoPageView slug req = do
   cn <- connect
   Just post <- getPostBySlug cn slug
   return $ Just $ standardResponse $ infoPage post
+
+-- | View that displays a login form an handles logging in
+loginView :: View
+loginView req = do
+  cn <- connect
+  loginView' cn req
+
+-- | Testable version of loginView
+loginView' cn req =
+  case requestMethod req of
+    "POST" -> do
+      (loginData, loginErrors) <- validateLogin (getPOST req :: (String -> Maybe String)) cn
+      if Map.null loginErrors
+         then do
+           loginCookie <- createLoginCookie loginData
+           return $ Just $ (redirectResponse adminMenuUrl) `with` [ addCookie loginCookie ]
+         else
+           return $ Just $ standardResponse $ loginPage loginData loginErrors
+    _ -> do
+      return $ Just $ standardResponse $ loginPage emptyLoginData Map.empty
+
+-- TODO, dummy types so it can compile
+validateLogin = undefined
+createLoginCookie = undefined
+addCookie = undefined
+loginPage = undefined :: () -> Map.Map String String -> String
+emptyLoginData = undefined
+
 
 -- Utilities
 

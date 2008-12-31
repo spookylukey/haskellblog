@@ -14,3 +14,6 @@ categoriesUrl     = Settings.root_url ++ "categories/"
 categoryUrl c     = Settings.root_url ++ "categories/" ++ (C.slug c) ++ "/"
 aboutUrl          = Settings.root_url ++ "about/"
 feedsUrl          = Settings.root_url ++ "feeds/"
+loginUrl          = Settings.root_url ++ "login/"
+
+adminMenuUrl = undefined :: String

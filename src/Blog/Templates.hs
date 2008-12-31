@@ -178,16 +178,9 @@ formatPost post commentStage commentData commentErrors categories comments other
       << (primHtml $ P.post_formatted post)
      )
      +++
-     (if null otherposts
-      then thediv << ""
-      else (thediv ! [theclass "related"]
-            << ((h1 << "Related:")
-                +++ (unordList $ map formatRelated otherposts))
-           )
-     )
-     +++
      (thediv ! [theclass "comments"]
-      << ((h1 << "Comments:")
+      << ((h1 ! [identifier "comments"]
+           << ("Comments: " +++ anchor ! [ theclass "anchor", href "#comments" ] << primHtml "&sect;"))
           +++ if null comments
               then p << "No comments."
               else thediv << map formatComment comments
@@ -202,6 +195,15 @@ formatPost post commentStage commentData commentErrors categories comments other
                )
            )
       else (hr +++ p << "Closed for comments.")
+     )
+     +++
+     (if null otherposts
+      then thediv << ""
+      else (thediv ! [ theclass "related" ]
+            << ((h1 ! [ identifier "related" ]
+                 << ("Related: " +++ anchor ! [ theclass "anchor", href "#related" ] << primHtml "&sect;"))
+                +++ (unordList $ map formatRelated otherposts))
+           )
      )
     )
 

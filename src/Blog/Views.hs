@@ -68,7 +68,8 @@ categoryView slug req = do
     Nothing -> return $ Just $ custom404
     Just cat -> do
               (posts,more) <- getPostsForCategory cn cat (getPage req)
-              return $ Just $ standardResponse $ categoryPage cat posts curpage more
+              cats <- getCategoriesBulk cn posts
+              return $ Just $ standardResponse $ categoryPage cat (zip posts cats) curpage more
 
 -- | View that shows individual post
 postView :: String -> View

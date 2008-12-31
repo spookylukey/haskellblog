@@ -113,13 +113,13 @@ mainIndexPage :: [(P.Post, [C.Category])] -- ^ list of posts (wtth their categor
               -> Html
 mainIndexPage postInfo curpage moreposts =
     page $ defaultPageVars
-             { pcontent = formatIndex postInfo curpage moreposts
+             { pcontent = formatIndex "Recent posts" indexUrl postInfo curpage moreposts
              , ptitle = ""
              }
 
-formatIndex :: [(P.Post, [C.Category])] -> Int -> Bool -> Html
-formatIndex postInfo curpage shownext =
-    (h1 << "Recent posts")
+formatIndex :: String -> String -> [(P.Post, [C.Category])] -> Int -> Bool -> Html
+formatIndex title url postInfo curpage shownext =
+    (h1 << title)
     +++
     (do (post, cats) <- postInfo
         return (
@@ -132,7 +132,7 @@ formatIndex postInfo curpage shownext =
                  << (primHtml $ P.summary_formatted post))
                )
     ) +++ (
-           pagingLinks indexUrl curpage shownext
+           pagingLinks url curpage shownext
           )
 
 categoriesPage :: [C.Category] -> Html
@@ -148,28 +148,12 @@ formatCategoryLink cat =
     (thediv ! [theclass "category"]
      << categoryLink cat)
 
-categoryPage :: C.Category -> [P.Post] -> Int -> Bool -> Html
+categoryPage :: C.Category -> [(P.Post, [C.Category])] -> Int -> Bool -> Html
 categoryPage cat posts curpage moreposts =
     page $ defaultPageVars
-         { pcontent = formatCategoryIndex cat posts curpage moreposts
+         { pcontent = formatIndex ("Category: " ++ C.name cat) (categoryUrl cat) posts curpage moreposts
          , ptitle = C.name cat
          }
-
-formatCategoryIndex cat posts curpage moreposts = 
-    (h1 << ("Category: " ++ C.name cat))
-    +++
-    (do post <- posts
-        return (
-                (thediv ! [ theclass "summarylink" ]
-                 << postLink post)
-                +++
-                (thediv ! [ theclass "summary" ]
-                 << (primHtml $ P.summary_formatted post))
-               )
-    ) +++ (
-           pagingLinks (categoryUrl cat) curpage moreposts
-          )
-
 
 postPage :: P.Post        -- ^ The Post to display
          -> CommentStage  -- ^ What stage comment submission is at

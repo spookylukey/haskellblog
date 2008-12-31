@@ -46,6 +46,12 @@
     format_id INTEGER REFERENCES format(id)
   );
 
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT,
+    password TEXT,
+    superuser INTEGER
+);
 
 CREATE UNIQUE INDEX post_slug_index ON posts (slug);
 CREATE UNIQUE INDEX post_id_index ON posts (id);

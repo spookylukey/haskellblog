@@ -134,7 +134,7 @@ loginView' cn req =
 validateLogin = undefined
 createLoginCookie = undefined
 addCookie = undefined
-loginPage = undefined :: () -> Map.Map String String -> String
+loginPage = undefined :: a -> a -> String
 emptyLoginData = undefined
 
 

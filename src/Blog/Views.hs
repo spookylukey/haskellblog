@@ -5,7 +5,7 @@ module Blog.Views where
 -- which has pure functions that generally return Html.
 
 import Blog.DB (connect)
-import Blog.Forms (CommentStage(..), validateComment, emptyComment)
+import Blog.Forms (CommentStage(..), validateComment, emptyComment, emptyLoginData)
 import Blog.Links
 import Blog.Model
 import Blog.Templates
@@ -161,9 +161,6 @@ createLoginCookies loginData timestamp =
      , standardCookie { cookieName = "hash"
                       , cookieValue = loginHash username password timestamp }
      ]
-
-loginPage = undefined :: a -> a -> String -- TODO
-emptyLoginData = undefined -- TODO
 
 
 -- Utilities

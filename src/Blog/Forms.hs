@@ -20,6 +20,7 @@ import qualified Ella.Forms.Widgets.TextInput as TI
 import qualified Ella.Forms.Widgets.Textarea as TA
 import qualified Text.XHtml as X
 
+-- Widgets
 
 nameWidget = TextInput { value = ""
                        , size = Just 20
@@ -50,6 +51,18 @@ messageWidget = Textarea { value = ""
                          , name = "message"
                          , identifier = "id_message"
                          }
+
+-- TODO properly
+passwordWidget = TextInput { value = ""
+                           , size = Just 20
+                           , maxlength = Just 20
+                           , name = "password"
+                           , identifier = "id_password"
+                           }
+
+usernameWidget = nameWidget { TI.name = "username"
+                            , TI.identifier = "id_username"
+                            }
 
 -- | Enum for the different stages of submitting a comment
 data CommentStage = NoComment
@@ -117,4 +130,8 @@ validateComment postedData blogpost =
                     , text_formatted = getFormatter format $ text
                     , format = format
                     }, Map.fromList errors)
+
+
+emptyLoginData = Map.fromList [("username", "")
+                              ,("password", "")]
 

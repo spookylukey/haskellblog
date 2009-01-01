@@ -2,20 +2,21 @@
 module Blog.Templates
 where
 
-import Blog.Forms (emailWidget, nameWidget, messageWidget, formatWidget, CommentStage(..))
+import Blog.Forms (emailWidget, nameWidget, messageWidget, formatWidget, usernameWidget, passwordWidget, CommentStage(..))
 import Blog.Links
-import Ella.Forms.Widgets (makeLabel)
-import Ella.Forms.Base
 import Data.List (intersperse)
-import qualified Data.Map as Map
+import Data.Maybe (fromJust)
+import Ella.Forms.Base
+import Ella.Forms.Widgets (makeLabel)
+import System.Locale (defaultTimeLocale)
+import System.Time (toUTCTime, formatCalendarTime)
+import System.Time.Utils (epochToClockTime)
 import Text.XHtml
-import qualified Blog.Post as P
 import qualified Blog.Category as C
 import qualified Blog.Comment as Cm
+import qualified Blog.Post as P
 import qualified Blog.Settings as Settings
-import System.Locale (defaultTimeLocale)
-import System.Time.Utils (epochToClockTime)
-import System.Time (toUTCTime, formatCalendarTime)
+import qualified Data.Map as Map
 
 -- | Holds variables for the 'page' template
 --
@@ -297,6 +298,38 @@ infoPage post =
              , ptitle = P.title post
              }
 
+
+loginPage loginData loginErrors =
+    page $ defaultPageVars
+             { pcontent = (h1 << "Login")
+                          +++
+                          loginForm loginData loginErrors
+             , ptitle = "Login"
+             }
+
+loginForm loginData loginErrors =
+    form ! [ method "post", action ""]
+    << (
+        (table <<
+         (
+          (tr <<
+           (td << makeLabel "User name:" usernameWidget
+            +++
+            td << setVal (fromJust $ Map.lookup "username" loginData) usernameWidget
+           )
+          )
+          +++
+          (tr <<
+           (td << makeLabel "Password: " passwordWidget
+            +++
+            td << setVal (fromJust $ Map.lookup "password" loginData) passwordWidget
+           )
+          )
+         )
+        )
+        +++
+        (submit "login" "Login")
+       )
 
 -- General HTML fragments
 

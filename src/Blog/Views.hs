@@ -1,20 +1,22 @@
 {-# OPTIONS_GHC -fglasgow-exts -XOverloadedStrings #-}
 module Blog.Views where
 
-import qualified Data.Map as Map
+
+import Blog.DB (connect)
+import Blog.Forms (CommentStage(..), validateComment, emptyComment)
+import Blog.Links
+import Blog.Model
+import Blog.Templates
+import Blog.Utils (getTimestamp)
 import Ella.Framework (default404, View)
+import Ella.GenUtils (utf8, with, exactParse)
 import Ella.Param (captureOrDefault)
 import Ella.Request
 import Ella.Response
 import Ella.Utils (addHtml)
-import Ella.GenUtils (utf8, with, exactParse)
-import Blog.Templates
-import Blog.Links
-import Blog.DB (connect)
-import Blog.Model
-import Blog.Forms (CommentStage(..), validateComment, emptyComment)
-
-import Maybe (fromMaybe, isJust)
+import Maybe (fromMaybe, isJust, fromJust)
+import qualified Blog.Settings as Settings
+import qualified Data.Map as Map
 
 ---- Utilities
 
@@ -123,19 +125,40 @@ loginView' cn req =
       (loginData, loginErrors) <- validateLogin (getPOST req :: (String -> Maybe String)) cn
       if Map.null loginErrors
          then do
-           loginCookie <- createLoginCookie loginData
-           return $ Just $ (redirectResponse adminMenuUrl) `with` [ addCookie loginCookie ]
+           loginCookies <- createLoginCookies loginData
+           return $ Just $ (redirectResponse adminMenuUrl) `with` (map addCookie loginCookies)
          else
            return $ Just $ standardResponse $ loginPage loginData loginErrors
     _ -> do
       return $ Just $ standardResponse $ loginPage emptyLoginData Map.empty
 
--- TODO, dummy types so it can compile
-validateLogin = undefined
-createLoginCookie = undefined
-addCookie = undefined
-loginPage = undefined :: a -> a -> String
-emptyLoginData = undefined
+validateLogin = undefined -- TODO
+
+standardCookie = Cookie { cookieName = ""
+                        , cookieValue = ""
+                        , cookieExpires = Nothing
+                        , cookieDomain = Just Settings.domain
+                        , cookiePath = Nothing
+                        , cookieSecure = False
+                        }
+
+-- | Generate a hash that is used to verify a 'session' cookie.
+loginHash = undefined -- TODO
+
+createLoginCookies loginData = do
+  ts <- getTimestamp
+  let username = fromJust $ Map.lookup "username" loginData
+      password = fromJust $ Map.lookup "password" loginData
+  return [ standardCookie { cookieName = "username"
+                          , cookieValue = username }
+         , standardCookie { cookieName = "timestamp"
+                          , cookieValue = show ts }
+         , standardCookie { cookieName = "hash"
+                          , cookieValue = loginHash username password ts }
+         ]
+
+loginPage = undefined :: a -> a -> String -- TODO
+emptyLoginData = undefined -- TODO
 
 
 -- Utilities

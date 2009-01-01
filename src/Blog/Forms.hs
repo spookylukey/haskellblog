@@ -27,6 +27,7 @@ nameWidget = TextInput { value = ""
                        , maxlength = Just 50
                        , name = "name"
                        , identifier = "id_name"
+                       , password = False
                        }
 
 emailWidget = TextInput { value = ""
@@ -34,6 +35,7 @@ emailWidget = TextInput { value = ""
                         , maxlength = Just 320
                         , name = "email"
                         , identifier = "id_email"
+                       , password = False
                         }
 
 commentAllowedFormats =  [Plaintext, RST]
@@ -52,12 +54,12 @@ messageWidget = Textarea { value = ""
                          , identifier = "id_message"
                          }
 
--- TODO properly
 passwordWidget = TextInput { value = ""
                            , size = Just 20
                            , maxlength = Just 20
                            , name = "password"
                            , identifier = "id_password"
+                           , password = True
                            }
 
 usernameWidget = nameWidget { TI.name = "username"

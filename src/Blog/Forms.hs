@@ -35,7 +35,7 @@ emailWidget = TextInput { value = ""
                         , maxlength = Just 320
                         , name = "email"
                         , identifier = "id_email"
-                       , password = False
+                        , password = False
                         }
 
 commentAllowedFormats =  [Plaintext, RST]

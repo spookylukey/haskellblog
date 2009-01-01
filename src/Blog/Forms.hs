@@ -5,14 +5,13 @@ module Blog.Forms
 where
 
 import Blog.Formats (Format(..), getFormatter)
+import Blog.Utils (getTimestamp)
 import Control.Monad (liftM)
 import Data.Maybe (fromJust)
 import Ella.Forms.Widgets.TextInput (TextInput(..))
 import Ella.Forms.Widgets.Textarea  (Textarea(..))
 import Ella.GenUtils (exactParse)
 import Ella.Param (captureOrDefault, Param(..))
-import System.Posix.Time (epochTime)
-import System.Posix.Types
 import qualified Blog.Comment as Cm
 import qualified Blog.Post as P
 import qualified Data.Map as Map
@@ -96,7 +95,7 @@ validateComment postedData blogpost =
     --             submit or if timedelta less than 10 seconds,
     --             emit validation error.
 
-      ts <- epochTime
+      ts <- getTimestamp
       let text = postedData "message" `captureOrDefault` ""
       let name = postedData "name" `captureOrDefault` ""
       let email = postedData "email" `captureOrDefault` ""
@@ -111,7 +110,7 @@ validateComment postedData blogpost =
       return (Cm.Comment {
                       uid = undefined
                     , post_id = P.uid blogpost
-                    , timestamp = floor $ toRational ts
+                    , timestamp = ts
                     , name = name
                     , email = email
                     , text_raw = text

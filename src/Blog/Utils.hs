@@ -2,7 +2,10 @@
 module Blog.Utils where
 
 import Data.Char
+import Control.Monad (liftM)
 import System.Environment(getArgs)
+import System.Posix.Time (epochTime)
+import System.Posix.Types
 import Text.Regex.Base
 import Text.Regex.PCRE
 import qualified Data.ByteString.Lazy.Char8 as BL
@@ -79,3 +82,7 @@ split (c:cs) delim
    | otherwise = (c : head rest) : tail rest
    where
        rest = split cs delim
+
+-- | Return current time as a UNIX timestamp
+getTimestamp :: IO Int
+getTimestamp = liftM (floor . toRational) epochTime

@@ -10,12 +10,13 @@ import qualified Tests.Blog.TestDB as TestDB
 
 withEmptyUsersTable = bracket (do
                                 cn <- TestDB.connect
-                                _ <- quickQuery' cn "DELETE FROM users;" []
+                                run cn "DELETE FROM users;" []
                                 commit cn
                                 return cn)
                                (\cn -> do
-                                    _ <- quickQuery' cn "DELETE FROM users;" []
+                                    run cn "DELETE FROM users;" []
                                     commit cn
+                                    disconnect cn
                                     return ())
 
 testSetPassword = withEmptyUsersTable

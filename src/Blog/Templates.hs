@@ -230,25 +230,16 @@ commentForm post commentStage commentData errors =
     +++
     form ! [method "post", action "#addcomment"]
     << (
-        (table <<
-         (
-          (tr <<
-           (td << makeLabel "Name:" nameWidget
-            +++
-            td << setVal (Cm.name commentData) nameWidget
-           ))
-          +++
-          (tr <<
-           (td << makeLabel "Email:" emailWidget
-            +++
-            td << setVal (Cm.email commentData) emailWidget
-           ))
-          +++
-          (tr <<
-           (td << "Format:"
-            +++
-            td << setVal (show $ fromEnum $ Cm.format commentData) formatWidget
-           ))))
+        simpleTable [] [] [ [ toHtml $ makeLabel "Name:" nameWidget
+                            , toHtml $ setVal (Cm.name commentData) nameWidget
+                            ]
+                          , [ toHtml $ makeLabel "Email:" emailWidget
+                            , toHtml $ setVal (Cm.email commentData) emailWidget
+                            ]
+                          , [ toHtml $ "Format:"
+                            , toHtml $ setVal (show $ fromEnum $ Cm.format commentData) formatWidget
+                            ]
+                          ]
         +++
         setVal (Cm.text_raw commentData) messageWidget
         +++
@@ -309,24 +300,13 @@ loginPage loginData loginErrors =
 
 loginForm loginData loginErrors =
     form ! [ method "post", action ""]
-    << (
-        (table <<
-         (
-          (tr <<
-           (td << makeLabel "User name:" usernameWidget
-            +++
-            td << setVal (fromJust $ Map.lookup "username" loginData) usernameWidget
-           )
-          )
-          +++
-          (tr <<
-           (td << makeLabel "Password: " passwordWidget
-            +++
-            td << setVal (fromJust $ Map.lookup "password" loginData) passwordWidget
-           )
-          )
-         )
-        )
+    << (simpleTable [] [] [ [ toHtml $ makeLabel "User name:" usernameWidget
+                            , toHtml $ setVal (fromJust $ Map.lookup "username" loginData) usernameWidget
+                            ]
+                          , [ toHtml $ makeLabel "Password: " passwordWidget
+                            , toHtml $ setVal (fromJust $ Map.lookup "password" loginData) passwordWidget
+                            ]
+                          ]
         +++
         (submit "login" "Login")
        )

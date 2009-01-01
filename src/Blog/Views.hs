@@ -5,7 +5,7 @@ module Blog.Views where
 -- which has pure functions that generally return Html.
 
 import Blog.DB (connect)
-import Blog.Forms (CommentStage(..), validateComment, emptyComment, emptyLoginData)
+import Blog.Forms (CommentStage(..), validateComment, emptyComment, emptyLoginData, validateLogin)
 import Blog.Links
 import Blog.Model
 import Blog.Templates
@@ -127,7 +127,7 @@ loginView req = do
 loginView' cn req =
   case requestMethod req of
     "POST" -> do
-      (loginData, loginErrors) <- validateLogin (getPOST req :: (String -> Maybe String)) cn
+      (loginData, loginErrors) <- validateLogin (getPOST req) cn
       if Map.null loginErrors
          then do
            ts <- getTimestamp
@@ -138,8 +138,6 @@ loginView' cn req =
     _ -> do
       return $ Just $ standardResponse $ loginPage emptyLoginData Map.empty
 
-validateLogin = undefined -- TODO
-
 standardCookie = Cookie { cookieName = ""
                         , cookieValue = ""
                         , cookieExpires = Nothing
@@ -148,8 +146,6 @@ standardCookie = Cookie { cookieName = ""
                         , cookieSecure = False
                         }
 
--- | Generate a hash that is used to verify a 'session' cookie.
-loginHash = undefined -- TODO
 
 createLoginCookies loginData timestamp =
   let username = fromJust $ Map.lookup "username" loginData
@@ -159,7 +155,7 @@ createLoginCookies loginData timestamp =
      , standardCookie { cookieName = "timestamp"
                       , cookieValue = show timestamp }
      , standardCookie { cookieName = "hash"
-                      , cookieValue = loginHash username password timestamp }
+                      , cookieValue = "TODO - sign the cookie" }
      ]
 
 

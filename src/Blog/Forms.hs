@@ -5,6 +5,7 @@ module Blog.Forms
 where
 
 import Blog.Formats (Format(..), getFormatter)
+import Blog.Model (checkPassword)
 import Blog.Utils (getTimestamp)
 import Control.Monad (liftM)
 import Data.Maybe (fromJust)
@@ -137,3 +138,24 @@ validateComment postedData blogpost =
 emptyLoginData = Map.fromList [("username", "")
                               ,("password", "")]
 
+validateLogin postedData cn = do
+  -- TODO - validation on field lengths
+    let username = postedData "username" `captureOrDefault` ""
+    let password = postedData "password" `captureOrDefault` ""
+    let loginData = Map.fromList [ ("username", username)
+                                 , ("password", password)]
+    let errors = (if null username
+                  then [("username", "Please enter a user name")]
+                  else [])
+                 ++
+                 (if null password
+                  then [("password", "Please enter a password")]
+                  else [])
+    if null errors
+       then do
+         passwordCheck <- checkPassword cn username password
+         if passwordCheck
+            then return (loginData, Map.empty)
+            else return (loginData, Map.fromList [("password", "Password not correct.")])
+       else do
+         return (loginData, Map.fromList errors)

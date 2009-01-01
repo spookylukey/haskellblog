@@ -290,6 +290,7 @@ infoPage post =
              }
 
 
+loginPage :: Map.Map String String -> Map.Map String String -> Html
 loginPage loginData loginErrors =
     page $ defaultPageVars
              { pcontent = (h1 << "Login")
@@ -299,6 +300,11 @@ loginPage loginData loginErrors =
              }
 
 loginForm loginData loginErrors =
+    (if not $ Map.null loginErrors
+        then (thediv ! [theclass "validationerror"]
+              << unordList (Map.elems loginErrors))
+        else noHtml)
+    +++
     form ! [ method "post", action ""]
     << (simpleTable [] [] [ [ toHtml $ makeLabel "User name:" usernameWidget
                             , toHtml $ setVal (fromJust $ Map.lookup "username" loginData) usernameWidget

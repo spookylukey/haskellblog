@@ -1,6 +1,8 @@
 {-# OPTIONS_GHC -fglasgow-exts -XOverloadedStrings #-}
 module Blog.Views where
 
+-- View functions and logic. The actual HTML is found in Templates,
+-- which has pure functions that generally return Html.
 
 import Blog.DB (connect)
 import Blog.Forms (CommentStage(..), validateComment, emptyComment)
@@ -27,6 +29,7 @@ standardResponse html = buildResponse [
 
 
 -- | Custom 404 response
+custom404 :: Response
 custom404 = with (standardResponse custom404page) [
              setStatus 404
             ]
@@ -42,7 +45,8 @@ mainIndex req = do
   cats <- getCategoriesBulk cn posts
   return $ Just $ standardResponse $ mainIndexPage (zip posts cats) curpage more
 
--- View to help with debugging
+-- | View to help with debugging
+debug :: String -> View
 debug path req = return $ Just $ buildResponse [
                   addContent "Path:\n"
                  , addContent $ utf8 path
@@ -50,17 +54,18 @@ debug path req = return $ Just $ buildResponse [
                  , addContent $ utf8 $ show req
                  ] utf8TextResponse
 
--- View that performs redirect to main page
-postsRedirectView req = return $ Just $ redirectResponse indexUrl :: IO (Maybe Response)
+-- | View that performs redirect to main page
+postsRedirectView :: View
+postsRedirectView req = return $ Just $ redirectResponse indexUrl
 
--- View that shows an overview of categories
+-- | View that shows an overview of categories
 categoriesView :: View
 categoriesView req = do
   cn <- connect
   cats <- getCategories cn
   return $ Just $ standardResponse $ categoriesPage cats
 
--- View that shows posts for an individual category
+-- | View that shows posts for an individual category
 categoryView :: String -> View
 categoryView slug req = do
   let curpage = getPage req

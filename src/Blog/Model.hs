@@ -11,11 +11,15 @@ module Blog.Model ( addPost
                   , getCategories
                   , getCategoriesBulk
                   , getPostsForCategory
+                  , setPassword
+                  , checkPassword
                   ) where
 
+import Data.Digest.Pure.SHA (showDigest, sha1)
 import Database.HDBC
 import Blog.DBUtils (makeSlugGeneric, pagedQuery, sqlInIds, getDbId)
-import Blog.Utils (regexReplace)
+import Blog.Utils (regexReplace, randomStr, split)
+import Ella.GenUtils (utf8)
 import qualified Blog.DB as DB
 import qualified Blog.Post as P
 import qualified Blog.Category as Ct
@@ -116,6 +120,8 @@ getCategoriesBulkQuery ids= "SELECT categories.id, categories.name, categories.s
 getCommentByIdQuery      = "SELECT id, post_id, timestamp, name, email, text_raw, text_formatted, format_id FROM comments WHERE id = ?;"
 getCommentsForPostQuery  = "SELECT id, '',      timestamp, name, email, '',       text_formatted, ''        FROM comments WHERE post_id = ? ORDER BY timestamp ASC;"
 
+getPasswordForUsernameQuery = "SELECT password FROM users WHERE username = ?;"
+setPasswordForUsernameQuery = "UPDATE users SET password = ? WHERE username = ?;"
 
 ---- Constructors ----
 
@@ -212,3 +218,34 @@ getRelatedPosts cn post categories = do
   (res,_) <- pagedQuery cn (getRelatedPostsQuery ids) [ toSql $ P.uid post
                                                       , toSql $ P.timestamp post ] 1 7
   return $ map makePost res
+
+makePasswordHash password = do
+  salt <- randomStr 10
+  let digest = sha1 $ utf8 (salt ++ password)
+  return ("sha1:" ++ salt ++ ":" ++ (showDigest $ digest))
+
+checkPasswordHash salt hash password =
+    (showDigest $ sha1 $ utf8 (salt ++ password)) == hash
+
+-- | Checks that the password for a user is correct
+checkPassword :: (IConnection conn) =>
+                 conn -> String -> String -> IO Bool
+checkPassword cn username password = do
+  res <- quickQuery' cn getPasswordForUsernameQuery [ toSql username ]
+  if null res
+     then return False
+     else do
+         [[SqlString pwdData]] <- return res -- force pattern match
+         -- pwdData stores algo;salt;hash
+         ["sha1", salt, hash] <- return $ split pwdData ':'
+         return $ checkPasswordHash salt hash password
+
+-- | Sets the password for a user
+setPassword :: (IConnection conn) =>
+               conn -> String -> String -> IO ()
+setPassword cn username password = do
+  pwdHash <- makePasswordHash password
+  _ <- quickQuery' cn setPasswordForUsernameQuery [ toSql pwdHash
+                                                  , toSql username ]
+  commit cn
+  return ()

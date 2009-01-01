@@ -125,7 +125,8 @@ loginView' cn req =
       (loginData, loginErrors) <- validateLogin (getPOST req :: (String -> Maybe String)) cn
       if Map.null loginErrors
          then do
-           loginCookies <- createLoginCookies loginData
+           ts <- getTimestamp
+           let loginCookies = createLoginCookies loginData ts
            return $ Just $ (redirectResponse adminMenuUrl) `with` (map addCookie loginCookies)
          else
            return $ Just $ standardResponse $ loginPage loginData loginErrors
@@ -145,17 +146,16 @@ standardCookie = Cookie { cookieName = ""
 -- | Generate a hash that is used to verify a 'session' cookie.
 loginHash = undefined -- TODO
 
-createLoginCookies loginData = do
-  ts <- getTimestamp
+createLoginCookies loginData timestamp =
   let username = fromJust $ Map.lookup "username" loginData
       password = fromJust $ Map.lookup "password" loginData
-  return [ standardCookie { cookieName = "username"
-                          , cookieValue = username }
-         , standardCookie { cookieName = "timestamp"
-                          , cookieValue = show ts }
-         , standardCookie { cookieName = "hash"
-                          , cookieValue = loginHash username password ts }
-         ]
+  in [ standardCookie { cookieName = "username"
+                      , cookieValue = username }
+     , standardCookie { cookieName = "timestamp"
+                      , cookieValue = show timestamp }
+     , standardCookie { cookieName = "hash"
+                      , cookieValue = loginHash username password timestamp }
+     ]
 
 loginPage = undefined :: a -> a -> String -- TODO
 emptyLoginData = undefined -- TODO

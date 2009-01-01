@@ -63,3 +63,4 @@ CREATE INDEX postcat_cid_index ON post_categories (category_id);
 CREATE UNIQUE INDEX comment_id_index ON comments (id);
 CREATE INDEX comment_pid_index ON comments (post_id);
 CREATE INDEX comment_ts_index ON comments (timestamp);
+CREATE UNIQUE INDEX user_username_index ON users (username);

@@ -245,7 +245,8 @@ setPassword :: (IConnection conn) =>
                conn -> String -> String -> IO ()
 setPassword cn username password = do
   pwdHash <- makePasswordHash password
-  _ <- quickQuery' cn setPasswordForUsernameQuery [ toSql pwdHash
-                                                  , toSql username ]
-  commit cn
+  withTransaction cn (\cn ->
+                      run cn setPasswordForUsernameQuery [ toSql pwdHash
+                                                         , toSql username ]
+                     )
   return ()

@@ -17,6 +17,7 @@ import Ella.Request
 import Ella.Response
 import Ella.Utils (addHtml)
 import Maybe (fromMaybe, isJust, fromJust)
+import System.Time (ClockTime(..), toUTCTime)
 import qualified Blog.Settings as Settings
 import qualified Data.Map as Map
 
@@ -141,8 +142,8 @@ loginView' cn req =
 standardCookie = Cookie { cookieName = ""
                         , cookieValue = ""
                         , cookieExpires = Nothing
-                        , cookieDomain = Just Settings.domain
-                        , cookiePath = Nothing
+                        , cookieDomain = Nothing
+                        , cookiePath = Just "/"
                         , cookieSecure = False
                         }
 
@@ -150,12 +151,15 @@ standardCookie = Cookie { cookieName = ""
 createLoginCookies loginData timestamp =
   let username = fromJust $ Map.lookup "username" loginData
       password = fromJust $ Map.lookup "password" loginData
+      expires = Just $ toUTCTime $ TOD (toInteger timestamp + 3600*24*365) 0
   in [ standardCookie { cookieName = "username"
-                      , cookieValue = username }
+                      , cookieValue = username
+                      , cookieExpires = expires
+                      }
      , standardCookie { cookieName = "timestamp"
-                      , cookieValue = show timestamp }
-     , standardCookie { cookieName = "hash"
-                      , cookieValue = "TODO - sign the cookie" }
+                      , cookieValue = show timestamp
+                      , cookieExpires = expires
+                      }
      ]
 
 

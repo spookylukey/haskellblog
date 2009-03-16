@@ -16,4 +16,4 @@ aboutUrl          = Settings.root_url ++ "about/"
 feedsUrl          = Settings.root_url ++ "feeds/"
 loginUrl          = Settings.root_url ++ "login/"
 
-adminMenuUrl      = Settings.root_url ++ "admin/"
+adminMenuUrl      = Settings.root_url 

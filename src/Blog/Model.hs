@@ -26,6 +26,7 @@ import qualified Blog.Category as Ct
 import qualified Blog.Comment as Cm
 import qualified Blog.Settings as Settings
 import qualified Data.ByteString.Lazy.Char8 as BL
+import qualified Data.ByteString.Lazy.UTF8 as UTF8
 
 ------ Create -------
 addPost cn p = do theslug <- makePostSlug cn p
@@ -235,9 +236,9 @@ checkPassword cn username password = do
   if null res
      then return False
      else do
-         [[SqlString pwdData]] <- return res -- force pattern match
+         [[SqlByteString pwdData]] <- return res -- force pattern match
          -- pwdData stores algo;salt;hash
-         ["sha1", salt, hash] <- return $ split pwdData ':'
+         ["sha1", salt, hash] <- return $ split (UTF8.toString $ BL.fromChunks [pwdData]) ':'
          return $ checkPasswordHash salt hash password
 
 -- | Sets the password for a user

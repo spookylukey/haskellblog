@@ -10,10 +10,10 @@ Build-Type:     Simple
 
 Executable migrate
   Build-Depends:
-        base == 3.*,
+        base == 4.*,
         haskell98 >= 1.0.1,
-        HDBC-sqlite3 >= 1.1.4,
-        HDBC >= 1.1.5,
+        HDBC-sqlite3 >= 2.1.0,
+        HDBC >= 2.1.0,
         containers,
         utf8-string,
         regex-pcre,
@@ -26,10 +26,11 @@ Executable migrate
 Executable blog.cgi
   Build-Depends:
         array >= 0.1.0,
-        base == 3.*,
+        base == 4.*,
         haskell98 >= 1.0.1,
         HDBC-sqlite3 >= 1.1.4,
         HDBC >= 1.1.5,
+        convertible,
         containers,
         unix >= 2.3.0.0,
         utf8-string,

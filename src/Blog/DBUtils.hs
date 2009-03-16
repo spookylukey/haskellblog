@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleContexts #-}
 module Blog.DBUtils ( makeSlugGeneric
                     , slugFromTitle
                     , getDbId
@@ -8,6 +9,7 @@ module Blog.DBUtils ( makeSlugGeneric
 where
 
 import Blog.Utils (regexReplace)
+import Data.Convertible.Base (Convertible)
 import Database.HDBC
 import GHC.Unicode (toLower)
 import qualified Data.ByteString.Lazy.Char8 as BL
@@ -29,7 +31,7 @@ makeSlugGeneric' cn slugBase table iter = do
    makeSuffix 1 = ""
    makeSuffix n = show n
 
-getDbId :: (IConnection conn, SqlType a) => conn -> IO a
+getDbId :: (IConnection conn, Convertible SqlValue a) => conn -> IO a
 getDbId cn =
     do
       [[newid]] <- quickQuery' cn "SELECT last_insert_rowid();" []

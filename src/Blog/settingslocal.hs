@@ -8,6 +8,8 @@ blog_author_name = "luke"
 post_page_size = 20 :: Int
 domain = "lukeplant_local"
 
+secret = "123"
+
 -- Testing
 testdb_sqlite_path = "/home/luke/devel/haskell/blog/testsuite/test.db"
 

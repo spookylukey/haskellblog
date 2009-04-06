@@ -118,7 +118,7 @@ infoPageView slug req = do
   Just post <- getPostBySlug cn slug
   return $ Just $ standardResponse $ infoPage post
 
--- | View that displays a login form an handles logging in
+-- | View that displays a login form and handles logging in
 loginView :: View
 loginView req = do
   cn <- connect

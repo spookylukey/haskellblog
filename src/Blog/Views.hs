@@ -12,7 +12,7 @@ import Blog.Templates
 import Blog.Utils (getTimestamp)
 import Ella.Framework (default404, View)
 import Ella.GenUtils (utf8, with, exactParse)
-import Ella.Param (captureOrDefault)
+import Ella.Param (captureOrDefault, capture)
 import Ella.Request
 import Ella.Response
 import Ella.Utils (addHtml)
@@ -139,6 +139,8 @@ loginView' cn req =
     _ -> do
       return $ Just $ standardResponse $ loginPage emptyLoginData Map.empty
 
+-- Authorisation
+
 standardCookie = Cookie { cookieName = ""
                         , cookieValue = ""
                         , cookieExpires = Nothing
@@ -161,6 +163,22 @@ createLoginCookies loginData timestamp =
                       , cookieExpires = expires
                       }
      ]
+
+
+timeout = 3600 * 24 * 10 -- 10 days
+
+-- | Return the username if logged in, otherwise Nothing
+--
+-- Relies on secure cookies middleware
+getCredentials :: Request -> IO (Maybe String)
+getCredentials req = do
+  current_ts <- getTimestamp
+  return $ do
+    username <- getCookieVal req "username"
+    timestamp <- getCookieVal req "timestamp" >>= capture
+    if timestamp + timeout > current_ts
+      then Just username
+      else Nothing
 
 
 -- Utilities

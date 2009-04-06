@@ -2,6 +2,7 @@ module Blog.Model ( addPost
                   , addCategory
                   , addPostCategory
                   , addComment
+                  , createUser
                   , getPostBySlug
                   , getRecentPosts
                   , getCategoriesForPost
@@ -97,6 +98,21 @@ addComment cn cm = do
                    ]
   newid <- getDbId cn
   return cm { Cm.uid = newid }
+
+createUser :: (IConnection conn) =>
+              conn -> String -> Bool -> IO Int
+createUser cn username superuser = do
+  DB.doInsert cn "users"
+        [ "username"
+        , "password"
+        , "superuser"
+        ]
+        [ toSql username
+        , toSql ""
+        , toSql superuser
+        ]
+  newid <- getDbId cn
+  return newid
 
 -------- Queries -----------
 

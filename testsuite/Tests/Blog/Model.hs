@@ -24,7 +24,7 @@ testSetPassword = withEmptyUsersTable
                      res1 <- checkPassword cn "testuser" "testpassword"
                      assertBool "Password check should fail with no user." (not res1)
 
-                     DB.doInsert cn "users" [ "username", "password"] [ toSql "testuser", toSql "sha1:foo:bar" ]
+                     createUser cn "testuser" True
 
                      setPassword cn "testuser" "testpassword"
                      res3 <- checkPassword cn "testuser" "testpassword"

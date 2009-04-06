@@ -13,6 +13,7 @@ import Data.Convertible.Base (Convertible)
 import Database.HDBC
 import GHC.Unicode (toLower)
 import qualified Data.ByteString.Lazy.Char8 as BL
+import qualified Data.ByteString.Char8 as BS
 import qualified Data.List as List
 
 slugFromTitle title = map toLower $ BL.unpack $
@@ -22,8 +23,8 @@ slugFromTitle title = map toLower $ BL.unpack $
 makeSlugGeneric cn title table = makeSlugGeneric' cn (slugFromTitle title) table 1
 makeSlugGeneric' cn slugBase table iter = do
   let slugAttempt =  (slugBase ++ makeSuffix iter);
-  [[SqlString c]] <- quickQuery cn ("SELECT count(slug) FROM " ++ table ++ " WHERE slug = ?") [toSql slugAttempt];
-  case c of
+  [[SqlByteString c]] <- quickQuery cn ("SELECT count(slug) FROM " ++ table ++ " WHERE slug = ?") [toSql slugAttempt];
+  case BS.unpack c of
     "0" -> return slugAttempt
     _   -> makeSlugGeneric' cn slugBase table (iter + 1)
 

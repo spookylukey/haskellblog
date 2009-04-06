@@ -163,6 +163,9 @@ createLoginCookies loginData timestamp =
      ]
 
 
+adminMenuView = undefined
+loginRequired = undefined
+
 -- Utilities
 
 getPage req = (getGET req "p") `captureOrDefault` 1 :: Int

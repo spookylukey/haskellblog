@@ -15,5 +15,4 @@ categoryUrl c     = Settings.root_url ++ "categories/" ++ (C.slug c) ++ "/"
 aboutUrl          = Settings.root_url ++ "about/"
 feedsUrl          = Settings.root_url ++ "feeds/"
 loginUrl          = Settings.root_url ++ "login/"
-
-adminMenuUrl      = Settings.root_url 
+adminMenuUrl      = Settings.root_url ++ "admin/"

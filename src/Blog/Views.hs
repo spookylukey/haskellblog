@@ -96,7 +96,7 @@ postView slug req = do
     handleUserComment cn post req =
         case requestMethod req of
           "POST" -> do
-            (commentData, commentErrors) <- validateComment (getPOST req) post
+            (commentData, commentErrors) <- validateComment (getCredentials req) (getPOST req) post
             if Map.null commentErrors
                then if isJust (getPOST req "submit")
                     then
@@ -167,10 +167,12 @@ createLoginCookies loginData timestamp =
 
 timeout = 3600 * 24 * 10 -- 10 days
 
+type Credentials = Maybe String
+
 -- | Return the username if logged in, otherwise Nothing
 --
 -- Relies on secure cookies middleware
-getCredentials :: Request -> IO (Maybe String)
+getCredentials :: Request -> IO Credentials
 getCredentials req = do
   current_ts <- getTimestamp
   return $ do

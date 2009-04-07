@@ -95,7 +95,7 @@ instance Param Format where
 
 -- | extract the posted data from a POST request and build
 -- a Comment from it, returning a Comment and a list of validation errors
-validateComment postedData blogpost =
+validateComment creds postedData blogpost =
     do
     -- TODO - protect name -- some names are reserved for logged in users.
     -- TODO - posts that are closed for comments

@@ -13,6 +13,7 @@ import Ella.Forms.Widgets.TextInput (TextInput(..))
 import Ella.Forms.Widgets.Textarea  (Textarea(..))
 import Ella.GenUtils (exactParse)
 import Ella.Param (captureOrDefault, Param(..))
+import Data.String.Utils (strip)
 import qualified Blog.Comment as Cm
 import qualified Blog.Post as P
 import qualified Data.Map as Map
@@ -113,7 +114,7 @@ validateComment postedData blogpost =
 
       ts <- getTimestamp
       let text = postedData "message" `captureOrDefault` ""
-      let name = postedData "name" `captureOrDefault` ""
+      let name = strip (postedData "name" `captureOrDefault` "")
       let email = postedData "email" `captureOrDefault` ""
       let format = postedData "format" `captureOrDefault` Plaintext
       let errors = (if null text
@@ -140,7 +141,7 @@ emptyLoginData = Map.fromList [("username", "")
 
 validateLogin postedData cn = do
   -- TODO - validation on field lengths
-    let username = postedData "username" `captureOrDefault` ""
+    let username = strip (postedData "username" `captureOrDefault` "")
     let password = postedData "password" `captureOrDefault` ""
     let loginData = Map.fromList [ ("username", username)
                                  , ("password", password)]

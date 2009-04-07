@@ -96,7 +96,8 @@ postView slug req = do
     handleUserComment cn post req =
         case requestMethod req of
           "POST" -> do
-            (commentData, commentErrors) <- validateComment (getCredentials req) (getPOST req) post
+            creds <- getCredentials req
+            (commentData, commentErrors) <- validateComment creds (getPOST req) post
             if Map.null commentErrors
                then if isJust (getPOST req "submit")
                     then

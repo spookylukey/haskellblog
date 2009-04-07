@@ -8,7 +8,7 @@ import Blog.Formats (Format(..), getFormatter)
 import Blog.Model (checkPassword)
 import Blog.Utils (getTimestamp)
 import Control.Monad (liftM)
-import Data.Maybe (fromJust)
+import Data.Maybe (fromJust, isNothing)
 import Ella.Forms.Widgets.TextInput (TextInput(..))
 import Ella.Forms.Widgets.Textarea  (Textarea(..))
 import Ella.GenUtils (exactParse)
@@ -16,6 +16,7 @@ import Ella.Param (captureOrDefault, Param(..))
 import Data.String.Utils (strip)
 import qualified Blog.Comment as Cm
 import qualified Blog.Post as P
+import qualified Blog.Settings as Settings
 import qualified Data.Map as Map
 import qualified Ella.Forms.Widgets.RadioButtonList as RBL
 import qualified Ella.Forms.Widgets.TextInput as TI
@@ -118,10 +119,13 @@ validateComment creds postedData blogpost =
       let email = postedData "email" `captureOrDefault` ""
       let format = postedData "format" `captureOrDefault` Plaintext
       let errors = (if null text
-                   then [("message", "'Message' is a required field.")]
-                   else []) ++
+                    then [("message", "'Message' is a required field.")]
+                    else []) ++
                    (if not $ format `elem` commentAllowedFormats
                     then [("format", "Please choose a format from the list")]
+                    else []) ++
+                   (if name `elem` Settings.reserved_names && not (maybe False (==name) creds)
+                    then [("name", "That name is reserved.")]
                     else [])
 
       return (Cm.Comment {

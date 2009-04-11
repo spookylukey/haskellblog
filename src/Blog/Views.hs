@@ -140,16 +140,13 @@ loginView' cn req =
     _ -> do
       return $ Just $ standardResponse $ loginPage emptyLoginData Map.empty
 
+-- | Delete auth cookies and redirect.
+logoutView req =
+    return $ Just $ (redirectResponse adminMenuUrl) `with` [ deleteCookie "username"
+                                                           , deleteCookie "timestamp"
+                                                           ]
+
 -- Authorisation
-
-standardCookie = Cookie { cookieName = ""
-                        , cookieValue = ""
-                        , cookieExpires = Nothing
-                        , cookieDomain = Nothing
-                        , cookiePath = Just "/"
-                        , cookieSecure = False
-                        }
-
 
 createLoginCookies loginData timestamp =
   let username = fromJust $ Map.lookup "username" loginData

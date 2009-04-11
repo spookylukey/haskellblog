@@ -27,7 +27,7 @@ import qualified Text.XHtml as X
 
 nameWidget = TextInput { value = ""
                        , size = Just 20
-                       , maxlength = Just 50
+                       , maxlength = Just Settings.max_comment_name_size
                        , name = "name"
                        , identifier = "id_name"
                        , password = False
@@ -35,7 +35,7 @@ nameWidget = TextInput { value = ""
 
 emailWidget = TextInput { value = ""
                         , size = Just 20
-                        , maxlength = Just 320
+                        , maxlength = Just $ Settings.max_comment_email_size
                         , name = "email"
                         , identifier = "id_email"
                         , password = False
@@ -98,10 +98,7 @@ instance Param Format where
 -- a Comment from it, returning a Comment and a list of validation errors
 validateComment creds postedData blogpost =
     do
-    -- TODO - protect name -- some names are reserved for logged in users.
-    -- TODO - posts that are closed for comments
     -- TODO - nicer mechanism for validation
-    -- TODO - validate lengths of fields
     -- TODO - CSRF protection
 
     -- TODO - Spam protection
@@ -118,15 +115,22 @@ validateComment creds postedData blogpost =
       let name = strip (postedData "name" `captureOrDefault` "")
       let email = postedData "email" `captureOrDefault` ""
       let format = postedData "format" `captureOrDefault` Plaintext
-      let errors = (if null text
-                    then [("message", "'Message' is a required field.")]
-                    else []) ++
-                   (if not $ format `elem` commentAllowedFormats
-                    then [("format", "Please choose a format from the list")]
-                    else []) ++
-                   (if name `elem` Settings.reserved_names && not (maybe False (==name) creds)
-                    then [("name", "That name is reserved.")]
-                    else [])
+      let tests = [ (null text,
+                     ("message", "'Message' is a required field."))
+                  , (not $ format `elem` commentAllowedFormats,
+                     ("format", "Please choose a format from the list"))
+                  , (name `elem` Settings.reserved_names && not (maybe False (==name) creds),
+                     ("name", "That name is reserved."))
+                  , (not $ P.comments_open blogpost,
+                     ("", "Post is closed for comments"))
+                  , (length text > Settings.max_comment_message_size,
+                     ("message", "Message too long"))
+                  , (length email > Settings.max_comment_email_size,
+                     ("email", "E-mail address too long"))
+                  , (length name > Settings.max_comment_name_size,
+                     ("name", "Name too long"))
+                  ]
+      let errors = [ err | (test, err) <- tests, test ]
 
       return (Cm.Comment {
                       uid = undefined

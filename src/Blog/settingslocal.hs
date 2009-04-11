@@ -11,6 +11,10 @@ domain = "lukeplant_local"
 
 secret = "123"
 
+max_comment_message_size = 5000 :: Int
+max_comment_name_size = 100 :: Int
+max_comment_email_size = 320 :: Int
+
 -- Testing
 testdb_sqlite_path = "/home/luke/devel/haskell/blog/testsuite/test.db"
 

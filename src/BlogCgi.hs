@@ -2,7 +2,7 @@ import Blog.Routes (views)
 import Blog.Views (custom404)
 import Database.HDBC
 import Ella.Framework
-import Ella.Processors.General (signedCookiesProcessor)
+import Ella.Processors.Security (signedCookiesProcessor)
 import qualified Blog.Settings as Settings
 
 options = defaultDispatchOptions { notFoundHandler = const $ return $ custom404

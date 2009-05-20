@@ -1,11 +1,8 @@
 {-# LANGUAGE BangPatterns, FlexibleContexts  #-}
 module Blog.Utils where
 
-import Control.Monad (liftM)
 import Data.Char
-import Random (randomRs, newStdGen)
 import System.Environment(getArgs)
-import System.Posix.Time (epochTime)
 import System.Posix.Types
 import Text.Regex.Base
 import Text.Regex.PCRE
@@ -84,13 +81,3 @@ split (c:cs) delim
    where
        rest = split cs delim
 
--- | Return current time as a UNIX timestamp
-getTimestamp :: IO Int
-getTimestamp = liftM (floor . toRational) epochTime
-
--- | Returns a randomly generated string of length n
-randomStr :: Int -> IO String
-randomStr n = do
-    g <- newStdGen
-    return $ take n (randomRs chars g)
-  where chars = ('a','z')

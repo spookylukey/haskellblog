@@ -9,9 +9,8 @@ import Blog.Forms (CommentStage(..), validateComment, emptyComment, emptyLoginDa
 import Blog.Links
 import Blog.Model
 import Blog.Templates
-import Blog.Utils (getTimestamp)
 import Ella.Framework (default404, View)
-import Ella.GenUtils (utf8, with, exactParse)
+import Ella.GenUtils (utf8, with, exactParse, getTimestamp)
 import Ella.Param (captureOrDefault, capture)
 import Ella.Request
 import Ella.Response

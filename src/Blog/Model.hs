@@ -19,8 +19,8 @@ module Blog.Model ( addPost
 import Data.Digest.Pure.SHA (showDigest, sha1)
 import Database.HDBC
 import Blog.DBUtils (makeSlugGeneric, pagedQuery, sqlInIds, getDbId)
-import Blog.Utils (regexReplace, randomStr, split)
-import Ella.GenUtils (utf8)
+import Blog.Utils (regexReplace, split)
+import Ella.GenUtils (utf8, randomStr)
 import qualified Blog.DB as DB
 import qualified Blog.Post as P
 import qualified Blog.Category as Ct

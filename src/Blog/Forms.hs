@@ -6,12 +6,11 @@ where
 
 import Blog.Formats (Format(..), getFormatter)
 import Blog.Model (checkPassword)
-import Blog.Utils (getTimestamp)
 import Control.Monad (liftM)
 import Data.Maybe (fromJust, isNothing)
 import Ella.Forms.Widgets.TextInput (TextInput(..))
 import Ella.Forms.Widgets.Textarea  (Textarea(..))
-import Ella.GenUtils (exactParse)
+import Ella.GenUtils (exactParse, getTimestamp)
 import Ella.Param (captureOrDefault, Param(..))
 import Data.String.Utils (strip)
 import qualified Blog.Comment as Cm

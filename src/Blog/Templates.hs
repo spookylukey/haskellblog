@@ -322,14 +322,14 @@ pagingLinks :: String     -- ^ Base URL
 pagingLinks url page shownext =
     (thediv ! [theclass "paginglinks"]
      << ((if page > 1
-          then makeLink url (page - 1) "<< Back"
-          else thespan << "<< Back")
+          then makeLink url (page - 1) "« Back"
+          else thespan << "« Back")
          +++
          (toHtml " | ")
          +++
          (if shownext
-          then makeLink url (page + 1) "Next >>"
-          else thespan << "Next >>")
+          then makeLink url (page + 1) "Next »"
+          else thespan << "Next »")
         )
      )
     where makeLink url page text = toHtml (hotlink (url ++ "?p=" ++ (show page)) << text)

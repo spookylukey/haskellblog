@@ -40,6 +40,16 @@ custom404 = with (standardResponse custom404page) [
              setStatus 404
             ]
 
+-- Templates
+
+get_templates = do
+  templates' <- directoryGroup Settings.template_path
+  return $ setEncoderGroup (show . stringToHtml) templates'
+
+get_template name = do
+  templates <- get_templates
+  return $ fromJust $ getStringTemplate name templates
+
 ---- Views
 
 -- View for the main page
@@ -69,9 +79,7 @@ categoriesView :: View
 categoriesView req = do
   cn <- connect
   cats <- getCategories cn
-  templates' <- directoryGroup Settings.template_path
-  let templates = setEncoderGroup (show . stringToHtml) templates'
-  let t = fromJust $ getStringTemplate "categories" templates
+  t <- get_template "categories"
   let categories = [ (c, categoryUrl c) | c <- cats ]
   return $ Just $ standardResponseBS $ render $ t `with` [ setAttribute "categories" categories
                                                          , setAttribute "hasCategories" (not . null $ cats)

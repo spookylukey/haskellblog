@@ -2,7 +2,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <link rel="alternate" type="application/rss+xml" title="RSS" href="/TODO" />
+    $if(atomfeedurl)$
+    <link rel="alternate" type="application/atom+xml"
+    title="$if(atomfeedtitle)$$atomfeedtitle$$else$Atom feed$endif$"
+    href="$atomfeedurl$" />
+    $endif$
     <link rel="StyleSheet" href="/newblog.css" type="text/css" />
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
     <!--[if lte IE 6]><link rel="stylesheet" href="/newblog_IE6.css" type="text/css" /><![endif]-->

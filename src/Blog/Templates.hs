@@ -6,17 +6,20 @@ import Blog.Forms (emailWidget, nameWidget, messageWidget, formatWidget, usernam
 import Blog.Links
 import Data.List (intersperse)
 import Data.Maybe (fromJust)
+import Data.ByteString.Lazy (ByteString)
 import Ella.Forms.Base
 import Ella.Forms.Widgets (makeLabel)
 import System.Locale (defaultTimeLocale)
 import System.Time (toUTCTime, formatCalendarTime)
 import System.Time.Utils (epochToClockTime)
 import Text.XHtml
+import Text.StringTemplate
 import qualified Blog.Category as C
 import qualified Blog.Comment as Cm
 import qualified Blog.Post as P
 import qualified Blog.Settings as Settings
 import qualified Data.Map as Map
+import qualified Data.ByteString.Lazy as BS
 
 -- | Holds variables for the 'page' template
 --
@@ -135,15 +138,6 @@ formatIndex title url postInfo curpage shownext =
     ) +++ (
            pagingLinks url curpage shownext
           )
-
-categoriesPage :: [C.Category] -> Html
-categoriesPage cats =
-    page $ defaultPageVars
-             { pcontent = h1 << "Categories"
-                          +++
-                          (map formatCategoryLink cats)
-             , ptitle = "Categories"
-             }
 
 formatCategoryLink cat =
     (thediv ! [theclass "category"]

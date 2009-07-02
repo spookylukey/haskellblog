@@ -1,6 +1,9 @@
 module Blog.Settings where
 
-sqlite_path = "/home/luke/httpd/lukeplant.me.uk/web/cgi-bin/data/test1.db"
+cgi_root_path = "/home/luke/httpd/lukeplant.me.uk/web/cgi-bin"
+sqlite_path = cgi_root_path ++ "/data/test1.db"
+template_path = cgi_root_path ++ "/data/blogtemplates/"
+
 root_url = "/blog/"
 prog_uri = "/cgi-bin/blog.cgi" -- Used for redirecting
 blog_author_name = "luke"

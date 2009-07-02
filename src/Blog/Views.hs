@@ -1,4 +1,4 @@
-{-# OPTIONS_GHC -fglasgow-exts -XOverloadedStrings #-}
+{-# OPTIONS_GHC -fglasgow-exts #-}
 module Blog.Views where
 
 -- View functions and logic. The actual HTML is found in Templates,
@@ -17,6 +17,9 @@ import Ella.Response
 import Ella.Utils (addHtml)
 import Maybe (fromMaybe, isJust, fromJust)
 import System.Time (ClockTime(..), toUTCTime)
+import Text.StringTemplate
+import Text.StringTemplate.GenericStandard
+import Text.XHtml (stringToHtml)
 import qualified Blog.Settings as Settings
 import qualified Data.Map as Map
 
@@ -27,6 +30,9 @@ standardResponse html = buildResponse [
                          addHtml html
                         ] utf8HtmlResponse
 
+standardResponseBS content = buildResponse [
+                              addContent content
+                             ] utf8HtmlResponse
 
 -- | Custom 404 response
 custom404 :: Response
@@ -48,9 +54,9 @@ mainIndex req = do
 -- | View to help with debugging
 debug :: String -> View
 debug path req = return $ Just $ buildResponse [
-                  addContent "Path:\n"
+                  addContent $ utf8 "Path:\n"
                  , addContent $ utf8 path
-                 , addContent "\n\nRequest:\n"
+                 , addContent $ utf8 "\n\nRequest:\n"
                  , addContent $ utf8 $ show req
                  ] utf8TextResponse
 
@@ -63,7 +69,14 @@ categoriesView :: View
 categoriesView req = do
   cn <- connect
   cats <- getCategories cn
-  return $ Just $ standardResponse $ categoriesPage cats
+  templates' <- directoryGroup Settings.template_path
+  let templates = setEncoderGroup (show . stringToHtml) templates'
+  let t = fromJust $ getStringTemplate "categories" templates
+  let categories = [ (c, categoryUrl c) | c <- cats ]
+  return $ Just $ standardResponseBS $ render $ t `with` [ setAttribute "categories" categories
+                                                         , setAttribute "hasCategories" (not . null $ cats)
+
+                                                         ]
 
 -- | View that shows posts for an individual category
 categoryView :: String -> View

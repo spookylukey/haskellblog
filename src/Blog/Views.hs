@@ -75,7 +75,7 @@ categoriesView req = do
   let categories = [ (c, categoryUrl c) | c <- cats ]
   return $ Just $ standardResponseBS $ render $ t `with` [ setAttribute "categories" categories
                                                          , setAttribute "hasCategories" (not . null $ cats)
-
+                                                         , setAttribute "pagetitle" "Categories"
                                                          ]
 
 -- | View that shows posts for an individual category

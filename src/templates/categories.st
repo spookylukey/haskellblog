@@ -6,7 +6,13 @@
     <link rel="StyleSheet" href="/newblog.css" type="text/css" />
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
     <!--[if lte IE 6]><link rel="stylesheet" href="/newblog_IE6.css" type="text/css" /><![endif]-->
-    <title>Categories « All Unkept</title>
+    <title>
+      $if(pagetitle)$
+        $pagetitle$ « All Unkept
+      $else$
+        All Unkept
+      $endif$
+    </title>
   </head>
   <body>
     <div id="container">

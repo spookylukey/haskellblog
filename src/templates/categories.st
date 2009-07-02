@@ -5,8 +5,7 @@
     <link rel="alternate" type="application/rss+xml" title="RSS" href="/TODO" />
     <link rel="StyleSheet" href="/newblog.css" type="text/css" />
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
-    <!--[if lte IE 6]><link rel="stylesheet" href="/newblog_IE6.css" --
-      --type="text/css" /><![endif]-->
+    <!--[if lte IE 6]><link rel="stylesheet" href="/newblog_IE6.css" type="text/css" /><![endif]-->
     <title>Categories &#171; All Unkept</title>
   </head>
   <body>

@@ -9,6 +9,7 @@ import Blog.Forms (CommentStage(..), validateComment, emptyComment, emptyLoginDa
 import Blog.Links
 import Blog.Model
 import Blog.Templates
+import Data.ByteString.Lazy (ByteString)
 import Ella.Framework (default404, View)
 import Ella.GenUtils (utf8, with, exactParse, getTimestamp)
 import Ella.Param (captureOrDefault, capture)
@@ -30,6 +31,7 @@ standardResponse html = buildResponse [
                          addHtml html
                         ] utf8HtmlResponse
 
+standardResponseBS :: ByteString -> Response
 standardResponseBS content = buildResponse [
                               addContent content
                              ] utf8HtmlResponse
@@ -75,16 +77,16 @@ postsRedirectView :: View
 postsRedirectView req = return $ Just $ redirectResponse indexUrl
 
 -- | View that shows an overview of categories
+
 categoriesView :: View
 categoriesView req = do
   cn <- connect
   cats <- getCategories cn
   t <- get_template "categories"
   let categories = [ (c, categoryUrl c) | c <- cats ]
-  return $ Just $ standardResponseBS $ render $ t `with` [ setAttribute "categories" categories
-                                                         , setAttribute "hasCategories" (not . null $ cats)
-                                                         , setAttribute "pagetitle" "Categories"
-                                                         ]
+  return $ Just $ standardResponseBS $ (renderf t
+         ("categories", categories)
+         ("hasCategories", not $ null cats))
 
 -- | View that shows posts for an individual category
 categoryView :: String -> View
@@ -204,3 +206,9 @@ getCredentials req = do
 -- Utilities
 
 getPage req = (getGET req "p") `captureOrDefault` 1 :: Int
+
+
+-- I am certainly going mad.  If this line is commented out,
+-- I get compilation errors with renderf elsewhere.  I haven't
+-- been able to whittle this down any further.
+xyz = get_template "" >>= \tp -> return $ standardResponseBS $ render tp

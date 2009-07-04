@@ -211,4 +211,4 @@ getPage req = (getGET req "p") `captureOrDefault` 1 :: Int
 -- I am certainly going mad.  If this line is commented out,
 -- I get compilation errors with renderf elsewhere.  I haven't
 -- been able to whittle this down any further.
-xyz = get_template "" >>= \tp -> return $ standardResponseBS $ render tp
+this_is_not_used = get_template "" >>= \tp -> return $ standardResponseBS $ render tp

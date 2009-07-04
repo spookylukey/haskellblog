@@ -44,10 +44,12 @@ custom404 = with (standardResponse custom404page) [
 
 -- Templates
 
+get_templates :: IO (STGroup ByteString)
 get_templates = do
   templates' <- directoryGroup Settings.template_path
   return $ setEncoderGroup (show . stringToHtml) templates'
 
+get_template :: String -> IO (StringTemplate ByteString)
 get_template name = do
   templates <- get_templates
   return $ fromJust $ getStringTemplate name templates
@@ -206,9 +208,3 @@ getCredentials req = do
 -- Utilities
 
 getPage req = (getGET req "p") `captureOrDefault` 1 :: Int
-
-
--- I am certainly going mad.  If this line is commented out,
--- I get compilation errors with renderf elsewhere.  I haven't
--- been able to whittle this down any further.
-this_is_not_used = get_template "" >>= \tp -> return $ standardResponseBS $ render tp

@@ -1,6 +1,9 @@
+{-# LANGUAGE DeriveDataTypeable #-}
 module Blog.Post where
 
 import Blog.Formats (Format)
+import Data.Data
+import Data.Typeable
 
 data Post = Post {
       uid :: Int,
@@ -13,5 +16,4 @@ data Post = Post {
       format :: Format,
       timestamp :: Int,
       comments_open :: Bool
-    } deriving (Show, Eq)
-
+    } deriving (Show, Eq, Data, Typeable)

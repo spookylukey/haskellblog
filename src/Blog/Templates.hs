@@ -7,6 +7,7 @@ import Blog.Links
 import Data.List (intersperse)
 import Data.Maybe (fromJust)
 import Data.ByteString.Lazy (ByteString)
+import Data.ByteString.Lazy.Char8 (pack)
 import Ella.Forms.Base
 import Ella.Forms.Widgets (makeLabel)
 import System.Locale (defaultTimeLocale)
@@ -14,12 +15,12 @@ import System.Time (toUTCTime, formatCalendarTime)
 import System.Time.Utils (epochToClockTime)
 import Text.XHtml
 import Text.StringTemplate
+import Text.StringTemplate.Classes (SElem(..))
 import qualified Blog.Category as C
 import qualified Blog.Comment as Cm
 import qualified Blog.Post as P
 import qualified Blog.Settings as Settings
 import qualified Data.Map as Map
-import qualified Data.ByteString.Lazy as BS
 
 -- | Holds variables for the 'page' template
 --
@@ -360,3 +361,29 @@ categoryLink c = toHtml $ hotlink (categoryUrl c) << (C.name c)
 postLink p = toHtml $ hotlink (postUrl p) << (P.title p)
 
 showDate timestamp = formatCalendarTime defaultTimeLocale  "%e %B %Y" (toUTCTime $ epochToClockTime timestamp)
+
+
+-- HStringTemplate related:
+
+-- Allow for heterogeneous lists
+data ToSElemD = forall a. ToSElem a => ToSElemD a
+
+instance ToSElem ToSElemD where
+    toSElem (ToSElemD x) = toSElem x
+
+-- Allow Html to be inserted
+instance ToSElem Html where
+    toSElem x = BS (pack $ showHtmlFragment x)
+
+postTemplateInfo :: P.Post -> Map.Map String ToSElemD
+postTemplateInfo p = Map.fromList [ ("title", ToSElemD $ P.title p)
+                                  , ("date", ToSElemD $ showDate $ P.timestamp p)
+                                  , ("summary", ToSElemD $ pack $ P.summary_formatted p)
+                                  , ("full", ToSElemD $ pack $ P.post_formatted p)
+                                  , ("url", ToSElemD $ postUrl p)
+                                  ]
+
+categoryTemplateInfo :: C.Category -> Map.Map String ToSElemD
+categoryTemplateInfo c = Map.fromList [ ("name", ToSElemD $ C.name c)
+                                      , ("url", ToSElemD $ categoryUrl c)
+                                      ]

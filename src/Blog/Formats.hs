@@ -1,3 +1,4 @@
+{-# LANGUAGE DeriveDataTypeable #-}
 module Blog.Formats ( Format(..)
                     , getFormatter
                     )
@@ -7,7 +8,9 @@ where
 import Blog.Utils (regexReplace, regexReplaceCustom, regexReplaceS)
 import Control.Arrow ((>>>))
 import Data.ByteString.Lazy.Char8 (ByteString)
+import Data.Data
 import Data.Maybe (fromJust)
+import Data.Typeable
 import Ella.GenUtils (utf8)
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.ByteString.Lazy.UTF8 as UTF8
@@ -18,7 +21,7 @@ import qualified Text.XHtml as X
 data Format = Rawhtml
             | Plaintext
             | RST
-            deriving (Eq, Ord, Show, Read, Enum)
+            deriving (Eq, Ord, Show, Read, Enum, Data, Typeable)
 
 
 formatRawhtml :: String -> String

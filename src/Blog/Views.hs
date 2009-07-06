@@ -63,8 +63,12 @@ mainIndex req = do
   cn <- connect
   (posts,more) <- getRecentPosts cn curpage
   cats <- getCategoriesBulk cn posts
-  return $ Just $ standardResponse $ mainIndexPage (zip posts cats) curpage more
-
+  t <- get_template "index"
+  return $ Just $ standardResponseBS $ (renderf t
+             ("posts", map postTemplateInfo posts)
+             ("categories", map (map categoryTemplateInfo) cats)
+             ("paginglinks", pagingLinks indexUrl curpage more)
+                                       )
 -- | View to help with debugging
 debug :: String -> View
 debug path req = return $ Just $ buildResponse [

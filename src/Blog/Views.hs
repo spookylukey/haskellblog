@@ -9,6 +9,7 @@ import Blog.Forms (CommentStage(..), validateComment, emptyComment, emptyLoginDa
 import Blog.Links
 import Blog.Model
 import Blog.Templates
+import Blog.Utils (escapeHtmlString)
 import Data.ByteString.Lazy (ByteString)
 import Ella.Framework (default404, View)
 import Ella.GenUtils (utf8, with, exactParse, getTimestamp)
@@ -20,7 +21,6 @@ import Maybe (fromMaybe, isJust, fromJust)
 import System.Time (ClockTime(..), toUTCTime)
 import Text.StringTemplate
 import Text.StringTemplate.GenericStandard
-import Text.XHtml (stringToHtml)
 import qualified Blog.Settings as Settings
 import qualified Data.Map as Map
 
@@ -47,7 +47,7 @@ custom404 = with (standardResponse custom404page) [
 get_templates :: IO (STGroup ByteString)
 get_templates = do
   templates' <- directoryGroup Settings.template_path
-  return $ setEncoderGroup (show . stringToHtml) templates'
+  return $ setEncoderGroup escapeHtmlString templates'
 
 get_template :: String -> IO (StringTemplate ByteString)
 get_template name = do

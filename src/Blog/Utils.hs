@@ -80,3 +80,11 @@ split (c:cs) delim
    where
        rest = split cs delim
 
+replace :: Eq a => [a] -> [a] -> [a] -> [a]
+replace _ _ [] = []
+replace find repl s =
+    if take (length find) s == find
+        then repl ++ (replace find repl (drop (length find) s))
+        else [head s] ++ (replace find repl (tail s))
+
+escapeHtmlString s = replace "<" "&lt;" $ replace ">" "&gt;" $ replace "\"" "&quot;" $ replace "&" "&amp;" s

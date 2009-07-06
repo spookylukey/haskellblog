@@ -70,6 +70,7 @@ mainIndex req = do
               ("categories", map (map categoryTemplateInfo) cats)
               ("paginglinks", pagingLinks indexUrl curpage more)
              )
+
 -- | View to help with debugging
 debug :: String -> View
 debug path req = return $ Just $ buildResponse [
@@ -90,9 +91,11 @@ categoriesView req = do
   cats <- getCategories cn
   t <- get_template "categories"
   let categories = [ (c, categoryUrl c) | c <- cats ]
-  return $ Just $ standardResponseBS $ (renderf t
-         ("categories", categories)
-         ("hasCategories", not $ null cats))
+  return $ Just $ standardResponseBS $
+             (renderf t
+              ("categories", categories)
+              ("hasCategories", not $ null cats)
+             )
 
 -- | View that shows posts for an individual category
 categoryView :: String -> View

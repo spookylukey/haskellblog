@@ -2,7 +2,6 @@
 module Blog.Utils where
 
 import Data.Char
-import System.Environment(getArgs)
 import System.Posix.Types
 import Text.Regex.Base
 import Text.Regex.PCRE

@@ -112,45 +112,6 @@ custom404page =
              , ptitle = "404 Not Found"
              }
 
-mainIndexPage :: [(P.Post, [C.Category])] -- ^ list of posts (wtth their categories) to display
-              -> Int                      -- ^ current page number being displayed
-              -> Bool                     -- ^ True if there are more pages to display
-              -> Html
-mainIndexPage postInfo curpage moreposts =
-    page $ defaultPageVars
-             { pcontent = formatIndex "Recent posts" indexUrl postInfo curpage moreposts
-             , ptitle = ""
-             }
-
-formatIndex :: String -> String -> [(P.Post, [C.Category])] -> Int -> Bool -> Html
-formatIndex title url postInfo curpage shownext =
-    (h1 << title)
-    +++
-    (do (post, cats) <- postInfo
-        return (
-                (thediv ! [ theclass "summarylink" ]
-                 << postLink post)
-                +++
-                (metaInfoLine post cats "metainfoindex")
-                +++
-                (thediv ! [ theclass "summary" ]
-                 << (primHtml $ P.summary_formatted post))
-               )
-    ) +++ (
-           pagingLinks url curpage shownext
-          )
-
-formatCategoryLink cat =
-    (thediv ! [theclass "category"]
-     << categoryLink cat)
-
-categoryPage :: C.Category -> [(P.Post, [C.Category])] -> Int -> Bool -> Html
-categoryPage cat posts curpage moreposts =
-    page $ defaultPageVars
-         { pcontent = formatIndex ("Category: " ++ C.name cat) (categoryUrl cat) posts curpage moreposts
-         , ptitle = C.name cat
-         }
-
 postPage :: P.Post        -- ^ The Post to display
          -> CommentStage  -- ^ What stage comment submission is at
          -> Cm.Comment    -- ^ Data for the comment form

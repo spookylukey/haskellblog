@@ -83,7 +83,6 @@ postsRedirectView :: View
 postsRedirectView req = return $ Just $ redirectResponse indexUrl
 
 -- | View that shows an overview of categories
-
 categoriesView :: View
 categoriesView req = do
   cn <- connect
@@ -105,7 +104,14 @@ categoryView slug req = do
     Just cat -> do
               (posts,more) <- getPostsForCategory cn cat (getPage req)
               cats <- getCategoriesBulk cn posts
-              return $ Just $ standardResponse $ categoryPage cat (zip posts cats) curpage more
+              t <- get_template "category"
+              return $ Just $ standardResponseBS $
+                         (renderf t
+                          ("category", cat)
+                          ("posts", map postTemplateInfo posts)
+                          ("categories", map (map categoryTemplateInfo) cats)
+                          ("paginglinks", pagingLinks (categoryUrl cat) curpage more)
+                         )
 
 -- | View that shows individual post
 postView :: String -> View

@@ -114,128 +114,19 @@ custom404page =
              , ptitle = "404 Not Found"
              }
 
-postPage :: P.Post        -- ^ The Post to display
-         -> CommentStage  -- ^ What stage comment submission is at
-         -> Cm.Comment    -- ^ Data for the comment form
-         -> Map.Map String String -- ^ Validation errors for comment
-         -> [C.Category]  -- ^ Categories the post is in
-         -> [Cm.Comment]  -- ^ Comments belonging to the poast
-         -> [P.Post]      -- ^ Related posts
-         -> Html
-postPage post commentStage commentData commentErrors categories comments related =
-    page $ defaultPageVars
-             { pcontent = formatPost post commentStage commentData commentErrors categories comments related
-             , ptitle = P.title post
-             }
 
-formatPost post commentStage commentData commentErrors categories comments otherposts =
-    (h1 ! [theclass "posttitle"] << P.title post
-     +++
-     metaInfoLine post categories "metainfo"
-     +++
-     (thediv ! [theclass "post"]
-      << (primHtml $ P.post_formatted post)
-     )
-     +++
-     (thediv ! [theclass "comments"]
-      << ((h1 ! [identifier "comments"]
-           << ("Comments: " +++ anchor ! [ theclass "anchor", href "#comments" ] << primHtml "&sect;"))
-          +++ if null comments
-              then p << "No comments."
-              else thediv << map formatComment comments
-         )
-     )
-     +++
-     (if P.comments_open post
-      then (thediv ! [identifier "addcomment"]
-            << ((h1 << "Add comment:")
-                +++
-                commentForm post commentStage commentData commentErrors
-               )
-           )
-      else (hr +++ p << "Closed for comments.")
-     )
-     +++
-     (if null otherposts
-      then thediv << ""
-      else (thediv ! [ theclass "related" ]
-            << ((h1 ! [ identifier "related" ]
-                 << ("Related: " +++ anchor ! [ theclass "anchor", href "#related" ] << primHtml "&sect;"))
-                +++ (unordList $ map formatRelated otherposts))
-           )
-     )
-    )
+commentNameLabel       = makeLabel "Name:" nameWidget
+commentNameWidget c    = setVal (Cm.name c) nameWidget
+commentEmailLabel      = makeLabel "Email:" emailWidget
+commentEmailWidget c   = setVal (Cm.email c) emailWidget
+commentFormatLabel     = "Format:"
+commentFormatWidget c  = setVal (show $ fromEnum $ Cm.format c) formatWidget
+commentMessageLabel    = "Message:"
+commentMessageWidget c = setVal (Cm.text_raw c) messageWidget
+commentSubmitButton    = submit "submit" "Post"
+commentPreviewButton   = submit "preview" "Preview"
 
-commentForm post commentStage commentData errors =
-    (case commentStage of
-       CommentPreview ->
-           (h2 << "Preview")
-           +++
-           (thediv ! [theclass "commentpreview"]
-            <<
-            formatComment commentData)
 
-       CommentAccepted ->
-           (thediv ! [theclass "accepted"]
-            << "Comment added, thank you.")
-
-       CommentInvalid ->
-           (thediv ! [theclass "validationerror"]
-            << unordList (Map.elems errors))
-
-       _ -> noHtml
-    )
-    +++
-    form ! [method "post", action "#addcomment"]
-    << (
-        simpleTable [] [] [ [ toHtml $ makeLabel "Name:" nameWidget
-                            , toHtml $ setVal (Cm.name commentData) nameWidget
-                            ]
-                          , [ toHtml $ makeLabel "Email:" emailWidget
-                            , toHtml $ setVal (Cm.email commentData) emailWidget
-                            ]
-                          , [ toHtml $ "Format:"
-                            , toHtml $ setVal (show $ fromEnum $ Cm.format commentData) formatWidget
-                            ]
-                          ]
-        +++
-        setVal (Cm.text_raw commentData) messageWidget
-        +++
-        br
-        +++
-        (submit "submit" "Post")
-        +++
-        (submit "preview" "Preview")
-       )
-
-commentclass comment = "comment" ++
-    if (Cm.name comment == Settings.blog_author_name)
-       then " author"
-       else ""
-
-formatComment comment =
-    (thediv ! [theclass (commentclass comment)] <<
-     (
-      (thediv ! [theclass "introline"] <<
-       (
-        (thespan << "On ")
-        +++
-        (thespan ! [theclass "timestamp"] << (showDate (Cm.timestamp comment)))
-        +++
-        (thespan << ", ")
-        +++
-        (thespan ! [theclass "commentby"] << (formatName $ Cm.name comment))
-        +++
-        (thespan << " wrote:")
-       )
-      )
-      +++
-      (thediv ! [theclass "commenttext"] <<
-                 (primHtml $ Cm.text_formatted comment))
-      )
-     ) +++ hr
-
-formatRelated = postLink
 
 infoPage post =
     page $ defaultPageVars
@@ -338,17 +229,28 @@ instance ToSElem ToSElemD where
 instance ToSElem Html where
     toSElem x = BS (utf8 $ showHtmlFragment x)
 
-enc = utf8 . escapeHtmlString
+encT = utf8 . escapeHtmlString -- use for text which might contain unicode or HTML chars
+encH = utf8                    -- use for HTML
 
 postTemplateInfo :: P.Post -> Map.Map String ToSElemD
-postTemplateInfo p = Map.fromList [ ("title", ToSElemD $ enc $ P.title p)
+postTemplateInfo p = Map.fromList [ ("title", ToSElemD $ encT $ P.title p)
                                   , ("date", ToSElemD $ showDate $ P.timestamp p)
-                                  , ("summary", ToSElemD $ utf8 $ P.summary_formatted p)
-                                  , ("full", ToSElemD $ utf8 $ P.post_formatted p)
-                                  , ("url", ToSElemD $ postUrl p)
+                                  , ("summary", ToSElemD $ encH $ P.summary_formatted p)
+                                  , ("full", ToSElemD $ encH $ P.post_formatted p)
+                                  , ("url", ToSElemD $ encT $ postUrl p)
+                                  , ("commentsOpen", ToSElemD $ P.comments_open p)
                                   ]
 
 categoryTemplateInfo :: C.Category -> Map.Map String ToSElemD
-categoryTemplateInfo c = Map.fromList [ ("name", ToSElemD $ enc $ C.name c)
-                                      , ("url", ToSElemD $ enc $ categoryUrl c)
+categoryTemplateInfo c = Map.fromList [ ("name", ToSElemD $ encT $ C.name c)
+                                      , ("url", ToSElemD $ encT $ categoryUrl c)
+                                      ]
+
+commentTemplateInfo :: Cm.Comment -> Map.Map String ToSElemD
+commentTemplateInfo cm = Map.fromList [ ("name", ToSElemD $ encT $ Cm.name cm)
+                                      , ("formattedName", ToSElemD $ encT $ formatName $ Cm.name cm)
+                                      , ("isAuthor", ToSElemD $ Cm.name cm == Settings.blog_author_name)
+                                      , ("date", ToSElemD $ showDate $ Cm.timestamp cm)
+                                      , ("textFormatted", ToSElemD $ encH $ Cm.text_formatted cm)
+                                      , ("email", ToSElemD $ encT $ Cm.email cm)
                                       ]

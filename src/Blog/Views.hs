@@ -1,4 +1,4 @@
-{-# OPTIONS_GHC -fglasgow-exts #-}
+{-# OPTIONS_GHC -fglasgow-exts -fcontext-stack=30 #-}
 module Blog.Views where
 
 -- View functions and logic. The actual HTML is found in Templates,
@@ -23,6 +23,7 @@ import Text.StringTemplate
 import Text.StringTemplate.GenericStandard
 import qualified Blog.Settings as Settings
 import qualified Data.Map as Map
+import qualified Text.XHtml as X
 
 ---- Utilities
 
@@ -129,7 +130,29 @@ postView slug req = do
             cats <- getCategoriesForPost cn post
             comments <- getCommentsForPost cn post
             related <- getRelatedPosts cn post cats
-            return $ Just $ standardResponse $ postPage post commentStage commentData commentErrors cats comments related
+            t <- get_template "post"
+            return $ Just $ standardResponseBS $
+                       (renderf t
+                        ("post", postTemplateInfo post)
+                        ("commentPreview", commentStage == CommentPreview)
+                        ("commentAccepted", commentStage == CommentAccepted)
+                        ("commentInvalid", commentStage == CommentInvalid)
+                        ("newComment", commentTemplateInfo commentData)
+                        ("commentErrors", commentErrors)
+                        ("categories", map categoryTemplateInfo cats)
+                        ("comments", map commentTemplateInfo comments)
+                        ("hasComments", not $ null comments)
+                        ("related", map postTemplateInfo related)
+                        ("hasRelated", not $ null related)
+                        ("nameLabel", X.toHtml $ commentNameLabel)
+                        ("nameWidget", X.toHtml $ commentNameWidget commentData)
+                        ("emailLabel", X.toHtml $ commentEmailLabel)
+                        ("emailWidget", X.toHtml $ commentEmailWidget commentData)
+                        ("formatLabel", X.toHtml $ commentFormatLabel)
+                        ("formatWidget", X.toHtml $ commentFormatWidget commentData)
+                        ("messageLabel", X.toHtml $ commentMessageLabel)
+                        ("messageWidget", X.toHtml $ commentMessageWidget commentData)
+                       )
   where
     handleUserComment cn post req =
         case requestMethod req of

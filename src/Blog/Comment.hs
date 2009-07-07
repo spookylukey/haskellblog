@@ -1,6 +1,9 @@
+{-# LANGUAGE DeriveDataTypeable #-}
 module Blog.Comment where
 
 import Blog.Formats (Format)
+import Data.Data
+import Data.Typeable
 
 data Comment = Comment {
       uid :: Int
@@ -11,4 +14,4 @@ data Comment = Comment {
     , text_raw :: String
     , text_formatted :: String
     , format :: Format
-    } deriving (Show, Eq)
+    } deriving (Show, Eq, Data, Typeable)

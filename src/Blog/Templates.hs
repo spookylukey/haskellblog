@@ -5,7 +5,6 @@ where
 import Blog.Forms (emailWidget, nameWidget, messageWidget, formatWidget, usernameWidget, passwordWidget, CommentStage(..))
 import Blog.Links
 import Blog.Utils (escapeHtmlString)
-import Data.List (intersperse)
 import Data.Maybe (fromJust)
 import Ella.Forms.Base
 import Ella.Forms.Widgets (makeLabel)
@@ -24,86 +23,7 @@ import qualified Blog.Settings as Settings
 import qualified Data.ByteString.Lazy.UTF8 as UTF8
 import qualified Data.Map as Map
 
-
--- | Holds variables for the 'page' template
---
--- fields should be limited to type class HTML, but that makes record
--- update syntax impossible with current GHC.
-data PageVars t1 t2 = {- (HTML t1, HTML t2) => -} PageVars
-    { ptitle :: t1
-    , pcontent :: t2
-    }
-
-defaultPageVars = PageVars { ptitle = ""
-                           , pcontent = ""
-                           }
-
--- Complete page template
-page vars =
-    (header
-     << (meta ! [httpequiv "Content-Type",
-                 content "text/html; charset=utf-8"]
-         +++ thelink ! [rel "alternate",
-                        thetype "application/rss+xml",
-                        title "RSS",
-                        href "/TODO"] << ""
-         +++ thelink ! [rel "StyleSheet",
-                        href "/newblog.css",
-                        thetype "text/css"] << ""
-         +++ thelink ! [rel "shortcut icon",
-                        href "/favicon.ico",
-                        thetype "image/x-icon"] << ""
-         +++ primHtml "<!--[if lte IE 6]><link rel=\"stylesheet\" href=\"/newblog_IE6.css\" type=\"text/css\" /><![endif]-->"
-         +++ thetitle << fulltitle
-        ))
-    +++
-    body
-    << thediv ! [identifier "container"]
-           << ((thediv ! [identifier "toplinks"]
-                           << unordList [ HotLink indexUrl (toHtml "Home") [theclass "first"]
-                                        , hotlink categoriesUrl << "Categories"
-                                        , hotlink feedsUrl << "Feeds"
-                                        , hotlink aboutUrl << "About"
-                                        ])
-               +++
-               (thediv ! [identifier "maintitle"]
-                << thediv
-                       << "All Unkept")
-               +++
-               (thediv ! [identifier "content"]
-                << (thediv ! [identifier "contentinner"]
-                           << pcontent vars))
-               +++
-               (thediv ! [identifier "footer"]
-                << (h1 << "Links"
-                    +++
-                    (thediv ! [theclass "bloglinks"]
-                     << (h2 << "Blog links:"
-                        +++
-                         unordList [ hotlink indexUrl << "Index"
-                                   , hotlink feedsUrl << "Feeds"
-                                   , hotlink categoriesUrl << "Categories"
-                                   , hotlink aboutUrl << "About blog"
-                                   ])
-                    )
-                    +++
-                    (thediv ! [theclass "sitelinks"]
-                     << (h2 << "Also on this site:"
-                        +++
-                         unordList [ hotlink "/" << "Index"
-                                   , hotlink "/softprojects.html" << "Software"
-                                   , hotlink "/bibleverses/" << "Bible memorisation"
-                                   , hotlink "/personal.html" << "About me"
-                                   ])
-                    )
-                   )
-               )
-              )
-    where fulltitle = let pt = ptitle vars
-                      in if null pt
-                         then "All Unkept"
-                         else pt ++ " « All Unkept"
-
+-- Widgets
 
 commentNameLabel       = makeLabel "Name:" nameWidget
 commentNameWidget c    = setVal (Cm.name c) nameWidget
@@ -172,6 +92,8 @@ instance ToSElem Html where
 encT = utf8 . escapeHtmlString -- use for text which might contain unicode or HTML chars
 encH = utf8                    -- use for HTML
 
+
+-- Convert to form needed for templates
 postTemplateInfo :: P.Post -> Map.Map String ToSElemD
 postTemplateInfo p = Map.fromList [ ("title", ToSElemD $ encT $ P.title p)
                                   , ("date", ToSElemD $ showDate $ P.timestamp p)

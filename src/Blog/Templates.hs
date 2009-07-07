@@ -9,6 +9,7 @@ import Data.List (intersperse)
 import Data.Maybe (fromJust)
 import Ella.Forms.Base
 import Ella.Forms.Widgets (makeLabel)
+import Ella.Forms.Widgets.TextInput (TextInput)
 import Ella.GenUtils (utf8)
 import System.Locale (defaultTimeLocale)
 import System.Time (toUTCTime, formatCalendarTime)
@@ -138,33 +139,12 @@ infoPage post =
              , ptitle = P.title post
              }
 
-
-loginPage :: Map.Map String String -> Map.Map String String -> Html
-loginPage loginData loginErrors =
-    page $ defaultPageVars
-             { pcontent = (h1 << "Login")
-                          +++
-                          loginForm loginData loginErrors
-             , ptitle = "Login"
-             }
-
-loginForm loginData loginErrors =
-    (if not $ Map.null loginErrors
-        then (thediv ! [theclass "validationerror"]
-              << unordList (Map.elems loginErrors))
-        else noHtml)
-    +++
-    form ! [ method "post", action ""]
-    << (simpleTable [] [] [ [ toHtml $ makeLabel "User name:" usernameWidget
-                            , toHtml $ setVal (fromJust $ Map.lookup "username" loginData) usernameWidget
-                            ]
-                          , [ toHtml $ makeLabel "Password: " passwordWidget
-                            , toHtml $ setVal (fromJust $ Map.lookup "password" loginData) passwordWidget
-                            ]
-                          ]
-        +++
-        (submit "login" "Login")
-       )
+loginUsernameLabel = makeLabel "User name:" usernameWidget
+loginUsernameWidget :: Map.Map String String -> TextInput
+loginUsernameWidget loginData = setVal (fromJust $ Map.lookup "username" loginData) usernameWidget
+loginPasswordLabel = makeLabel "Password: " passwordWidget
+loginPasswordWidget :: Map.Map String String -> TextInput
+loginPasswordWidget loginData = setVal (fromJust $ Map.lookup "password" loginData) passwordWidget
 
 -- General HTML fragments
 

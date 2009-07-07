@@ -196,10 +196,25 @@ loginView' cn req =
            ts <- getTimestamp
            let loginCookies = createLoginCookies loginData ts
            return $ Just $ (redirectResponse adminMenuUrl) `with` (map addCookie loginCookies)
-         else
-           return $ Just $ standardResponse $ loginPage loginData loginErrors
+         else do
+           t <- loginTemplate
+           return $ Just $ standardResponseBS $ loginPage t loginData loginErrors
     _ -> do
-      return $ Just $ standardResponse $ loginPage emptyLoginData Map.empty
+      t <- loginTemplate
+      return $ Just $ standardResponseBS $ loginPage t emptyLoginData (Map.empty :: Map.Map String String)
+
+  where loginPage t loginData loginErrors =
+            (renderf t
+             ("loginInvalid", not $ Map.null loginErrors)
+             ("loginErrors", Map.toList loginErrors)
+             ("loginData", loginData)
+             ("usernameLabel", X.toHtml $ loginUsernameLabel)
+             ("usernameWidget", X.toHtml $ loginUsernameWidget loginData)
+             ("passwordLabel", X.toHtml $ loginPasswordLabel)
+             ("passwordWidget", X.toHtml $ loginPasswordWidget loginData)
+            )
+
+        loginTemplate = get_template "login"
 
 -- | Delete auth cookies and redirect.
 logoutView req =

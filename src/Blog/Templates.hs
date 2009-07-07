@@ -105,17 +105,6 @@ page vars =
                          else pt ++ " « All Unkept"
 
 
--- Page specific templates
-
-custom404page =
-    page $ defaultPageVars
-             { pcontent = h1 << "404 Not Found"
-                          +++
-                          p << "Sorry, the page you requested could not be found"
-             , ptitle = "404 Not Found"
-             }
-
-
 commentNameLabel       = makeLabel "Name:" nameWidget
 commentNameWidget c    = setVal (Cm.name c) nameWidget
 commentEmailLabel      = makeLabel "Email:" emailWidget

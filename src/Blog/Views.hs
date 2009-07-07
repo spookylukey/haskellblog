@@ -37,11 +37,18 @@ standardResponseBS content = buildResponse [
                               addContent content
                              ] utf8HtmlResponse
 
+return404 :: View
+return404 req = do
+  resp <- custom404handler req
+  return $ Just $ resp
+
 -- | Custom 404 response
-custom404 :: Response
-custom404 = with (standardResponse custom404page) [
-             setStatus 404
-            ]
+custom404handler :: Request -> IO Response
+custom404handler req = do
+  t <- get_template "notfound"
+  return $ with (standardResponseBS $ render t) [
+                        setStatus 404
+                       ]
 
 -- Templates
 
@@ -105,7 +112,7 @@ categoryView slug req = do
   cn <- connect
   mcat <- getCategoryBySlug cn slug
   case mcat of
-    Nothing -> return $ Just $ custom404
+    Nothing -> return404 req
     Just cat -> do
               (posts,more) <- getPostsForCategory cn cat (getPage req)
               cats <- getCategoriesBulk cn posts
@@ -124,7 +131,7 @@ postView slug req = do
   cn <- connect
   mp <- getPostBySlug cn slug
   case mp of
-    Nothing -> return $ Just $ custom404 -- preferred to 'Nothing'
+    Nothing -> return404 req
     Just post -> do
             (commentStage, commentData, commentErrors) <- handleUserComment cn post req
             cats <- getCategoriesForPost cn post

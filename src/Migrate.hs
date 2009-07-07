@@ -153,6 +153,10 @@ main = handleSqlError $ do
   let categoryUrlMap = Map.fromList $ zip (map (show . C.uid) origCats)
                                           (map Links.categoryUrl newCats)
   createRedirectFile postUrlMap categoryUrlMap
+
+  createUser cn "luke" True
+  setPassword cn "luke" "test"
+
   commit cn
   return ()
 

@@ -9,8 +9,6 @@ import Blog.Forms (CommentStage(..), validateComment, emptyComment, emptyLoginDa
 import Blog.Links
 import Blog.Model
 import Blog.Templates
-import Blog.Utils (escapeHtmlString)
-import Data.ByteString.Lazy (ByteString)
 import Ella.Framework (default404, View)
 import Ella.GenUtils (utf8, with, exactParse, getTimestamp)
 import Ella.Param (captureOrDefault, capture)
@@ -49,18 +47,6 @@ custom404handler req = do
   return $ with (standardResponseBS $ render t) [
                         setStatus 404
                        ]
-
--- Templates
-
-get_templates :: IO (STGroup ByteString)
-get_templates = do
-  templates' <- directoryGroup Settings.template_path
-  return $ setEncoderGroup escapeHtmlString templates'
-
-get_template :: String -> IO (StringTemplate ByteString)
-get_template name = do
-  templates <- get_templates
-  return $ fromJust $ getStringTemplate name templates
 
 ---- Views
 

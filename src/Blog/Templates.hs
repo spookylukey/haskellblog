@@ -21,7 +21,20 @@ import qualified Blog.Comment as Cm
 import qualified Blog.Post as P
 import qualified Blog.Settings as Settings
 import qualified Data.ByteString.Lazy.UTF8 as UTF8
+import qualified Data.ByteString.Lazy as LB
 import qualified Data.Map as Map
+
+-- Templates
+
+get_templates :: IO (STGroup LB.ByteString)
+get_templates = do
+  templates' <- directoryGroup Settings.template_path
+  return $ setEncoderGroup escapeHtmlString templates'
+
+get_template :: String -> IO (StringTemplate LB.ByteString)
+get_template name = do
+  templates <- get_templates
+  return $ fromJust $ getStringTemplate name templates
 
 -- Widgets
 
@@ -70,12 +83,7 @@ formatName name = if null name
                   then "Anonymous Coward"
                   else name
 
-categoryLink c = toHtml $ hotlink (categoryUrl c) << (C.name c)
-
-postLink p = toHtml $ hotlink (postUrl p) << (P.title p)
-
 showDate timestamp = formatCalendarTime defaultTimeLocale  "%e %B %Y" (toUTCTime $ epochToClockTime timestamp)
-
 
 -- HStringTemplate related:
 

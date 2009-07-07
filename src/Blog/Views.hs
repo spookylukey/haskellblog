@@ -185,7 +185,8 @@ infoPageView :: String -> View
 infoPageView slug req = do
   cn <- connect
   Just post <- getPostBySlug cn slug
-  return $ Just $ standardResponse $ infoPage post
+  t <- get_template "info"
+  return $ Just $ standardResponseBS $ renderf t ("post", postTemplateInfo post)
 
 -- | View that displays a login form and handles logging in
 loginView :: View

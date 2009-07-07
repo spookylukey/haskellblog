@@ -116,18 +116,6 @@ commentMessageWidget c = setVal (Cm.text_raw c) messageWidget
 commentSubmitButton    = submit "submit" "Post"
 commentPreviewButton   = submit "preview" "Preview"
 
-
-
-infoPage post =
-    page $ defaultPageVars
-             { pcontent = (h1 << P.title post)
-                          +++
-                          (thediv ! [theclass "post"]
-                                      << (primHtml $ P.post_formatted post)
-                          )
-             , ptitle = P.title post
-             }
-
 loginUsernameLabel = makeLabel "User name:" usernameWidget
 loginUsernameWidget :: Map.Map String String -> TextInput
 loginUsernameWidget loginData = setVal (fromJust $ Map.lookup "username" loginData) usernameWidget

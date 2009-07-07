@@ -34,7 +34,7 @@ $if(post.commentsOpen)$
     $if(commentInvalid)$
       <div class="validationerror">
       <ul>
-        $commentErrors:{ <li>$it.message$</li> }$
+        $commentErrors:{ <li>$it.1$</li> }$
       </ul>
       </div>
     $endif$

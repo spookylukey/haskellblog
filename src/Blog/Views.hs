@@ -138,7 +138,7 @@ postView slug req = do
                         ("commentAccepted", commentStage == CommentAccepted)
                         ("commentInvalid", commentStage == CommentInvalid)
                         ("newComment", commentTemplateInfo commentData)
-                        ("commentErrors", commentErrors)
+                        ("commentErrors", Map.toList $ commentErrors)
                         ("categories", map categoryTemplateInfo cats)
                         ("comments", map commentTemplateInfo comments)
                         ("hasComments", not $ null comments)

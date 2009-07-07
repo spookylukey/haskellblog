@@ -169,23 +169,6 @@ pagingLinks url page shownext =
      )
     where makeLink url page text = toHtml (hotlink (url ++ "?p=" ++ (show page)) << text)
 
-categoryLinks categories =
-    intersperse (toHtml ", ") $ map categoryLink categories
-
-metaInfoLine post categories divclass =
-    (thediv ! [theclass divclass]
-     << ("Posted in: "
-         +++
-         categoryLinks categories
-         +++
-         (toHtml " | ")
-         +++
-         (thespan ! [theclass "timestamp"]
-          << (showDate $ P.timestamp post)
-         )
-        )
-    )
-
 formatName name = if null name
                   then "Anonymous Coward"
                   else name

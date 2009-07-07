@@ -21,6 +21,7 @@ $if(post.commentsOpen)$
     <h1>Add comment</h1>
     $if(commentPreview)$
       <div class="commentpreview">
+        <p>Comment preview:</p>
         $comment(comment=newComment)$
       </div>
     $endif$

@@ -6,8 +6,6 @@ import Blog.Forms (emailWidget, nameWidget, messageWidget, formatWidget, usernam
 import Blog.Links
 import Data.List (intersperse)
 import Data.Maybe (fromJust)
-import Data.ByteString.Lazy (ByteString)
-import Data.ByteString.Lazy.Char8 (pack)
 import Ella.Forms.Base
 import Ella.Forms.Widgets (makeLabel)
 import System.Locale (defaultTimeLocale)
@@ -20,7 +18,9 @@ import qualified Blog.Category as C
 import qualified Blog.Comment as Cm
 import qualified Blog.Post as P
 import qualified Blog.Settings as Settings
+import qualified Data.ByteString.Lazy.UTF8 as UTF8
 import qualified Data.Map as Map
+
 
 -- | Holds variables for the 'page' template
 --
@@ -334,13 +334,13 @@ instance ToSElem ToSElemD where
 
 -- Allow Html to be inserted
 instance ToSElem Html where
-    toSElem x = BS (pack $ showHtmlFragment x)
+    toSElem x = BS (UTF8.fromString $ showHtmlFragment x)
 
 postTemplateInfo :: P.Post -> Map.Map String ToSElemD
 postTemplateInfo p = Map.fromList [ ("title", ToSElemD $ P.title p)
                                   , ("date", ToSElemD $ showDate $ P.timestamp p)
-                                  , ("summary", ToSElemD $ pack $ P.summary_formatted p)
-                                  , ("full", ToSElemD $ pack $ P.post_formatted p)
+                                  , ("summary", ToSElemD $ UTF8.fromString $ P.summary_formatted p)
+                                  , ("full", ToSElemD $ UTF8.fromString $ P.post_formatted p)
                                   , ("url", ToSElemD $ postUrl p)
                                   ]
 

@@ -5,22 +5,22 @@ import Data.Char
 import System.Posix.Types
 import Text.Regex.Base
 import Text.Regex.PCRE
-import qualified Data.ByteString.Lazy.Char8 as BL
+import qualified Data.ByteString.Lazy.Char8 as LB
 
 
 -- | Replace using a regular expression. ByteString version
 regexReplace ::
     (RegexMaker Regex CompOption ExecOption source) =>
     source                 -- ^ regular expression
-    -> BL.ByteString       -- ^ replacement text
-    -> BL.ByteString       -- ^ text to operate on
-    -> BL.ByteString
+    -> LB.ByteString       -- ^ replacement text
+    -> LB.ByteString       -- ^ text to operate on
+    -> LB.ByteString
 regexReplace !regex !replacement !text = go text []
  where go str res =
-           if BL.null str
-           then BL.concat . reverse $ res
-           else case (str =~~ regex) :: Maybe (BL.ByteString, BL.ByteString, BL.ByteString) of
-                  Nothing -> BL.concat . reverse $ (str:res)
+           if LB.null str
+           then LB.concat . reverse $ res
+           else case (str =~~ regex) :: Maybe (LB.ByteString, LB.ByteString, LB.ByteString) of
+                  Nothing -> LB.concat . reverse $ (str:res)
                   Just (bef, _ , aft) -> go aft (replacement:bef:res)
 -- Could be implemented like this:
 -- > regexReplace r rep t = regexReplaceCustom r (const rep) t
@@ -30,15 +30,15 @@ regexReplace !regex !replacement !text = go text []
 regexReplaceCustom ::
   (RegexMaker Regex CompOption ExecOption source) =>
   source                               -- ^ regular expression
-  -> (BL.ByteString -> BL.ByteString)  -- ^ transformation function applied to all matches
-  -> BL.ByteString                     -- ^ text to operate on
-  -> BL.ByteString
+  -> (LB.ByteString -> LB.ByteString)  -- ^ transformation function applied to all matches
+  -> LB.ByteString                     -- ^ text to operate on
+  -> LB.ByteString
 regexReplaceCustom !regex replacef !text = go text []
  where go str res =
-           if BL.null str
-           then BL.concat . reverse $ res
-           else case (str =~~ regex) :: Maybe (BL.ByteString, BL.ByteString, BL.ByteString) of
-                  Nothing -> BL.concat . reverse $ (str:res)
+           if LB.null str
+           then LB.concat . reverse $ res
+           else case (str =~~ regex) :: Maybe (LB.ByteString, LB.ByteString, LB.ByteString) of
+                  Nothing -> LB.concat . reverse $ (str:res)
                   Just (bef, match , aft) -> go aft (replacef(match):bef:res)
 
 

@@ -12,19 +12,19 @@ import Blog.Utils (regexReplace)
 import Data.Convertible.Base (Convertible)
 import Database.HDBC
 import GHC.Unicode (toLower)
-import qualified Data.ByteString.Lazy.Char8 as BL
-import qualified Data.ByteString.Char8 as BS
+import qualified Data.ByteString.Lazy.Char8 as LB
+import qualified Data.ByteString.Char8 as B
 import qualified Data.List as List
 
-slugFromTitle title = map toLower $ BL.unpack $
-                      regexReplace (BL.pack "-+$") (BL.pack "") $
-                      regexReplace (BL.pack "[^A-Za-z0-9]+") (BL.pack "-") (BL.pack title)
+slugFromTitle title = map toLower $ LB.unpack $
+                      regexReplace (LB.pack "-+$") (LB.pack "") $
+                      regexReplace (LB.pack "[^A-Za-z0-9]+") (LB.pack "-") (LB.pack title)
 
 makeSlugGeneric cn title table = makeSlugGeneric' cn (slugFromTitle title) table 1
 makeSlugGeneric' cn slugBase table iter = do
   let slugAttempt =  (slugBase ++ makeSuffix iter);
   [[SqlByteString c]] <- quickQuery cn ("SELECT count(slug) FROM " ++ table ++ " WHERE slug = ?") [toSql slugAttempt];
-  case BS.unpack c of
+  case B.unpack c of
     "0" -> return slugAttempt
     _   -> makeSlugGeneric' cn slugBase table (iter + 1)
 
@@ -43,7 +43,7 @@ sqlInIds :: [Int] -> String
 sqlInIds ids = "(" ++ (concat $ List.intersperse "," $ map show ids) ++ ")"
 
 addLimitOffset sql limitOffset =
-    BL.unpack $ regexReplace (" \\$LIMITOFFSET") (BL.pack $ " " ++ limitOffset) (BL.pack sql)
+    LB.unpack $ regexReplace (" \\$LIMITOFFSET") (LB.pack $ " " ++ limitOffset) (LB.pack sql)
 
 -- return 'LIMIT/OFFSET' for a page (1 indexed), with an extra row
 -- which allows us to tell if there are more records

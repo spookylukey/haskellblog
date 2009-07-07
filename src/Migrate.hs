@@ -13,7 +13,7 @@ import qualified Blog.Formats as Formats
 import qualified Blog.Post as P
 import qualified Blog.Links as Links
 import qualified Blog.Settings as Settings
-import qualified Data.ByteString.Lazy.Char8 as BL
+import qualified Data.ByteString.Lazy.Char8 as LB
 import qualified Data.ByteString.Lazy.UTF8 as UTF8
 import qualified Data.Map as Map
 -- Migration script for the old data
@@ -71,7 +71,7 @@ readPosts = makeItems "posts.txt" mkPost
                                        }
                                 else p
           -- Fix dodgy stuff, and reinterpret as UTF8
-          fixCodes txt = UTF8.toString $ regexReplace (BL.pack "&#10;") (BL.pack "\n") (BL.pack txt)
+          fixCodes txt = UTF8.toString $ regexReplace (LB.pack "&#10;") (LB.pack "\n") (LB.pack txt)
 
 readPostCategories = makeItems "postcategories.txt" mkPostCategory
     where mkPostCategory row = (read (row !! 0),

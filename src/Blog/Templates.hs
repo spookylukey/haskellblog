@@ -4,10 +4,12 @@ where
 
 import Blog.Forms (emailWidget, nameWidget, messageWidget, formatWidget, usernameWidget, passwordWidget, CommentStage(..))
 import Blog.Links
+import Blog.Utils (escapeHtmlString)
 import Data.List (intersperse)
 import Data.Maybe (fromJust)
 import Ella.Forms.Base
 import Ella.Forms.Widgets (makeLabel)
+import Ella.GenUtils (utf8)
 import System.Locale (defaultTimeLocale)
 import System.Time (toUTCTime, formatCalendarTime)
 import System.Time.Utils (epochToClockTime)
@@ -334,17 +336,19 @@ instance ToSElem ToSElemD where
 
 -- Allow Html to be inserted
 instance ToSElem Html where
-    toSElem x = BS (UTF8.fromString $ showHtmlFragment x)
+    toSElem x = BS (utf8 $ showHtmlFragment x)
+
+enc = utf8 . escapeHtmlString
 
 postTemplateInfo :: P.Post -> Map.Map String ToSElemD
-postTemplateInfo p = Map.fromList [ ("title", ToSElemD $ P.title p)
+postTemplateInfo p = Map.fromList [ ("title", ToSElemD $ enc $ P.title p)
                                   , ("date", ToSElemD $ showDate $ P.timestamp p)
-                                  , ("summary", ToSElemD $ UTF8.fromString $ P.summary_formatted p)
-                                  , ("full", ToSElemD $ UTF8.fromString $ P.post_formatted p)
+                                  , ("summary", ToSElemD $ utf8 $ P.summary_formatted p)
+                                  , ("full", ToSElemD $ utf8 $ P.post_formatted p)
                                   , ("url", ToSElemD $ postUrl p)
                                   ]
 
 categoryTemplateInfo :: C.Category -> Map.Map String ToSElemD
-categoryTemplateInfo c = Map.fromList [ ("name", ToSElemD $ C.name c)
-                                      , ("url", ToSElemD $ categoryUrl c)
+categoryTemplateInfo c = Map.fromList [ ("name", ToSElemD $ enc $ C.name c)
+                                      , ("url", ToSElemD $ enc $ categoryUrl c)
                                       ]

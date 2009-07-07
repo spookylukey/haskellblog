@@ -55,11 +55,11 @@ $if(post.commentsOpen)$
           <td>$formatWidget$</td>
         </tr>
       </table>
-      $messageWidget$
-      <br>
-      <input type="submit" name="submit" value="Submit" />
-      <input type="submit" name="preview" value="Preview" />
-
+      <div>$messageWidget$</div>
+      <div>
+        <input type="submit" name="submit" value="Submit" />
+        <input type="submit" name="preview" value="Preview" />
+      </div>
     </form>
   </div>
 $else$
@@ -74,6 +74,7 @@ $if(hasRelated)$
     $related:{
       <li><a href="$it.url$">$it.title$</a></li>
     }$
+    </ul>
   </div>
 $endif$
 $pageend()$

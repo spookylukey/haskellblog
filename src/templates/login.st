@@ -21,7 +21,9 @@ $endif$
       <td>$passwordWidget$</td>
     </tr>
   </table>
-  <input type="submit" name="login" value="Login" />
+  <div>
+    <input type="submit" name="login" value="Login" />
+  </div>
 </form>
 
 $pageend()$

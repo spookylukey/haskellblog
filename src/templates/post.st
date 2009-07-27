@@ -1,6 +1,6 @@
 $pagestart(pagetitle=post.title)$
-<h1 class="posttitle">$post.title$</h1>
 $metainfoline(divclass="metainfo";post=post;categories=categories)$
+<h1 class="posttitle">$post.title$</h1>
 <div class="post">
   $post.full$
 </div>

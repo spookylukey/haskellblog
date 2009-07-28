@@ -4,7 +4,7 @@
         <span>On <span class="timestamp">$comment.date$</span>, <span class="commentBy">$comment.formattedName$</span> wrote:</span>
       </div>
       <div class="commenttext">
-         $comment.textFormatted$
+         $comment.textFormatted:noescape()$
       </div>
     </div>
     <hr/>

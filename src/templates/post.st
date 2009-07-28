@@ -2,7 +2,7 @@ $pagestart(pagetitle=post.title)$
 $metainfoline(divclass="metainfo";post=post;categories=categories)$
 <h1 class="posttitle">$post.title$</h1>
 <div class="post">
-  $post.full$
+  $post.full:noescape()$
 </div>
 
 <div class="comments">
@@ -43,19 +43,19 @@ $if(post.commentsOpen)$
     <form method="post" action="#addcomment">
       <table>
         <tr>
-          <td>$nameLabel$</td>
-          <td>$nameWidget$</td>
+          <td>$nameLabel:noescape()$</td>
+          <td>$nameWidget:noescape()$</td>
         </tr>
         <tr>
-          <td>$emailLabel$</td>
-          <td>$emailWidget$</td>
+          <td>$emailLabel:noescape()$</td>
+          <td>$mailWidget:noescape()$</td>
         </tr>
         <tr>
-          <td>$formatLabel$</td>
-          <td>$formatWidget$</td>
+          <td>$formatLabel:noescape()$</td>
+          <td>$formatWidget:noescape()$</td>
         </tr>
       </table>
-      <div>$messageWidget$</div>
+      <div>$messageWidget:noescape()$</div>
       <div>
         <input type="submit" name="submit" value="Submit" />
         <input type="submit" name="preview" value="Preview" />

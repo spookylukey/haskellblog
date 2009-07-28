@@ -21,6 +21,9 @@ import Text.StringTemplate
 import Text.StringTemplate.GenericStandard
 import qualified Blog.Settings as Settings
 import qualified Data.Map as Map
+import qualified Data.ByteString.Lazy as LB
+import qualified Data.Text.Lazy as LT
+import qualified Data.Text.Lazy.Encoding as LT
 import qualified Text.XHtml as X
 
 ---- Utilities
@@ -30,10 +33,16 @@ standardResponse html = buildResponse [
                          addHtml html
                         ] utf8HtmlResponse
 
-standardResponseBS :: ByteString -> Response
+standardResponseBS :: LB.ByteString -> Response
 standardResponseBS content = buildResponse [
                               addContent content
                              ] utf8HtmlResponse
+
+-- | Standard response, taking a StringTemplate Text as input
+standardResponseTT :: StringTemplate LT.Text -> Response
+standardResponseTT template = buildResponse [
+                               addContent (LT.encodeUtf8 $ render template)
+                              ] utf8HtmlResponse
 
 return404 :: View
 return404 req = do
@@ -44,7 +53,7 @@ return404 req = do
 custom404handler :: Request -> IO Response
 custom404handler req = do
   t <- get_template "notfound"
-  return $ with (standardResponseBS $ render t) [
+  return $ with (standardResponseTT t) [
                         setStatus 404
                        ]
 
@@ -58,7 +67,7 @@ mainIndex req = do
   (posts,more) <- getRecentPosts cn curpage
   cats <- getCategoriesBulk cn posts
   t <- get_template "index"
-  return $ Just $ standardResponseBS $
+  return $ Just $ standardResponseTT $
              (renderf t
               ("posts", map postTemplateInfo posts)
               ("categories", map (map categoryTemplateInfo) cats)
@@ -85,7 +94,7 @@ categoriesView req = do
   cats <- getCategories cn
   t <- get_template "categories"
   let categories = [ (c, categoryUrl c) | c <- cats ]
-  return $ Just $ standardResponseBS $
+  return $ Just $ standardResponseTT $
              (renderf t
               ("categories", categories)
               ("hasCategories", not $ null cats)
@@ -103,7 +112,7 @@ categoryView slug req = do
               (posts,more) <- getPostsForCategory cn cat (getPage req)
               cats <- getCategoriesBulk cn posts
               t <- get_template "category"
-              return $ Just $ standardResponseBS $
+              return $ Just $ standardResponseTT $
                          (renderf t
                           ("category", cat)
                           ("posts", map postTemplateInfo posts)
@@ -124,7 +133,7 @@ postView slug req = do
             comments <- getCommentsForPost cn post
             related <- getRelatedPosts cn post cats
             t <- get_template "post"
-            return $ Just $ standardResponseBS $
+            return $ Just $ standardResponseTT $
                        (renderf t
                         ("post", postTemplateInfo post)
                         ("commentPreview", commentStage == CommentPreview)
@@ -172,7 +181,7 @@ infoPageView slug req = do
   cn <- connect
   Just post <- getPostBySlug cn slug
   t <- get_template "info"
-  return $ Just $ standardResponseBS $ renderf t ("post", postTemplateInfo post)
+  return $ Just $ standardResponseTT $ renderf t ("post", postTemplateInfo post)
 
 -- | View that displays a login form and handles logging in
 loginView :: View
@@ -192,10 +201,10 @@ loginView' cn req =
            return $ Just $ (redirectResponse adminMenuUrl) `with` (map addCookie loginCookies)
          else do
            t <- loginTemplate
-           return $ Just $ standardResponseBS $ loginPage t loginData loginErrors
+           return $ Just $ standardResponseTT $ loginPage t loginData loginErrors
     _ -> do
       t <- loginTemplate
-      return $ Just $ standardResponseBS $ loginPage t emptyLoginData (Map.empty :: Map.Map String String)
+      return $ Just $ standardResponseTT $ loginPage t emptyLoginData (Map.empty :: Map.Map String String)
 
   where loginPage t loginData loginErrors =
             (renderf t

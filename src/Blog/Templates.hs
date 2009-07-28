@@ -4,7 +4,7 @@ where
 
 import Blog.Forms (emailWidget, nameWidget, messageWidget, formatWidget, usernameWidget, passwordWidget, CommentStage(..))
 import Blog.Links
-import Blog.Utils (escapeHtmlString)
+import Blog.Utils (escapeHtmlStringT)
 import Data.Maybe (fromJust)
 import Ella.Forms.Base
 import Ella.Forms.Widgets (makeLabel)
@@ -23,15 +23,19 @@ import qualified Blog.Settings as Settings
 import qualified Data.ByteString.Lazy.UTF8 as UTF8
 import qualified Data.ByteString.Lazy as LB
 import qualified Data.Map as Map
+import qualified Data.Text.Lazy as LT
 
 -- Templates
 
-get_templates :: IO (STGroup LB.ByteString)
+get_templates :: IO (STGroup LT.Text)
 get_templates = do
-  templates' <- directoryGroup Settings.template_path
-  return $ setEncoderGroup escapeHtmlString templates'
+  g1 <- directoryGroup Settings.template_path
+  let g2 = setEncoderGroup escapeHtmlStringT g1
+      g3 = groupStringTemplates [("noescape", newSTMP "$it$" :: StringTemplate LT.Text)]
+      g4 = mergeSTGroups g2 g3
+  return g4
 
-get_template :: String -> IO (StringTemplate LB.ByteString)
+get_template :: String -> IO (StringTemplate LT.Text)
 get_template name = do
   templates <- get_templates
   return $ fromJust $ getStringTemplate name templates
@@ -95,32 +99,28 @@ instance ToSElem ToSElemD where
 
 -- Allow Html to be inserted
 instance ToSElem Html where
-    toSElem x = BS (utf8 $ showHtmlFragment x)
-
-encT = utf8 . escapeHtmlString -- use for text which might contain unicode or HTML chars
-encH = utf8                    -- use for HTML
-
+    toSElem x = STR $ showHtmlFragment x
 
 -- Convert to form needed for templates
 postTemplateInfo :: P.Post -> Map.Map String ToSElemD
-postTemplateInfo p = Map.fromList [ ("title", ToSElemD $ encT $ P.title p)
+postTemplateInfo p = Map.fromList [ ("title", ToSElemD $ P.title p)
                                   , ("date", ToSElemD $ showDate $ P.timestamp p)
-                                  , ("summary", ToSElemD $ encH $ P.summary_formatted p)
-                                  , ("full", ToSElemD $ encH $ P.post_formatted p)
-                                  , ("url", ToSElemD $ encT $ postUrl p)
+                                  , ("summary", ToSElemD $ P.summary_formatted p)
+                                  , ("full", ToSElemD $ P.post_formatted p)
+                                  , ("url", ToSElemD $ postUrl p)
                                   , ("commentsOpen", ToSElemD $ P.comments_open p)
                                   ]
 
 categoryTemplateInfo :: C.Category -> Map.Map String ToSElemD
-categoryTemplateInfo c = Map.fromList [ ("name", ToSElemD $ encT $ C.name c)
-                                      , ("url", ToSElemD $ encT $ categoryUrl c)
+categoryTemplateInfo c = Map.fromList [ ("name", ToSElemD $ C.name c)
+                                      , ("url", ToSElemD $ categoryUrl c)
                                       ]
 
 commentTemplateInfo :: Cm.Comment -> Map.Map String ToSElemD
-commentTemplateInfo cm = Map.fromList [ ("name", ToSElemD $ encT $ Cm.name cm)
-                                      , ("formattedName", ToSElemD $ encT $ formatName $ Cm.name cm)
+commentTemplateInfo cm = Map.fromList [ ("name", ToSElemD $ Cm.name cm)
+                                      , ("formattedName", ToSElemD $ formatName $ Cm.name cm)
                                       , ("isAuthor", ToSElemD $ Cm.name cm == Settings.blog_author_name)
                                       , ("date", ToSElemD $ showDate $ Cm.timestamp cm)
-                                      , ("textFormatted", ToSElemD $ encH $ Cm.text_formatted cm)
-                                      , ("email", ToSElemD $ encT $ Cm.email cm)
+                                      , ("textFormatted", ToSElemD $ Cm.text_formatted cm)
+                                      , ("email", ToSElemD $ Cm.email cm)
                                       ]

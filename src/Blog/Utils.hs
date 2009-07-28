@@ -6,7 +6,7 @@ import System.Posix.Types
 import Text.Regex.Base
 import Text.Regex.PCRE
 import qualified Data.ByteString.Lazy.Char8 as LB
-
+import qualified Data.Text.Lazy as LT
 
 -- | Replace using a regular expression. ByteString version
 regexReplace ::
@@ -88,3 +88,18 @@ replace find repl s =
         else [head s] ++ (replace find repl (tail s))
 
 escapeHtmlString s = replace "<" "&lt;" $ replace ">" "&gt;" $ replace "\"" "&quot;" $ replace "&" "&amp;" s
+
+-- | Replace a string of Text in a Text with another Text
+replaceLT find repl src
+    | LT.null src = src
+    | otherwise = let l = LT.length find
+                  in if LT.take (fromIntegral l) src == find
+                     then LT.append repl (replaceLT find repl (LT.drop (fromIntegral l) src))
+                     else LT.cons (LT.head src) (replaceLT find repl (LT.tail src))
+
+escapeHtmlStringT = repl "<" "&lt;" .
+                    repl ">" "&gt;" .
+                    repl "\"" "&quot;" .
+                    repl "\'" "&#39;" .
+                    repl "&" "&amp;"
+    where repl x y = replaceLT (LT.pack x) (LT.pack y)

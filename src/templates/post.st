@@ -48,7 +48,7 @@ $if(post.commentsOpen)$
         </tr>
         <tr>
           <td>$emailLabel:noescape()$</td>
-          <td>$mailWidget:noescape()$</td>
+          <td>$emailWidget:noescape()$</td>
         </tr>
         <tr>
           <td>$formatLabel:noescape()$</td>

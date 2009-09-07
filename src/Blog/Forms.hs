@@ -129,7 +129,7 @@ validateComment creds postedData blogpost =
                   , (length name > Settings.max_comment_name_size,
                      ("name", "Name too long"))
                   ]
-      let errors = [ err | (test, err) <- tests, test ]
+      let errors = map snd $ filter fst $ tests
 
       return (Cm.Comment {
                       uid = undefined

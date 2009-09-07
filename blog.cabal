@@ -43,7 +43,7 @@ Executable blog.cgi
         MissingH >= 1.0.2,
         pandoc >= 1.1,
         SHA >= 1.0.2,
-        HStringTemplate >= 0.6,
+        HStringTemplate >= 0.6.1,
         text >= 0.3,
         ella >= 0.1.2
   Main-is: BlogCgi.hs

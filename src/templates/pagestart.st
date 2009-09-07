@@ -10,7 +10,7 @@
     <!--[if lte IE 6]><link rel="stylesheet" href="/newblog_IE6.css" type="text/css"><![endif]-->
     <title>
       $if(pagetitle)$
-        $pagetitle$ &#171; All Unkept
+        $pagetitle$ « All Unkept
       $else$
         All Unkept
       $endif$

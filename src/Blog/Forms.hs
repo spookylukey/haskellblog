@@ -50,8 +50,8 @@ formatWidget = RBL.RadioButtonList { value = ""
                                    }
 
 messageWidget = Textarea { value = ""
-                         , cols = Just 60
-                         , rows = Just 20
+                         , cols = Just 80
+                         , rows = Just 25
                          , name = "message"
                          , identifier = "id_message"
                          }

@@ -41,6 +41,7 @@ $if(post.commentsOpen)$
     $endif$
 
     <form method="post" action="#addcomment">
+    $csrffield:noescape()$
       <table>
         <tr>
           <td>$nameLabel:noescape()$</td>

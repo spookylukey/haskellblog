@@ -6,6 +6,7 @@ module Blog.Views where
 
 import Blog.DB (connect)
 import Blog.Forms (CommentStage(..), validateComment, emptyComment, emptyLoginData, validateLogin)
+import Blog.Globals (mkCsrfField)
 import Blog.Links
 import Blog.Model
 import Blog.Templates
@@ -38,11 +39,14 @@ standardResponseBS content = buildResponse [
                               addContent content
                              ] utf8HtmlResponse
 
--- | Standard response, taking a StringTemplate Text as input
-standardResponseTT :: StringTemplate LT.Text -> Response
-standardResponseTT template = buildResponse [
-                               addContent (LT.encodeUtf8 $ render template)
-                              ] utf8HtmlResponse
+-- | Standard response, taking a Request and StringTemplate Text as input
+standardResponseTT :: Request -> StringTemplate LT.Text -> Response
+standardResponseTT req template =
+    let csrffield = mkCsrfField req
+        t2 = setAttribute "csrffield" csrffield template
+        rendered = (LT.encodeUtf8 $ render t2)
+    in buildResponse [ addContent rendered
+                     ] utf8HtmlResponse
 
 return404 :: View
 return404 req = do
@@ -53,7 +57,7 @@ return404 req = do
 custom404handler :: Request -> IO Response
 custom404handler req = do
   t <- get_template "notfound"
-  return $ with (standardResponseTT t) [
+  return $ with (standardResponseTT req t) [
                         setStatus 404
                        ]
 
@@ -67,7 +71,7 @@ mainIndex req = do
   (posts,more) <- getRecentPosts cn curpage
   cats <- getCategoriesBulk cn posts
   t <- get_template "index"
-  return $ Just $ standardResponseTT $
+  return $ Just $ standardResponseTT req $
              (renderf t
               ("posts", map postTemplateInfo posts)
               ("categories", map (map categoryTemplateInfo) cats)
@@ -94,7 +98,7 @@ categoriesView req = do
   cats <- getCategories cn
   t <- get_template "categories"
   let categories = [ (c, categoryUrl c) | c <- cats ]
-  return $ Just $ standardResponseTT $
+  return $ Just $ standardResponseTT req $
              (renderf t
               ("categories", categories)
               ("hasCategories", not $ null cats)
@@ -112,7 +116,7 @@ categoryView slug req = do
               (posts,more) <- getPostsForCategory cn cat (getPage req)
               cats <- getCategoriesBulk cn posts
               t <- get_template "category"
-              return $ Just $ standardResponseTT $
+              return $ Just $ standardResponseTT req $
                          (renderf t
                           ("category", cat)
                           ("posts", map postTemplateInfo posts)
@@ -133,7 +137,7 @@ postView slug req = do
             comments <- getCommentsForPost cn post
             related <- getRelatedPosts cn post cats
             t <- get_template "post"
-            return $ Just $ standardResponseTT $
+            return $ Just $ standardResponseTT req $
                        (renderf t
                         ("post", postTemplateInfo post)
                         ("commentPreview", commentStage == CommentPreview)
@@ -181,7 +185,7 @@ infoPageView slug req = do
   cn <- connect
   Just post <- getPostBySlug cn slug
   t <- get_template "info"
-  return $ Just $ standardResponseTT $ renderf t ("post", postTemplateInfo post)
+  return $ Just $ standardResponseTT req $ renderf t ("post", postTemplateInfo post)
 
 -- | View that displays a login form and handles logging in
 loginView :: View
@@ -201,10 +205,10 @@ loginView' cn req =
            return $ Just $ (redirectResponse adminMenuUrl) `with` (map addCookie loginCookies)
          else do
            t <- loginTemplate
-           return $ Just $ standardResponseTT $ loginPage t loginData loginErrors
+           return $ Just $ standardResponseTT req $ loginPage t loginData loginErrors
     _ -> do
       t <- loginTemplate
-      return $ Just $ standardResponseTT $ loginPage t emptyLoginData (Map.empty :: Map.Map String String)
+      return $ Just $ standardResponseTT req $ loginPage t emptyLoginData (Map.empty :: Map.Map String String)
 
   where loginPage t loginData loginErrors =
             (renderf t

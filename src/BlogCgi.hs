@@ -1,12 +1,15 @@
 import Blog.Routes (views)
 import Blog.Views (custom404handler)
+import Blog.Globals (csrfProtectionProcessor)
 import Database.HDBC
 import Ella.Framework
 import Ella.Processors.Security (signedCookiesProcessor)
 import qualified Blog.Settings as Settings
 
 options = defaultDispatchOptions { notFoundHandler = custom404handler
-                                 , viewProcessors = [signedCookiesProcessor Settings.secret]
+                                 , viewProcessors = [ signedCookiesProcessor Settings.secret
+                                                    , csrfProtectionProcessor
+                                                    ]
                                  }
 
 sqlDebug action = catchSql (do { action; return ()}) (\e -> sendResponseCGI $ default500 $ show e)

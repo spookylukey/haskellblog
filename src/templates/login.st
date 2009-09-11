@@ -11,6 +11,7 @@ $if(loginInvalid)$
 $endif$
 
 <form method="post" action="">
+  $csrffield:noescape()$
   <table>
     <tr>
       <td>$usernameLabel:noescape()$</td>

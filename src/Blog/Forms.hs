@@ -98,7 +98,6 @@ instance Param Format where
 validateComment creds postedData blogpost =
     do
     -- TODO - nicer mechanism for validation
-    -- TODO - CSRF protection
 
     -- TODO - Spam protection
     --    Method - add 10 second minimum time for adding comment.  On

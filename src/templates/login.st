@@ -13,12 +13,12 @@ $endif$
 <form method="post" action="">
   <table>
     <tr>
-      <td>$usernameLabel$</td>
-      <td>$usernameWidget$</td>
+      <td>$usernameLabel:noescape()$</td>
+      <td>$usernameWidget:noescape()$</td>
     </tr>
     <tr>
-      <td>$passwordLabel$</td>
-      <td>$passwordWidget$</td>
+      <td>$passwordLabel:noescape()$</td>
+      <td>$passwordWidget:noescape()$</td>
     </tr>
   </table>
   <div>

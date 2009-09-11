@@ -16,7 +16,7 @@ import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.ByteString.Lazy.UTF8 as UTF8
 import qualified Data.Map as Map
 import qualified Text.Pandoc as Pandoc
-import qualified Text.Pandoc.Definition
+import qualified Text.Pandoc.Definition as PD
 import qualified Text.XHtml as X
 
 data Format = Rawhtml
@@ -62,10 +62,10 @@ formatPlaintext s = utf8 >>>
                     UTF8.toString
                     $ s
 
-removeRawHtml :: Text.Pandoc.Definition.Pandoc -> Text.Pandoc.Definition.Pandoc
-removeRawHtml (Text.Pandoc.Definition.Pandoc m blocks) = Text.Pandoc.Definition.Pandoc m (filter (not . isRawHtml) blocks)
+removeRawHtml :: PD.Pandoc -> PD.Pandoc
+removeRawHtml (PD.Pandoc m blocks) = PD.Pandoc m (filter (not . isRawHtml) blocks)
     where
-      isRawHtml (Text.Pandoc.Definition.RawHtml s) = True
+      isRawHtml (PD.RawHtml s) = True
       isRawHtml _ = False
 
 formatRST :: String -> String

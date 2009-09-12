@@ -70,7 +70,7 @@ removeRawHtml (PD.Pandoc m blocks) = PD.Pandoc m (filter (not . isRawHtml) block
 
 formatRST :: String -> String
 formatRST = normaliseCRLF_S >>>
-            Pandoc.readRST (Pandoc.defaultParserState { Pandoc.stateSanitizeHTML = False }) >>>
+            Pandoc.readRST Pandoc.defaultParserState >>>
             removeRawHtml >>>
             Pandoc.writeHtmlString Pandoc.defaultWriterOptions { Pandoc.writerStandalone = False }
 

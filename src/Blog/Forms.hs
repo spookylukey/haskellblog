@@ -93,26 +93,29 @@ instance Param Format where
     -- TODO error handling for out of bounds.
     capture s = liftM toEnum $ exactParse s
 
+-- | Creates a timestamp/hash for hidden fields for spam protection.
+initialCommentExtra req = getTimestamp >>= return
+
 -- | extract the posted data from a POST request and build
 -- a Comment from it, returning a Comment and a list of validation errors
 validateComment creds postedData blogpost =
     do
     -- TODO - nicer mechanism for validation
 
-    -- TODO - Spam protection
-    --    Method - add 10 second minimum time for adding comment.  On
-    --             first request, send back field with hash of time +
-    --             IP address + secret, and field with time only. Time
-    --             and hash fields are propagated if the user presses
-    --             preview.  If hash doesn't match when user presses
-    --             submit or if timedelta less than 10 seconds,
-    --             emit validation error.
+    -- Spam protection
+    --  - send a hidden field with deliberately incorrect name.
+    --    A bit of javascript corrects the field name.
+    --    Without this correction, submission fails.  This
+    --    will catch most bots.
+    --  - add a timestamp and a 10 second minimum time for adding comment.
+    --    this will catch most humans using a browser
 
       ts <- getTimestamp
       let text = postedData "message" `captureOrDefault` ""
       let name = strip (postedData "name" `captureOrDefault` "")
       let email = postedData "email" `captureOrDefault` ""
       let format = postedData "format" `captureOrDefault` Plaintext
+      let test_ts = postedData "timestamp" `captureOrDefault` 0 :: Int
       let tests = [ (null text,
                      ("message", "'Message' is a required field."))
                   , (not $ format `elem` commentAllowedFormats,
@@ -127,6 +130,10 @@ validateComment creds postedData blogpost =
                      ("email", "E-mail address too long"))
                   , (length name > Settings.max_comment_name_size,
                      ("name", "Name too long"))
+                  , (test_ts == 0, -- field missing
+                     ("timestamp", "Appears to be spam"))
+                  , (ts < test_ts + 10,
+                     ("timestamp", "That didn't take long to write! Spammer?"))
                   ]
       let errors = map snd $ filter fst $ tests
 
@@ -139,7 +146,10 @@ validateComment creds postedData blogpost =
                     , text_raw = text
                     , text_formatted = getFormatter format $ text
                     , format = format
-                    }, Map.fromList errors)
+                    }
+             , Map.fromList errors
+             , if test_ts > 0 then test_ts else ts
+             )
 
 
 emptyLoginData = Map.fromList [("username", "")

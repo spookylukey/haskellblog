@@ -57,9 +57,14 @@ $if(post.commentsOpen)$
         </tr>
       </table>
       <div>$messageWidget:noescape()$</div>
+      <div><input type="hidden" id="id_spamcheck" name="spamcheck" value="$commentExtra$" />
+      </div>
       <div>
         <input type="submit" name="submit" value="Submit" />
         <input type="submit" name="preview" value="Preview" />
+      </div>
+      <div class="note"><br /><br />[Javascript has to be on to get past my spam protection.
+      Sorry for any inconvenience.]
       </div>
     </form>
   </div>

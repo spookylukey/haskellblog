@@ -5,7 +5,7 @@ module Blog.Views where
 -- which has pure functions that generally return Html.
 
 import Blog.DB (connect)
-import Blog.Forms (CommentStage(..), validateComment, emptyComment, emptyLoginData, validateLogin)
+import Blog.Forms (CommentStage(..), validateComment, emptyComment, emptyLoginData, validateLogin, initialCommentExtra)
 import Blog.Globals (mkCsrfField)
 import Blog.Links
 import Blog.Model
@@ -132,7 +132,7 @@ postView slug req = do
   case mp of
     Nothing -> return404 req
     Just post -> do
-            (commentStage, commentData, commentErrors) <- handleUserComment cn post req
+            (commentStage, commentData, commentErrors, commentExtra) <- handleUserComment cn post req
             cats <- getCategoriesForPost cn post
             comments <- getCommentsForPost cn post
             related <- getRelatedPosts cn post cats
@@ -158,25 +158,27 @@ postView slug req = do
                         ("formatWidget", X.toHtml $ commentFormatWidget commentData)
                         ("messageLabel", X.toHtml $ commentMessageLabel)
                         ("messageWidget", X.toHtml $ commentMessageWidget commentData)
+                        ("commentExtra", commentExtra)
                        )
   where
     handleUserComment cn post req =
         case requestMethod req of
           "POST" -> do
             creds <- getCredentials req
-            (commentData, commentErrors) <- validateComment creds (getPOST req) post
+            (commentData, commentErrors, commentExtra) <- validateComment creds (getPOST req) post
             if Map.null commentErrors
                then if isJust (getPOST req "submit")
                     then
                         do
                           addComment cn commentData
-                          return (CommentAccepted, emptyComment, Map.empty)
+                          return (CommentAccepted, emptyComment, Map.empty, commentExtra)
                           -- Just assume 'preview' if not 'submit'
-                    else return (CommentPreview, commentData, commentErrors)
+                    else return (CommentPreview, commentData, commentErrors, commentExtra)
                else
-                   return (CommentInvalid, commentData, commentErrors)
+                   return (CommentInvalid, commentData, commentErrors, commentExtra)
 
-          _ -> return (NoComment, emptyComment, Map.empty)
+          _ -> do commentExtra <- initialCommentExtra req
+                  return (NoComment, emptyComment, Map.empty, commentExtra)
 
 
 -- | View that shows a post as a static information page -- no comments etc.

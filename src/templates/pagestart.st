@@ -15,6 +15,12 @@
         All Unkept
       $endif$
     </title>
+    <script language="javascript" src="/js/jquery-1.3.2.min.js"></script>
+    <script language="javascript">
+      \$(document).ready(function() {
+      \$('#id_spamcheck').attr("name", "timestamp");
+      });
+    </script>
   </head>
   <body>
     <div id="container">

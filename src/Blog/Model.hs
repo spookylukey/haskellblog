@@ -87,6 +87,8 @@ addComment cn cm = do
                    , "text_raw"
                    , "text_formatted"
                    , "format_id"
+                   , "hidden"
+                   , "response"
                    ] [
                     toSql $ Cm.post_id cm
                    , toSql $ Cm.timestamp cm
@@ -95,6 +97,8 @@ addComment cn cm = do
                    , toSql $ Cm.text_raw cm
                    , toSql $ Cm.text_formatted cm
                    , toSql $ fromEnum $ Cm.format cm
+                   , toSql $ Cm.hidden cm
+                   , toSql $ Cm.response cm
                    ]
   newid <- getDbId cn
   return cm { Cm.uid = newid }
@@ -134,8 +138,8 @@ getCategoriesQuery        = "SELECT categories.id, categories.name, categories.s
 getCategoriesForPostQuery = "SELECT categories.id, categories.name, categories.slug FROM categories INNER JOIN post_categories ON categories.id = post_categories.category_id WHERE post_categories.post_id = ? ORDER BY categories.slug;"
 getCategoriesBulkQuery ids= "SELECT categories.id, categories.name, categories.slug, post_categories.post_id FROM categories INNER JOIN post_categories ON categories.id = post_categories.category_id WHERE post_categories.post_id IN " ++ sqlInIds ids ++ " ORDER BY categories.slug;"
 
-getCommentByIdQuery      = "SELECT id, post_id, timestamp, name, email, text_raw, text_formatted, format_id FROM comments WHERE id = ?;"
-getCommentsForPostQuery  = "SELECT id, '',      timestamp, name, email, '',       text_formatted, ''        FROM comments WHERE post_id = ? ORDER BY timestamp ASC;"
+getCommentByIdQuery      = "SELECT id, post_id, timestamp, name, email, text_raw, text_formatted, format_id, hidden, response FROM comments WHERE id = ?;"
+getCommentsForPostQuery  = "SELECT id, '',      timestamp, name, email, '',       text_formatted, '',        hidden, response FROM comments WHERE post_id = ? ORDER BY timestamp ASC;"
 
 getPasswordForUsernameQuery = "SELECT password FROM users WHERE username = ?;"
 setPasswordForUsernameQuery = "UPDATE users SET password = ? WHERE username = ?;"
@@ -170,6 +174,8 @@ makeComment row =
                , Cm.text_raw = fromSql (row !! 5)
                , Cm.text_formatted = fromSql (row !! 6)
                , Cm.format = toEnum $ fromSql (row !! 7)
+               , Cm.hidden = fromSql (row !! 8)
+               , Cm.response = fromSql (row !! 9)
                }
 
 ---- Public API for queries ----

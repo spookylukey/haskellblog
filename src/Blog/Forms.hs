@@ -86,6 +86,8 @@ emptyComment = Cm.Comment {
                , text_raw = ""
                , text_formatted = undefined
                , format = Plaintext
+               , hidden = False
+               , response = ""
                }
 
 instance Param Format where
@@ -146,6 +148,8 @@ validateComment creds postedData blogpost =
                     , text_raw = text
                     , text_formatted = getFormatter format $ text
                     , format = format
+                    , hidden = False
+                    , response = ""
                     }
              , Map.fromList errors
              , if test_ts > 0 then test_ts else ts

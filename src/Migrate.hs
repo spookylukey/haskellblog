@@ -87,6 +87,8 @@ readComments = makeItems "comments.txt" mkComment
                                      , Cm.text_raw = row !! 5
                                      , Cm.text_formatted = row !! 5
                                      , Cm.format = Formats.Rawhtml
+                                     , Cm.hidden = False
+                                     , Cm.response = ""
                                      }
 -- Writing
 

@@ -43,7 +43,9 @@
     email TEXT,
     text_raw TEXT,
     text_formatted TEXT,
-    format_id INTEGER REFERENCES format(id)
+    format_id INTEGER REFERENCES format(id),
+    hidden INTEGER,
+    response TEXT
   );
 
 CREATE TABLE users (

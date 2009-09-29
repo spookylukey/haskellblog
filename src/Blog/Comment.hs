@@ -14,4 +14,6 @@ data Comment = Comment {
     , text_raw :: String
     , text_formatted :: String
     , format :: Format
+    , hidden :: Bool
+    , response :: String
     } deriving (Show, Eq, Data, Typeable)

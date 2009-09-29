@@ -46,6 +46,7 @@ escapeQuotes = regexReplace "\"" (BL.pack "&quot;")
 normaliseCRLF = regexReplace "\r\n" (BL.pack "\n")
 normaliseCRLF_S = regexReplaceS "\r\n" "\n"
 
+-- | Convert HTTP URLS in HTML strings into anchors
 linkify = regexReplaceCustom url_regex (\s -> (BL.pack "<a href=\"") `BL.append` (escapeQuotes s) `BL.append` (BL.pack "\">") `BL.append` s `BL.append` (BL.pack "</a>"))
 
 preserveLeadingWhitespace = regexReplaceCustom "^(\\s+)" (regexReplace " " (BL.pack "&nbsp;"))
@@ -53,14 +54,13 @@ preserveLeadingWhitespace = regexReplaceCustom "^(\\s+)" (regexReplace " " (BL.p
 nl2br = regexReplace "\n" (BL.pack "<br />\n")
 
 formatPlaintext :: String -> String
-formatPlaintext s = utf8 >>>
+formatPlaintext   = utf8 >>>
                     escapeHtml >>>
                     normaliseCRLF >>>
                     linkify >>>
                     nl2br >>>
                     preserveLeadingWhitespace >>>
                     UTF8.toString
-                    $ s
 
 removeRawHtml :: PD.Pandoc -> PD.Pandoc
 removeRawHtml (PD.Pandoc m blocks) = PD.Pandoc m (filter (not . isRawHtml) blocks)

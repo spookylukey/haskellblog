@@ -8,6 +8,7 @@ root_url = "/blog/"
 prog_uri = "/cgi-bin/blog.cgi" -- Used for redirecting
 blog_author_name = "luke"
 reserved_names = [blog_author_name]
+admin_usernames = [blog_author_name]
 
 post_page_size = 20 :: Int
 domain = "lukeplant_local"

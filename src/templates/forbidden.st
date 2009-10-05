@@ -1,0 +1,4 @@
+$pagestart(pagetitle="Forbidden")$
+<h1>403 Forbidden</h1>
+<p>Permission denied.  You may need to <a href="/blog/login/">login</a></p>
+$pageend()$

@@ -62,6 +62,14 @@ custom404handler req = do
                         setStatus 404
                        ]
 
+return403 :: View
+return403 req = do
+  t <- get_template "forbidden"
+  return $ Just $ with (standardResponseTT req t) [
+                 setStatus 403
+                ]
+
+
 ---- Views
 
 -- View for the main page
@@ -309,6 +317,20 @@ getCredentials req = do
       then Just username
       else Nothing
 
+
+-- Decorators
+
+-- | Decorate a view function with this to limit the view
+-- to users who are 'admins'
+
+adminRequired :: View -> View
+adminRequired view = \req -> do
+  creds <- getCredentials req
+  case creds of
+    Just n -> if n `elem` Settings.admin_usernames
+              then view req
+              else return403 req
+    Nothing -> return403 req
 
 -- Utilities
 

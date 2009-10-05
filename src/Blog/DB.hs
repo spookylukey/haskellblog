@@ -2,6 +2,8 @@ module Blog.DB ( connect
                , commit
                , doInsert
                , mkInsertStatement
+               , doUpdate
+               , mkUpdateStatement
                )
 where
 
@@ -34,6 +36,10 @@ doInsert conn table columns values =
     let sql = mkInsertStatement table columns
     in doSql conn sql values
 
+doUpdate conn table columns values whereClause whereClauseVals =
+    let sql = mkUpdateStatement table columns
+    in doSql conn (sql ++ " " ++ whereClause ++ ";") (values ++ whereClauseVals)
+
 mkInsertStatement table columns = let joinC = concat . intersperse ", "
                                       colSql = joinC columns
                                       valSql = joinC $ take (length columns) $ repeat "?"
@@ -41,3 +47,8 @@ mkInsertStatement table columns = let joinC = concat . intersperse ", "
                                       " (" ++ colSql ++ ")" ++
                                       " VALUES " ++
                                       " (" ++ valSql ++ ");"
+
+mkUpdateStatement table columns = let joinC = concat . intersperse ", "
+                                      valSql = joinC $ [c ++ "=?" | c <- columns]
+                                  in "UPDATE " ++ table ++
+                                     " SET " ++ valSql

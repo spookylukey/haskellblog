@@ -1,3 +1,4 @@
+import qualified Tests.Blog.DB as DB
 import qualified Tests.Blog.DBUtils as DBUtils
 import qualified Tests.Blog.Formats as Formats
 import qualified Tests.Blog.Model as Model
@@ -8,4 +9,5 @@ main = runTestTT (test [ "DBUtils tests" ~: DBUtils.tests
                        , "Format tests" ~: Formats.tests
                        , "Model tests" ~: Model.tests
                        , "View tests" ~: View.tests
+                       , "DB tests" ~: DB.tests
                        ])

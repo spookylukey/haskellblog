@@ -9,3 +9,7 @@ data Category = Category { uid :: Int,
                            slug :: String
                          } deriving (Show, Eq, Data, Typeable)
 
+newCategory name = Category { uid = undefined
+                            , name = name
+                            , slug = undefined
+                            }

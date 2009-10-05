@@ -20,6 +20,7 @@ import Maybe (fromMaybe, isJust, fromJust)
 import System.Time (ClockTime(..), toUTCTime)
 import Text.StringTemplate
 import Text.StringTemplate.GenericStandard
+import qualified Blog.Category as Ct
 import qualified Blog.Settings as Settings
 import qualified Data.Map as Map
 import qualified Data.ByteString.Lazy as LB
@@ -231,7 +232,50 @@ logoutView req =
                                                            , deleteCookie "timestamp"
                                                            ]
 
--- Authorisation
+--
+-- Admin views
+--
+
+-- Category editing is very simple and doesn't require
+-- much validation.
+
+adminCategories req = do
+  cn <- connect
+  t <- get_template "admin_categories"
+  -- handle deletion if "delete" in POST vars
+  -- handle adding/editing if "save" in POST vars
+  message <- handlePost req cn
+  categories <- getCategories cn
+  return $ Just $ standardResponseTT req $
+         (renderf t
+          ("categories", categories)
+          ("message", message)
+          ("showMessage", length message > 0)
+         )
+    where
+      handlePost req cn =
+          if requestMethod req == "POST"
+          then if isJust (getPOST req "save")
+               then
+                   let catid = (getPOST req "catid") `captureOrDefault` 0 :: Int
+                   in if catid == 0
+                      then do
+                        let ct = Ct.newCategory (getPOST req "name" `captureOrDefault` "")
+                        addCategory cn ct
+                        return "Category added"
+                      else do
+                        Just ct <- getCategoryById cn catid
+                        let ct2 = ct { Ct.name = (getPOST req "name" `captureOrDefault` "") }
+                        updateCategory cn ct2
+                        return ("Category " ++ show catid ++ " saved")
+               else if isJust (getPOST req "delete")
+                    then
+                        let catid = (getPOST req "categories") `captureOrDefault` 0 :: Int
+                        in do
+                          deleteCategory cn catid
+                          return ("Category " ++ show catid ++ " deleted")
+                    else return ""
+          else return ""
 
 createLoginCookies loginData timestamp =
   let username = fromJust $ Map.lookup "username" loginData

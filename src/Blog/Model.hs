@@ -1,5 +1,7 @@
 module Blog.Model ( addPost
                   , addCategory
+                  , updateCategory
+                  , deleteCategory
                   , addPostCategory
                   , addComment
                   , createUser
@@ -9,6 +11,7 @@ module Blog.Model ( addPost
                   , getCommentsForPost
                   , getRelatedPosts
                   , getCategoryBySlug
+                  , getCategoryById
                   , getCategories
                   , getCategoriesBulk
                   , getPostsForCategory
@@ -69,6 +72,20 @@ addCategory cn c =  do theslug <- makeCategorySlug cn c
                        return c2 { Ct.uid = newid }
 
 makeCategorySlug cn cat = makeSlugGeneric cn (Ct.name cat) "categories"
+
+updateCategory cn c = do
+  DB.doUpdate cn "categories"
+        [ "name"
+        , "slug" ]
+        [ toSql $ Ct.name c
+        , toSql $ Ct.slug c
+        ]
+        "WHERE id = ?"
+        [ toSql $ Ct.uid c]
+
+deleteCategory cn uid = do
+  DB.doDelete cn "categories" "WHERE id = ?" [toSql $ uid]
+  DB.doDelete cn "post_categories" "WHERE category_id = ?" [toSql $ uid]
 
 addPostCategory cn pc = do { DB.doInsert cn "post_categories"
                              ["post_id",
@@ -134,6 +151,7 @@ getPostsForCategoryQuery= "SELECT id, title, slug, '',       '',             '',
 getRelatedPostsQuery ids = "SELECT id, title, slug, '',       '',             '',          '',                '',               '', ''            FROM posts INNER JOIN (SELECT post_id, COUNT(post_id) AS c from post_categories WHERE category_id IN " ++ sqlInIds ids ++ " GROUP BY post_id) as t2 ON posts.id = t2.post_id AND posts.id <> ? ORDER BY c DESC, abs(posts.timestamp - ?) ASC $LIMITOFFSET;"
 
 getCategoryBySlugQuery    = "SELECT categories.id, categories.name, categories.slug FROM categories WHERE slug = ?;"
+getCategoryByIdQuery      = "SELECT categories.id, categories.name, categories.slug FROM categories WHERE id = ?;"
 getCategoriesQuery        = "SELECT categories.id, categories.name, categories.slug FROM categories ORDER BY slug;"
 getCategoriesForPostQuery = "SELECT categories.id, categories.name, categories.slug FROM categories INNER JOIN post_categories ON categories.id = post_categories.category_id WHERE post_categories.post_id = ? ORDER BY categories.slug;"
 getCategoriesBulkQuery ids= "SELECT categories.id, categories.name, categories.slug, post_categories.post_id FROM categories INNER JOIN post_categories ON categories.id = post_categories.category_id WHERE post_categories.post_id IN " ++ sqlInIds ids ++ " ORDER BY categories.slug;"
@@ -200,6 +218,13 @@ getPostsForCategory cn cat curpage = do
 getCategoryBySlug :: (IConnection conn) => conn -> String -> IO (Maybe Ct.Category)
 getCategoryBySlug cn slug = do
   res <- quickQuery' cn getCategoryBySlugQuery [toSql slug]
+  case res of
+    [] -> return Nothing
+    (rs:_) -> return $ Just $ makeCategory rs
+
+getCategoryById :: (IConnection conn) => conn -> Int -> IO (Maybe Ct.Category)
+getCategoryById cn catid = do
+  res <- quickQuery' cn getCategoryByIdQuery [toSql catid]
   case res of
     [] -> return Nothing
     (rs:_) -> return $ Just $ makeCategory rs

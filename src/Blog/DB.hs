@@ -4,6 +4,7 @@ module Blog.DB ( connect
                , mkInsertStatement
                , doUpdate
                , mkUpdateStatement
+               , doDelete
                )
 where
 
@@ -39,6 +40,9 @@ doInsert conn table columns values =
 doUpdate conn table columns values whereClause whereClauseVals =
     let sql = mkUpdateStatement table columns
     in doSql conn (sql ++ " " ++ whereClause ++ ";") (values ++ whereClauseVals)
+
+doDelete conn table whereClause whereClauseVals =
+    doSql conn ("DELETE FROM " ++ table ++ " " ++ whereClause ++ ";") whereClauseVals
 
 mkInsertStatement table columns = let joinC = concat . intersperse ", "
                                       colSql = joinC columns

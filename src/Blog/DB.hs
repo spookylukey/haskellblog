@@ -15,8 +15,7 @@ import qualified Blog.Settings as Settings
 
 connect = connectSqlite3 Settings.sqlite_path
 
-doInsert conn table columns values = do
-    let sql = mkInsertStatement table columns
+doSql conn sql values = do
     stmnt <- prepare conn sql
     catchSql (do
                execute stmnt values
@@ -30,6 +29,10 @@ doInsert conn table columns values = do
                                             seErrorMsg = "Part 1: " ++ m1 ++
                                                          "; Part 2: " ++ m2 }
               )
+
+doInsert conn table columns values =
+    let sql = mkInsertStatement table columns
+    in doSql conn sql values
 
 mkInsertStatement table columns = let joinC = concat . intersperse ", "
                                       colSql = joinC columns

@@ -82,14 +82,15 @@ readComments = makeItems "comments.txt" mkComment
     where mkComment row = Cm.Comment { Cm.uid = read (row !! 0)
                                      , Cm.post_id = read (row !! 1)
                                      , Cm.timestamp = read (row !! 2)
-                                     , Cm.name = row !! 3
+                                     , Cm.name = fixCodes $ row !! 3
                                      , Cm.email = row !! 4
-                                     , Cm.text_raw = row !! 5
-                                     , Cm.text_formatted = row !! 5
+                                     , Cm.text_raw = fixCodes $ row !! 5
+                                     , Cm.text_formatted = fixCodes $ row !! 5
                                      , Cm.format = Formats.Rawhtml
                                      , Cm.hidden = False
                                      , Cm.response = ""
                                      }
+          fixCodes txt = UTF8.toString $ LB.pack txt
 -- Writing
 
 writeItems cn writer items = mapM (writer cn) items

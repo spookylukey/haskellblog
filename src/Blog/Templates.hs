@@ -2,7 +2,7 @@
 module Blog.Templates
 where
 
-import Blog.Forms (emailWidget, nameWidget, messageWidget, formatWidget, CommentStage(..))
+import Blog.Forms (formatWidget, CommentStage(..))
 import Blog.Links
 import Blog.Utils (escapeHtmlStringT)
 import Data.Maybe (fromJust)
@@ -42,16 +42,7 @@ get_template name = do
 
 -- Widgets
 
-commentNameLabel       = makeLabel "Name:" nameWidget
-commentNameWidget c    = setVal (Cm.name c) nameWidget
-commentEmailLabel      = makeLabel "Email:" emailWidget
-commentEmailWidget c   = setVal (Cm.email c) emailWidget
-commentFormatLabel     = "Format:"
 commentFormatWidget c  = setVal (show $ fromEnum $ Cm.format c) formatWidget
-commentMessageLabel    = "Message:"
-commentMessageWidget c = setVal (Cm.text_raw c) messageWidget
-commentSubmitButton    = submit "submit" "Post"
-commentPreviewButton   = submit "preview" "Preview"
 
 -- General HTML fragments
 

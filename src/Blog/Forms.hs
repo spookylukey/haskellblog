@@ -8,8 +8,6 @@ import Blog.Formats (Format(..), getFormatter)
 import Blog.Model (checkPassword)
 import Control.Monad (liftM)
 import Data.Maybe (fromJust, isNothing)
-import Ella.Forms.Widgets.TextInput (TextInput(..))
-import Ella.Forms.Widgets.Textarea  (Textarea(..))
 import Ella.GenUtils (exactParse, getTimestamp)
 import Ella.Param (captureOrDefault, Param(..))
 import Data.String.Utils (strip)
@@ -18,28 +16,9 @@ import qualified Blog.Post as P
 import qualified Blog.Settings as Settings
 import qualified Data.Map as Map
 import qualified Ella.Forms.Widgets.RadioButtonList as RBL
-import qualified Ella.Forms.Widgets.TextInput as TI
-import qualified Ella.Forms.Widgets.Textarea as TA
 import qualified Text.XHtml as X
 
 -- Widgets
-
-nameWidget = TextInput { value = ""
-                       , size = Just 20
-                       , maxlength = Just Settings.max_comment_name_size
-                       , name = "name"
-                       , identifier = "id_name"
-                       , password = False
-                       }
-
-emailWidget = TextInput { value = ""
-                        , size = Just 20
-                        , maxlength = Just $ Settings.max_comment_email_size
-                        , name = "email"
-                        , identifier = "id_email"
-                        , password = False
-                        }
-
 commentAllowedFormats =  [Plaintext, RST]
 
 formatWidget = RBL.RadioButtonList { value = ""
@@ -48,13 +27,6 @@ formatWidget = RBL.RadioButtonList { value = ""
                                    , values = map (show . fromEnum) commentAllowedFormats
                                    , captions = map X.toHtml ["Plain text", "Restructured text"]
                                    }
-
-messageWidget = Textarea { value = ""
-                         , cols = Just 80
-                         , rows = Just 25
-                         , name = "message"
-                         , identifier = "id_message"
-                         }
 
 -- | Enum for the different stages of submitting a comment
 data CommentStage = NoComment

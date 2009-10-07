@@ -44,20 +44,21 @@ $if(post.commentsOpen)$
     $csrffield:noescape()$
       <table>
         <tr>
-          <td>$nameLabel:noescape()$</td>
-          <td>$nameWidget:noescape()$</td>
+          <td><label for="id_name">Name:</label></td>
+          <td><input type="text" name="name" value="$commentData.name$" id="id_name" maxlength="100" size="20" /></td>
         </tr>
         <tr>
-          <td>$emailLabel:noescape()$</td>
-          <td>$emailWidget:noescape()$</td>
+          <td><label for="id_email">Email:</label></td>
+          <td><input type="text" name="email" value="$commentData.email$" id="id_email" maxlength="320" size="20" /></td>
         </tr>
         <tr>
-          <td>$formatLabel:noescape()$</td>
+          <td>Format:</td>
           <td>$formatWidget:noescape()$</td>
         </tr>
       </table>
-      <div>$messageWidget:noescape()$</div>
-      <div><input type="hidden" id="id_spamcheck" name="spamcheck" value="$commentExtra$" />
+
+      <div><textarea name="message" id="id_message" cols="80" rows="25">$commentData.text_raw$</textarea></div>
+      <div><input type="hidden" id="id_spamcheck" name="spamcheck" value="$commentExtra$">
       </div>
       <div>
         <input type="submit" name="submit" value="Submit" />

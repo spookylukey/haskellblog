@@ -56,18 +56,6 @@ messageWidget = Textarea { value = ""
                          , identifier = "id_message"
                          }
 
-passwordWidget = TextInput { value = ""
-                           , size = Just 20
-                           , maxlength = Just 20
-                           , name = "password"
-                           , identifier = "id_password"
-                           , password = True
-                           }
-
-usernameWidget = nameWidget { TI.name = "username"
-                            , TI.identifier = "id_username"
-                            }
-
 -- | Enum for the different stages of submitting a comment
 data CommentStage = NoComment
                   | CommentPreview

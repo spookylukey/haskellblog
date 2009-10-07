@@ -2,7 +2,7 @@
 module Blog.Templates
 where
 
-import Blog.Forms (emailWidget, nameWidget, messageWidget, formatWidget, usernameWidget, passwordWidget, CommentStage(..))
+import Blog.Forms (emailWidget, nameWidget, messageWidget, formatWidget, CommentStage(..))
 import Blog.Links
 import Blog.Utils (escapeHtmlStringT)
 import Data.Maybe (fromJust)
@@ -52,13 +52,6 @@ commentMessageLabel    = "Message:"
 commentMessageWidget c = setVal (Cm.text_raw c) messageWidget
 commentSubmitButton    = submit "submit" "Post"
 commentPreviewButton   = submit "preview" "Preview"
-
-loginUsernameLabel = makeLabel "User name:" usernameWidget
-loginUsernameWidget :: Map.Map String String -> TextInput
-loginUsernameWidget loginData = setVal (fromJust $ Map.lookup "username" loginData) usernameWidget
-loginPasswordLabel = makeLabel "Password: " passwordWidget
-loginPasswordWidget :: Map.Map String String -> TextInput
-loginPasswordWidget loginData = setVal (fromJust $ Map.lookup "password" loginData) passwordWidget
 
 -- General HTML fragments
 

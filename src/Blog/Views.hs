@@ -226,10 +226,6 @@ loginView' cn req =
              ("loginInvalid", not $ Map.null loginErrors)
              ("loginErrors", Map.toList loginErrors)
              ("loginData", loginData)
-             ("usernameLabel", X.toHtml $ loginUsernameLabel)
-             ("usernameWidget", X.toHtml $ loginUsernameWidget loginData)
-             ("passwordLabel", X.toHtml $ loginPasswordLabel)
-             ("passwordWidget", X.toHtml $ loginPasswordWidget loginData)
             )
 
         loginTemplate = get_template "login"

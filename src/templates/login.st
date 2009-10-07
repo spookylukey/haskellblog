@@ -14,12 +14,12 @@ $endif$
   $csrffield:noescape()$
   <table>
     <tr>
-      <td>$usernameLabel:noescape()$</td>
-      <td>$usernameWidget:noescape()$</td>
+      <td><label for="id_username">User name:</label></td>
+      <td><input type="text" name="username" value="$loginData.username$" id="id_username" maxlength="100" size="20" /></td>
     </tr>
     <tr>
-      <td>$passwordLabel:noescape()$</td>
-      <td>$passwordWidget:noescape()$</td>
+      <td><label for="id_password">Password: </label></td>
+      <td><input type="password" name="password" value="$loginData.password$" id="id_password" maxlength="20" size="20" /></td>
     </tr>
   </table>
   <div>

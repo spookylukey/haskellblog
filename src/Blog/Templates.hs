@@ -107,4 +107,5 @@ commentTemplateInfo cm = Map.fromList [ ("name", ToSElemD $ Cm.name cm)
                                       , ("date", ToSElemD $ showDate $ Cm.timestamp cm)
                                       , ("textFormatted", ToSElemD $ Cm.text_formatted cm)
                                       , ("email", ToSElemD $ Cm.email cm)
+                                      , ("uid", ToSElemD $ Cm.uid cm)
                                       ]

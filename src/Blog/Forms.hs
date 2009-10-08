@@ -45,7 +45,7 @@ data CommentStage = NoComment
 
 -- | An empty comment used for populating the default form.
 emptyComment = Cm.Comment {
-                 uid = 0 -- use 0 rather than undefined, to allow preview to work
+                 uid = undefined
                , post_id = undefined
                , timestamp = undefined
                , name = ""
@@ -107,7 +107,7 @@ validateComment creds postedData blogpost =
       let errors = map snd $ filter fst $ tests
 
       return (Cm.Comment {
-                      uid = undefined
+                      uid = 0 -- for sake of preview
                     , post_id = P.uid blogpost
                     , timestamp = ts
                     , name = name

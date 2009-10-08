@@ -45,7 +45,7 @@ data CommentStage = NoComment
 
 -- | An empty comment used for populating the default form.
 emptyComment = Cm.Comment {
-                 uid = undefined
+                 uid = 0 -- use 0 rather than undefined, to allow preview to work
                , post_id = undefined
                , timestamp = undefined
                , name = ""

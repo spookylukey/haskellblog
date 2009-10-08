@@ -6,6 +6,7 @@ module Blog.Model ( addPost
                   , addComment
                   , createUser
                   , getPostBySlug
+                  , getPostById
                   , getRecentPosts
                   , getCategoriesForPost
                   , getCommentsForPost
@@ -201,6 +202,13 @@ makeComment row =
 getPostBySlug :: (IConnection conn) => conn -> String -> IO (Maybe P.Post)
 getPostBySlug cn slug = do
   res <- quickQuery' cn getPostBySlugQuery [toSql slug]
+  case res of
+    [] -> return Nothing
+    (postdata:_) -> return $ Just $ makePost postdata
+
+getPostById :: (IConnection conn) => conn -> Int -> IO (Maybe P.Post)
+getPostById cn postid = do
+  res <- quickQuery' cn getPostByIdQuery [toSql postid]
   case res of
     [] -> return Nothing
     (postdata:_) -> return $ Just $ makePost postdata

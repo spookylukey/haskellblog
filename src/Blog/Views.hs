@@ -5,7 +5,7 @@ module Blog.Views where
 -- which has pure functions that generally return Html.
 
 import Blog.DB (connect)
-import Blog.Forms (CommentStage(..), validateComment, emptyComment, emptyLoginData, validateLogin, initialCommentExtra, formatWidgetForComment)
+import Blog.Forms
 import Blog.Globals (mkCsrfField)
 import Blog.Links
 import Blog.Model
@@ -250,7 +250,7 @@ adminCategories req = do
           ("message", message)
           ("showMessage", length message > 0)
          )
-    where
+  where
       handlePost req cn =
           if requestMethod req == "POST"
           then if isJust (getPOST req "save")
@@ -274,6 +274,41 @@ adminCategories req = do
                           return ("Category " ++ show catid ++ " deleted")
                     else return ""
           else return ""
+
+adminEditPost post_id req = do
+  cn <- connect
+  m_post <- getPostById cn post_id
+  case m_post of
+    Just p -> adminEditPost' p False cn req
+    Nothing -> return404 req
+
+adminNewPost req = do
+  cn <- connect
+  adminEditPost' emptyPost True cn req
+
+adminEditPost' post isNew cn req = do
+  categories <- getCategories cn
+  postCategories <- if isNew then return [] else getCategoriesForPost cn post
+  case requestMethod req of
+    "GET" ->  output post (map Ct.uid postCategories) categories
+    "POST" -> output post (map Ct.uid postCategories) categories
+              -- TODO
+              -- handle 'submit'
+              --   - with validation
+              --   - and redirection afterwards if successful
+              -- handle 'preview'
+              -- handle 'delete'
+  where
+      output postData postCatIds categories = do
+        t <- get_template "admin_post"
+        return $ Just $ standardResponseTT req $
+                                   (renderf t
+                                    ("post", postData)
+                                    ("categoriesWidget", X.toHtml $ categoriesWidgetForPost postCatIds categories)
+                                    ("formatWidget", X.toHtml $ formatWidgetForPost postData)
+                                    ("isNew", isNew)
+                                    ("pagetitle", if isNew then "Add post" else "Edit post")
+                                   )
 
 createLoginCookies loginData timestamp =
   let username = fromJust $ Map.lookup "username" loginData

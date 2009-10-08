@@ -5,7 +5,6 @@ where
 import Blog.Links
 import Blog.Utils (escapeHtmlStringT)
 import Data.Maybe (fromJust)
-import Ella.Forms.Base
 import Ella.GenUtils (utf8)
 import System.Locale (defaultTimeLocale)
 import System.Time (toUTCTime, formatCalendarTime)

@@ -12,28 +12,47 @@ import Ella.Forms.Base
 import Ella.GenUtils (exactParse, getTimestamp)
 import Ella.Param (captureOrDefault, Param(..))
 import Data.String.Utils (strip)
+import qualified Blog.Category as Ct
 import qualified Blog.Comment as Cm
 import qualified Blog.Post as P
 import qualified Blog.Settings as Settings
 import qualified Data.Map as Map
 import qualified Ella.Forms.Widgets.RadioButtonList as RBL
+import qualified Ella.Forms.Widgets.OptionList as OL
 import qualified Text.XHtml as X
 
 -- Widgets
-commentAllowedFormats =  [Plaintext, RST]
-
 formatNames = Map.fromList [ (Plaintext, "Plain text")
                            , (RST, "Restructured text")
                            , (Rawhtml, "HTML")
                            ]
 
-formatWidget formats = RBL.RadioButtonList { value = ""
+formatWidget formats = RBL.RadioButtonList { selectedValue = ""
                                            , name = "format"
                                            , identifier = "id_format"
                                            , values = map (show . fromEnum) formats
                                            , captions = map (X.toHtml . fromJust . (\f -> Map.lookup f formatNames)) formats
                                            }
+
+commentAllowedFormats =  [Plaintext, RST]
+
 formatWidgetForComment c  = setVal (show $ fromEnum $ Cm.format c) (formatWidget commentAllowedFormats)
+
+postAllowedFormats = [Plaintext, RST, Rawhtml]
+
+formatWidgetForPost p = setVal (show $ fromEnum $ P.format p) (formatWidget postAllowedFormats)
+
+categoriesWidget categories = OL.OptionList { selectedValues = []
+                                            , name = "categories"
+                                            , identifier = "id_categories"
+                                            , values = map (show . Ct.uid) categories
+                                            , captions = map Ct.name categories
+                                            , multiple = True
+                                            , size = 10
+                                            }
+
+categoriesWidgetForPost :: [Int] -> [Ct.Category] -> OL.OptionList
+categoriesWidgetForPost catids categories = setVal (map show catids) (categoriesWidget categories)
 
 -- | Enum for the different stages of submitting a comment
 data CommentStage = NoComment
@@ -147,3 +166,15 @@ validateLogin postedData cn = do
             else return (loginData, Map.fromList [("password", "Password not correct.")])
        else do
          return (loginData, Map.fromList errors)
+
+emptyPost = P.Post { uid = undefined
+                   , title = ""
+                   , slug = undefined
+                   , post_raw = ""
+                   , post_formatted = undefined
+                   , summary_raw = ""
+                   , summary_formatted = undefined
+                   , format = RST
+                   , timestamp = undefined
+                   , comments_open = True
+                   }

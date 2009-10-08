@@ -113,14 +113,12 @@ createRedirectFile postUrlMap categoryUrlMap = do
 -- Misc fixes
 -- Titles of all posts in category 'articles' have HTML in them, which is difficult to fix
 -- up.  They are only announcements, so we just delete.
-articlePosts = "select posts.id FROM posts INNER JOIN post_categories ON posts.id = post_categories.post_id INNER JOIN categories ON post_categories.category_id = categories.id WHERE categories.slug = 'articles';"
 deletePost = "DELETE FROM posts WHERE id = ?;";
-deletePC   = "DELETE FROM post_categories WHERE post_id = ?;"
 deleteArticlePosts cn = do
-  ids' <- quickQuery cn articlePosts []
-  let ids = map (fromSql . head) ids' :: [Int]
-  mapM_ (\x -> quickQuery cn deletePost [toSql $ x]) ids
-  mapM_ (\x -> quickQuery cn deletePC [toSql $ x]) ids
+  Just cat <- getCategoryBySlug cn "articles"
+  (posts, False) <- getPostsForCategory cn cat 1 -- there is only one page worth
+  deleteCategory cn (C.uid cat)
+  mapM_ (\x -> quickQuery cn deletePost [toSql $ P.uid x]) posts
 
 
 -- Main

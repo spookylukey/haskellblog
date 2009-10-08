@@ -2,13 +2,10 @@
 module Blog.Templates
 where
 
-import Blog.Forms (formatWidget, CommentStage(..))
 import Blog.Links
 import Blog.Utils (escapeHtmlStringT)
 import Data.Maybe (fromJust)
 import Ella.Forms.Base
-import Ella.Forms.Widgets (makeLabel)
-import Ella.Forms.Widgets.TextInput (TextInput)
 import Ella.GenUtils (utf8)
 import System.Locale (defaultTimeLocale)
 import System.Time (toUTCTime, formatCalendarTime)
@@ -39,10 +36,6 @@ get_template :: String -> IO (StringTemplate LT.Text)
 get_template name = do
   templates <- get_templates
   return $ fromJust $ getStringTemplate name templates
-
--- Widgets
-
-commentFormatWidget c  = setVal (show $ fromEnum $ Cm.format c) formatWidget
 
 -- General HTML fragments
 

@@ -8,6 +8,7 @@ import Blog.Formats (Format(..), getFormatter)
 import Blog.Model (checkPassword)
 import Control.Monad (liftM)
 import Data.Maybe (fromJust, isNothing)
+import Ella.Forms.Base
 import Ella.GenUtils (exactParse, getTimestamp)
 import Ella.Param (captureOrDefault, Param(..))
 import Data.String.Utils (strip)
@@ -21,12 +22,18 @@ import qualified Text.XHtml as X
 -- Widgets
 commentAllowedFormats =  [Plaintext, RST]
 
-formatWidget = RBL.RadioButtonList { value = ""
-                                   , name = "format"
-                                   , identifier = "id_format"
-                                   , values = map (show . fromEnum) commentAllowedFormats
-                                   , captions = map X.toHtml ["Plain text", "Restructured text"]
-                                   }
+formatNames = Map.fromList [ (Plaintext, "Plain text")
+                           , (RST, "Restructured text")
+                           , (Rawhtml, "HTML")
+                           ]
+
+formatWidget formats = RBL.RadioButtonList { value = ""
+                                           , name = "format"
+                                           , identifier = "id_format"
+                                           , values = map (show . fromEnum) formats
+                                           , captions = map (X.toHtml . fromJust . (\f -> Map.lookup f formatNames)) formats
+                                           }
+commentFormatWidget c  = setVal (show $ fromEnum $ Cm.format c) (formatWidget commentAllowedFormats)
 
 -- | Enum for the different stages of submitting a comment
 data CommentStage = NoComment

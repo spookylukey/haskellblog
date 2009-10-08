@@ -5,7 +5,7 @@ module Blog.Views where
 -- which has pure functions that generally return Html.
 
 import Blog.DB (connect)
-import Blog.Forms (CommentStage(..), validateComment, emptyComment, emptyLoginData, validateLogin, initialCommentExtra)
+import Blog.Forms (CommentStage(..), validateComment, emptyComment, emptyLoginData, validateLogin, initialCommentExtra, commentFormatWidget)
 import Blog.Globals (mkCsrfField)
 import Blog.Links
 import Blog.Model

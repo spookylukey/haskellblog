@@ -54,8 +54,8 @@ readPosts = makeItems "posts.txt" mkPost
                               , P.slug = ""
                               , P.post_raw = ""
                               , P.post_formatted = ""
-                              , P.summary_raw = row !! 4
-                              , P.summary_formatted = row !! 4
+                              , P.summary_raw = fixCodes $ row !! 4
+                              , P.summary_formatted = fixCodes $ row !! 4
                               , P.format = Formats.Rawhtml
                               , P.timestamp = read (row !! 2)
                               , P.comments_open = True
@@ -70,8 +70,9 @@ readPosts = makeItems "posts.txt" mkPost
                                        , P.post_formatted = P.summary_formatted p
                                        }
                                 else p
-          -- Fix dodgy stuff, and reinterpret as UTF8
-          fixCodes txt = UTF8.toString $ regexReplace (LB.pack "&#10;") (LB.pack "\n") (LB.pack txt)
+
+ -- Fix dodgy stuff, and reinterpret as UTF8
+fixCodes txt = UTF8.toString $ regexReplace (LB.pack "&#10;") (LB.pack "\n") (LB.pack txt)
 
 readPostCategories = makeItems "postcategories.txt" mkPostCategory
     where mkPostCategory row = (read (row !! 0),
@@ -90,7 +91,6 @@ readComments = makeItems "comments.txt" mkComment
                                      , Cm.hidden = False
                                      , Cm.response = ""
                                      }
-          fixCodes txt = UTF8.toString $ LB.pack txt
 -- Writing
 
 writeItems cn writer items = mapM (writer cn) items
@@ -111,7 +111,7 @@ createRedirectFile postUrlMap categoryUrlMap = do
     renderToFile Settings.redirect_file_output tpl ctx
 
 -- Misc fixes
--- Titles of all article have HTML in them, which is difficult to fix
+-- Titles of all posts in category 'articles' have HTML in them, which is difficult to fix
 -- up.  They are only announcements, so we just delete.
 articlePosts = "select posts.id FROM posts INNER JOIN post_categories ON posts.id = post_categories.post_id INNER JOIN categories ON post_categories.category_id = categories.id WHERE categories.slug = 'articles';"
 deletePost = "DELETE FROM posts WHERE id = ?;";

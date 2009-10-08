@@ -5,7 +5,7 @@ module Blog.Views where
 -- which has pure functions that generally return Html.
 
 import Blog.DB (connect)
-import Blog.Forms (CommentStage(..), validateComment, emptyComment, emptyLoginData, validateLogin, initialCommentExtra, commentFormatWidget)
+import Blog.Forms (CommentStage(..), validateComment, emptyComment, emptyLoginData, validateLogin, initialCommentExtra, formatWidgetForComment)
 import Blog.Globals (mkCsrfField)
 import Blog.Links
 import Blog.Model
@@ -160,7 +160,7 @@ postView slug req = do
                         ("related", map postTemplateInfo related)
                         ("hasRelated", not $ null related)
                         ("commentData", commentData)
-                        ("formatWidget", X.toHtml $ commentFormatWidget commentData)
+                        ("formatWidget", X.toHtml $ formatWidgetForComment commentData)
                         ("commentExtra", commentExtra)
                        )
   where

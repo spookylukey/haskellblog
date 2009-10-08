@@ -33,7 +33,7 @@ formatWidget formats = RBL.RadioButtonList { value = ""
                                            , values = map (show . fromEnum) formats
                                            , captions = map (X.toHtml . fromJust . (\f -> Map.lookup f formatNames)) formats
                                            }
-commentFormatWidget c  = setVal (show $ fromEnum $ Cm.format c) (formatWidget commentAllowedFormats)
+formatWidgetForComment c  = setVal (show $ fromEnum $ Cm.format c) (formatWidget commentAllowedFormats)
 
 -- | Enum for the different stages of submitting a comment
 data CommentStage = NoComment

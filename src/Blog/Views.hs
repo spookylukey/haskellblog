@@ -237,6 +237,7 @@ logoutView req =
 -- Category editing is very simple and doesn't require
 -- much validation.
 
+-- | View that handles all editing of categories (add/edit/delete)
 adminCategories req = do
   cn <- connect
   t <- get_template "admin_categories"
@@ -275,6 +276,7 @@ adminCategories req = do
                     else return ""
           else return ""
 
+-- | View that handles editing an existing blog post
 adminEditPost post_id req = do
   cn <- connect
   m_post <- getPostById cn post_id
@@ -282,6 +284,7 @@ adminEditPost post_id req = do
     Just p -> adminEditPost' p False cn req
     Nothing -> return404 req
 
+-- | View that handles adding a new blog post
 adminNewPost req = do
   cn <- connect
   adminEditPost' emptyPost True cn req
@@ -297,6 +300,7 @@ adminEditPost' post isNew cn req = do
               --   - with validation
               --   - and redirection afterwards if successful
               -- handle 'preview'
+              --   - same validation - can't show preview if invalid
               -- handle 'delete'
   where
       output postData postCatIds categories = do

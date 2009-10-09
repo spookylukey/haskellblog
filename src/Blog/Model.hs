@@ -33,56 +33,59 @@ import qualified Blog.Settings as Settings
 import qualified Data.ByteString.Lazy.Char8 as BL
 import qualified Data.ByteString.Lazy.UTF8 as UTF8
 
------- Create -------
+------ Create/Update/Delete -------
+
+-- post table
+postColumnNames = [ "title"
+                  , "slug"
+                  , "post_raw"
+                  , "post_formatted"
+                  , "summary_raw"
+                  , "summary_formatted"
+                  , "format_id"
+                  , "timestamp"
+                  , "comments_open"
+                  ]
+postColumnValues p = [ toSql $ P.title p
+                     , toSql $ P.slug p
+                     , toSql $ P.post_raw p
+                     , toSql $ P.post_formatted p
+                     , toSql $ P.summary_raw p
+                     , toSql $ P.summary_formatted p
+                     , toSql $ fromEnum $ P.format p
+                     , toSql $ P.timestamp p
+                     , toSql $ P.comments_open p
+                     ]
+
 addPost cn p = do theslug <- makePostSlug cn p
                   let p2 = p { P.slug = theslug }
-                  DB.doInsert cn "posts" [
-                         "title",
-                         "slug",
-                         "post_raw",
-                         "post_formatted",
-                         "summary_raw",
-                         "summary_formatted",
-                         "format_id",
-                         "timestamp",
-                         "comments_open"
-                        ] [
-                         toSql $ P.title p2,
-                         toSql $ P.slug p2,
-                         toSql $ P.post_raw p2,
-                         toSql $ P.post_formatted p2,
-                         toSql $ P.summary_raw p2,
-                         toSql $ P.summary_formatted p2,
-                         toSql $ fromEnum $ P.format p2,
-                         toSql $ P.timestamp p2,
-                         toSql $ P.comments_open p2
-                        ]
+                  DB.doInsert cn "posts" postColumnNames (postColumnValues p2)
                   newid <- getDbId cn
                   return p2 { P.uid = newid }
 
 makePostSlug cn p = makeSlugGeneric cn (P.title p) "posts"
 
+
+-- category table
+categoryColumnNames = [ "name"
+                      , "slug"
+                      ]
+categoryColumnValues c = [ toSql $ Ct.name c
+                         , toSql $ Ct.slug c
+                         ]
+
+
 addCategory cn c =  do theslug <- makeCategorySlug cn c
                        let c2 = c { Ct.slug = theslug }
-                       DB.doInsert cn "categories"
-                             ["name",
-                              "slug"]
-                             [toSql $ Ct.name c2,
-                              toSql $ Ct.slug c2]
+                       DB.doInsert cn "categories" categoryColumnNames (categoryColumnValues c2)
                        newid <- getDbId cn
                        return c2 { Ct.uid = newid }
 
 makeCategorySlug cn cat = makeSlugGeneric cn (Ct.name cat) "categories"
 
 updateCategory cn c = do
-  DB.doUpdate cn "categories"
-        [ "name"
-        , "slug" ]
-        [ toSql $ Ct.name c
-        , toSql $ Ct.slug c
-        ]
-        "WHERE id = ?"
-        [ toSql $ Ct.uid c]
+  DB.doUpdate cn "categories" categoryColumnNames (categoryColumnValues c)
+        "WHERE id = ?" [ toSql $ Ct.uid c]
 
 deleteCategory cn uid = do
   DB.doDelete cn "categories" "WHERE id = ?" [toSql $ uid]
@@ -95,40 +98,43 @@ addPostCategory cn pc = do { DB.doInsert cn "post_categories"
                               toSql $ snd pc];
                              return pc; }
 
+-- comment table
+commentColumnNames = [ "post_id"
+                     , "timestamp"
+                     , "name"
+                     , "email"
+                     , "text_raw"
+                     , "text_formatted"
+                     , "format_id"
+                     , "hidden"
+                     , "response"
+                     ]
+commentColumnValues cm = [ toSql $ Cm.post_id cm
+                         , toSql $ Cm.timestamp cm
+                         , toSql $ Cm.name cm
+                         , toSql $ Cm.email cm
+                         , toSql $ Cm.text_raw cm
+                         , toSql $ Cm.text_formatted cm
+                         , toSql $ fromEnum $ Cm.format cm
+                         , toSql $ Cm.hidden cm
+                         , toSql $ Cm.response cm
+                         ]
 
 addComment cn cm = do
-  DB.doInsert cn "comments" [
-                    "post_id"
-                   , "timestamp"
-                   , "name"
-                   , "email"
-                   , "text_raw"
-                   , "text_formatted"
-                   , "format_id"
-                   , "hidden"
-                   , "response"
-                   ] [
-                    toSql $ Cm.post_id cm
-                   , toSql $ Cm.timestamp cm
-                   , toSql $ Cm.name cm
-                   , toSql $ Cm.email cm
-                   , toSql $ Cm.text_raw cm
-                   , toSql $ Cm.text_formatted cm
-                   , toSql $ fromEnum $ Cm.format cm
-                   , toSql $ Cm.hidden cm
-                   , toSql $ Cm.response cm
-                   ]
+  DB.doInsert cn "comments" commentColumnNames (commentColumnValues cm)
   newid <- getDbId cn
   return cm { Cm.uid = newid }
+
+-- user table
+userColumnNames = [ "username"
+                  , "password"
+                  , "superuser"
+                  ]
 
 createUser :: (IConnection conn) =>
               conn -> String -> Bool -> IO Int
 createUser cn username superuser = do
-  DB.doInsert cn "users"
-        [ "username"
-        , "password"
-        , "superuser"
-        ]
+  DB.doInsert cn "users" userColumnNames
         [ toSql username
         , toSql ""
         , toSql superuser

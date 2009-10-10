@@ -76,7 +76,7 @@ updatePost cn p catIds = do
   return p
 
 deletePost cn uid = do
-  DB.doDelete cn "post_categories" "WHERE post_id = ?" [toSql uid]
+  deletePostCategoriesForPost cn uid
   DB.doDelete cn "posts" "WHERE id = ?" [toSql uid]
 
 -- category table
@@ -101,7 +101,7 @@ updateCategory cn c = do
         "WHERE id = ?" [ toSql $ Ct.uid c]
 
 deleteCategory cn uid = do
-  DB.doDelete cn "post_categories" "WHERE category_id = ?" [toSql uid]
+  deletePostCategoriesForCat cn uid
   DB.doDelete cn "categories" "WHERE id = ?" [toSql uid]
 
 -- post_categories tables
@@ -112,8 +112,15 @@ addPostCategory cn pc = do { DB.doInsert cn "post_categories"
                              [toSql $ fst pc,
                               toSql $ snd pc];
                              return pc; }
-setPostCategories cn postId catIds = do
+
+deletePostCategoriesForCat cn catId =
+  DB.doDelete cn "post_categories" "WHERE category_id = ?" [toSql catId]
+
+deletePostCategoriesForPost cn postId =
   DB.doDelete cn "post_categories" "WHERE post_id = ?" [toSql postId]
+
+setPostCategories cn postId catIds = do
+  deletePostCategoriesForPost cn postId
   mapM_ (\c -> addPostCategory cn (postId, c)) catIds
 
 

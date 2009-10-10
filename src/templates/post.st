@@ -33,11 +33,7 @@ $if(post.commentsOpen)$
     $endif$
 
     $if(commentInvalid)$
-      <div class="validationerror">
-      <ul>
-        $commentErrors:{ <li>$it.1$</li> }$
-      </ul>
-      </div>
+      $displayerrors(errors=commentErrors)$
     $endif$
 
     <form method="post" action="#addcomment">

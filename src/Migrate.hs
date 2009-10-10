@@ -113,12 +113,11 @@ createRedirectFile postUrlMap categoryUrlMap = do
 -- Misc fixes
 -- Titles of all posts in category 'articles' have HTML in them, which is difficult to fix
 -- up.  They are only announcements, so we just delete.
-deletePost = "DELETE FROM posts WHERE id = ?;";
 deleteArticlePosts cn = do
   Just cat <- getCategoryBySlug cn "articles"
   (posts, False) <- getPostsForCategory cn cat 1 -- there is only one page worth
   deleteCategory cn (C.uid cat)
-  mapM_ (\x -> quickQuery cn deletePost [toSql $ P.uid x]) posts
+  mapM_ (\x -> deletePost cn $ P.uid x) posts
 
 
 -- Main
@@ -129,7 +128,7 @@ main = handleSqlError $ do
   newCats <- writeItems cn addCategory origCats
   -- Posts
   origPosts <- readPosts
-  newPosts <- writeItems cn addPost origPosts
+  newPosts <- writeItems cn (\cn p -> addPost cn p []) origPosts
   -- we need the new/old IDs of posts/categories to rewrite comments tables
   -- and the post/categories m2m
   let post_id_map = Map.fromList $ zip (map P.uid origPosts) (map P.uid newPosts)

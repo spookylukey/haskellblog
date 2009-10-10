@@ -7,10 +7,11 @@ where
 import Blog.Formats (Format(..), getFormatter)
 import Blog.Model (checkPassword)
 import Control.Monad (liftM)
-import Data.Maybe (fromJust, isNothing)
+import Data.Maybe (fromJust, isNothing, catMaybes)
 import Ella.Forms.Base
 import Ella.GenUtils (exactParse, getTimestamp)
 import Ella.Param (captureOrDefault, Param(..))
+import Ella.Request (getPOST, getPOSTlist, hasPOST)
 import Data.String.Utils (strip)
 import qualified Blog.Category as Ct
 import qualified Blog.Comment as Cm
@@ -178,3 +179,32 @@ emptyPost = P.Post { uid = undefined
                    , timestamp = undefined
                    , comments_open = True
                    }
+
+-- | Extract a 'post', the 'post categories' and any errors
+-- from the POST request
+validatePost req basePost = do
+  let title = getPOST req "title" `captureOrDefault` ""
+  let categories = catMaybes $ map capture $ getPOSTlist req "categories" :: [Int]
+  let summary_raw = getPOST req "summary_raw" `captureOrDefault` ""
+  let post_raw = getPOST req "post_raw" `captureOrDefault` ""
+  let format = getPOST req "format" `captureOrDefault` Plaintext
+  let comments_open = hasPOST req "comments_open"
+  let tests = [ (null title,
+                 ("title", "'Title' is a required field."))
+              , (null summary_raw,
+                  ("summary", "'Summary' is a required field."))
+              , (null post_raw,
+                 ("post", "'Full post' is a required field."))
+              ]
+  let errors = map snd $ filter fst $ tests
+  return (basePost { P.title = title
+                   , P.summary_raw = summary_raw
+                   , P.summary_formatted = getFormatter Plaintext $ summary_raw
+                   , P.post_raw = post_raw
+                   , P.post_formatted = getFormatter format $ post_raw
+                   , P.format = format
+                   , P.comments_open = comments_open
+                   }
+         , categories
+         , errors
+         )

@@ -1,4 +1,6 @@
 module Blog.Model ( addPost
+                  , updatePost
+                  , deletePost
                   , addCategory
                   , updateCategory
                   , deleteCategory
@@ -57,14 +59,25 @@ postColumnValues p = [ toSql $ P.title p
                      , toSql $ P.comments_open p
                      ]
 
-addPost cn p = do theslug <- makePostSlug cn p
-                  let p2 = p { P.slug = theslug }
-                  DB.doInsert cn "posts" postColumnNames (postColumnValues p2)
-                  newid <- getDbId cn
-                  return p2 { P.uid = newid }
+addPost cn p catIds = do
+  theslug <- makePostSlug cn p
+  let p2 = p { P.slug = theslug }
+  DB.doInsert cn "posts" postColumnNames (postColumnValues p2)
+  newid <- getDbId cn
+  setPostCategories cn newid catIds
+  return p2 { P.uid = newid }
 
 makePostSlug cn p = makeSlugGeneric cn (P.title p) "posts"
 
+updatePost cn p catIds = do
+  DB.doUpdate cn "posts" postColumnNames (postColumnValues p)
+        "WHERE id = ?" [toSql $ P.uid p]
+  setPostCategories cn (P.uid p) catIds
+  return p
+
+deletePost cn uid = do
+  DB.doDelete cn "post_categories" "WHERE post_id = ?" [toSql uid]
+  DB.doDelete cn "posts" "WHERE id = ?" [toSql uid]
 
 -- category table
 categoryColumnNames = [ "name"
@@ -88,15 +101,21 @@ updateCategory cn c = do
         "WHERE id = ?" [ toSql $ Ct.uid c]
 
 deleteCategory cn uid = do
-  DB.doDelete cn "categories" "WHERE id = ?" [toSql $ uid]
   DB.doDelete cn "post_categories" "WHERE category_id = ?" [toSql $ uid]
+  DB.doDelete cn "categories" "WHERE id = ?" [toSql $ uid]
 
+-- post_categories tables
+addPostCategory :: (IConnection conn) => conn -> (Int, Int) -> IO (Int, Int)
 addPostCategory cn pc = do { DB.doInsert cn "post_categories"
                              ["post_id",
                               "category_id"]
                              [toSql $ fst pc,
                               toSql $ snd pc];
                              return pc; }
+setPostCategories cn postId catIds = do
+  DB.doDelete cn "post_categories" "WHERE post_id = ?" [toSql postId]
+  mapM_ (\c -> addPostCategory cn (postId, c)) catIds
+
 
 -- comment table
 commentColumnNames = [ "post_id"

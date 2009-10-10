@@ -16,11 +16,12 @@ import Ella.Param (captureOrDefault, capture)
 import Ella.Request
 import Ella.Response
 import Ella.Utils (addHtml)
-import Maybe (fromMaybe, isJust, fromJust)
+import Maybe (fromMaybe, isJust, fromJust, catMaybes)
 import System.Time (ClockTime(..), toUTCTime)
 import Text.StringTemplate
 import Text.StringTemplate.GenericStandard
 import qualified Blog.Category as Ct
+import qualified Blog.Post as P
 import qualified Blog.Settings as Settings
 import qualified Data.Map as Map
 import qualified Data.ByteString.Lazy as LB
@@ -292,25 +293,54 @@ adminEditPost' post isNew cn req = do
   categories <- getCategories cn
   postCategories <- if isNew then return [] else getCategoriesForPost cn post
   case requestMethod req of
-    "GET" ->  output post (map Ct.uid postCategories) categories
-    "POST" -> output post (map Ct.uid postCategories) categories
-              -- TODO
-              -- handle 'submit'
-              --   - with validation
-              --   - and redirection afterwards if successful
-              -- handle 'preview'
-              --   - same validation - can't show preview if invalid
-              -- handle 'delete'
+    "GET" ->  output post (map Ct.uid postCategories) categories "start" []
+    "POST" -> do
+      let mode = head $ map fst $ filter snd $  [ ("submit", hasPOST req "submit")
+                                                , ("delete", hasPOST req "delete")
+                                                -- use preview as default, for simplicity
+                                                , ("preview", True)
+                                                ]
+      if mode == "delete"
+        then do
+          deletePost cn (P.uid post)
+          return $ Just $ redirectResponse adminMenuUrl
+        else do
+          (postData, postCatIds, postErrors) <- validatePost req post
+          if null postErrors
+            then
+              if mode == "submit"
+                then do
+                  if isNew
+                    then do
+                      -- Set timestamp here, because we don't want to do it in
+                      -- validatePost (we would need to pass in isNew)
+                      ts <- getTimestamp
+                      let newPost = postData { P.timestamp = ts }
+                      addPost cn newPost postCatIds
+                    else updatePost cn postData postCatIds
+                  return $ Just $ redirectResponse adminMenuUrl
+              else do
+                -- mode == "preview"
+                output postData postCatIds categories mode postErrors
+            else
+                -- invalid
+                output postData postCatIds categories "invalid" postErrors
   where
-      output postData postCatIds categories = do
-        t <- get_template "admin_post"
-        return $ Just $ standardResponseTT req $
+    output :: P.Post -> [Int] -> [Ct.Category] -> String -> [(String, String)] -> IO (Maybe Response)
+    output postData postCatIds categories mode errors =
+        do
+          t <- get_template "admin_post"
+          return $ Just $ standardResponseTT req $
                                    (renderf t
                                     ("post", postData)
                                     ("categoriesWidget", X.toHtml $ categoriesWidgetForPost postCatIds categories)
                                     ("formatWidget", X.toHtml $ formatWidgetForPost postData)
                                     ("isNew", isNew)
                                     ("pagetitle", if isNew then "Add post" else "Edit post")
+                                    ("mode", mode)
+                                    ("errors", errors)
+                                    ("showErrors", not $ null errors)
+                                    ("showPreview", mode == "preview")
                                    )
 
 createLoginCookies loginData timestamp =

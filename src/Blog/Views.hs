@@ -153,7 +153,7 @@ postView slug req = do
                         ("commentAccepted", commentStage == CommentAccepted)
                         ("commentInvalid", commentStage == CommentInvalid)
                         ("newComment", commentTemplateInfo commentData)
-                        ("commentErrors", Map.toList $ commentErrors)
+                        ("commentErrors", commentErrors)
                         ("categories", map categoryTemplateInfo cats)
                         ("comments", map commentTemplateInfo comments)
                         ("hasComments", not $ null comments)
@@ -169,19 +169,18 @@ postView slug req = do
           "POST" -> do
             creds <- getCredentials req
             (commentData, commentErrors, commentExtra) <- validateComment creds (getPOST req) post
-            if Map.null commentErrors
+            if null commentErrors
                then if isJust (getPOST req "submit")
-                    then
-                        do
-                          addComment cn commentData
-                          return (CommentAccepted, emptyComment, Map.empty, commentExtra)
-                          -- Just assume 'preview' if not 'submit'
+                    then do
+                      addComment cn commentData
+                      return (CommentAccepted, emptyComment, [], commentExtra)
+                    -- Just assume 'preview' if not 'submit'
                     else return (CommentPreview, commentData, commentErrors, commentExtra)
                else
-                   return (CommentInvalid, commentData, commentErrors, commentExtra)
+                 return (CommentInvalid, commentData, commentErrors, commentExtra)
 
           _ -> do commentExtra <- initialCommentExtra req
-                  return (NoComment, emptyComment, Map.empty, commentExtra)
+                  return (NoComment, emptyComment, [], commentExtra)
 
 
 -- | View that shows a post as a static information page -- no comments etc.
@@ -203,7 +202,7 @@ loginView' cn req =
   case requestMethod req of
     "POST" -> do
       (loginData, loginErrors) <- validateLogin (getPOST req) cn
-      if Map.null loginErrors
+      if null loginErrors
          then do
            ts <- getTimestamp
            let loginCookies = createLoginCookies loginData ts
@@ -213,12 +212,12 @@ loginView' cn req =
            return $ Just $ standardResponseTT req $ loginPage t loginData loginErrors
     _ -> do
       t <- loginTemplate
-      return $ Just $ standardResponseTT req $ loginPage t emptyLoginData (Map.empty :: Map.Map String String)
+      return $ Just $ standardResponseTT req $ loginPage t emptyLoginData ([] :: [(String,String)])
 
   where loginPage t loginData loginErrors =
             (renderf t
-             ("loginInvalid", not $ Map.null loginErrors)
-             ("loginErrors", Map.toList loginErrors)
+             ("loginInvalid", not $ null loginErrors)
+             ("loginErrors", loginErrors)
              ("loginData", loginData)
             )
 

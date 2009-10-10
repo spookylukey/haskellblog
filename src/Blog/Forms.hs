@@ -137,7 +137,7 @@ validateComment creds postedData blogpost =
                     , hidden = False
                     , response = ""
                     }
-             , Map.fromList errors
+             , errors
              , if test_ts > 0 then test_ts else ts
              )
 
@@ -162,10 +162,10 @@ validateLogin postedData cn = do
        then do
          passwordCheck <- checkPassword cn username password
          if passwordCheck
-            then return (loginData, Map.empty)
-            else return (loginData, Map.fromList [("password", "Password not correct.")])
+            then return (loginData, [])
+            else return (loginData, [("password", "Password not correct.")])
        else do
-         return (loginData, Map.fromList errors)
+         return (loginData, errors)
 
 emptyPost = P.Post { uid = undefined
                    , title = ""

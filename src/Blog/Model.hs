@@ -101,8 +101,8 @@ updateCategory cn c = do
         "WHERE id = ?" [ toSql $ Ct.uid c]
 
 deleteCategory cn uid = do
-  DB.doDelete cn "post_categories" "WHERE category_id = ?" [toSql $ uid]
-  DB.doDelete cn "categories" "WHERE id = ?" [toSql $ uid]
+  DB.doDelete cn "post_categories" "WHERE category_id = ?" [toSql uid]
+  DB.doDelete cn "categories" "WHERE id = ?" [toSql uid]
 
 -- post_categories tables
 addPostCategory :: (IConnection conn) => conn -> (Int, Int) -> IO (Int, Int)

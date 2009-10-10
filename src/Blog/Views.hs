@@ -50,16 +50,11 @@ standardResponseTT req template =
     in buildResponse [ addContent rendered
                      ] utf8HtmlResponse
 
+-- | Custom 404 response
 return404 :: View
 return404 req = do
-  resp <- custom404handler req
-  return $ Just $ resp
-
--- | Custom 404 response
-custom404handler :: Request -> IO Response
-custom404handler req = do
   t <- get_template "notfound"
-  return $ with (standardResponseTT req t) [
+  return $ Just $ with (standardResponseTT req t) [
                         setStatus 404
                        ]
 

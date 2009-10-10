@@ -1,12 +1,12 @@
 import Blog.Routes (views)
-import Blog.Views (custom404handler)
+import Blog.Views (return404)
 import Blog.Globals (csrfProtectionProcessor)
 import Database.HDBC
 import Ella.Framework
 import Ella.Processors.Security (signedCookiesProcessor)
 import qualified Blog.Settings as Settings
 
-options = defaultDispatchOptions { notFoundHandler = custom404handler
+options = defaultDispatchOptions { notFoundHandler = return404
                                  , viewProcessors = [ signedCookiesProcessor Settings.secret
                                                     , csrfProtectionProcessor
                                                     ]

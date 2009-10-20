@@ -26,5 +26,6 @@ views  = [ addSlashRedirectView
          , "admin/post/" <+/> empty                   //-> adminPosts             $ [adminRequired]
          , "admin/post/new/" <+/> empty               //-> adminNewPost           $ [adminRequired]
          , "admin/post/edit/" <+/> anyParam           //-> adminEditPost          $ [adminRequired]
+         , "admin/ajax/commentvisible/" <+/> empty    //-> adminCommentVisible    $ [adminRequired]
          , "debug/" <+/> anyParam                     //-> debug                  $ []
          ]

@@ -362,6 +362,23 @@ adminEditPost' post isNew cn req = do
                                     ("showPreview", mode == "preview")
                                    )
 
+
+-- Admin AJAX
+
+-- TODO - proper JSON objects
+success = buildResponse [ addContent $ utf8 "success" ] utf8TextResponse
+failure = buildResponse [ addContent $ utf8 "failure" ] utf8TextResponse
+
+adminCommentVisible req = do
+  let commentId = getPOST req "id" `captureOrDefault` 0 :: Int
+  let visible   = getPOST req "visible" `captureOrDefault` False
+  if commentId <= 0
+    then  return $ Just $ failure
+    else do
+      cn <- connect
+      setCommentVisible cn commentId visible
+      return $ Just $ success
+
 createLoginCookies loginData timestamp =
   let username = fromJust $ Map.lookup "username" loginData
       password = fromJust $ Map.lookup "password" loginData

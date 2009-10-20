@@ -20,6 +20,7 @@ module Blog.Model ( addPost
                   , getPostsForCategory
                   , setPassword
                   , checkPassword
+                  , setCommentVisible
                   ) where
 
 import Data.Digest.Pure.SHA (showDigest, sha1)
@@ -195,6 +196,8 @@ getCommentsForPostQuery  = "SELECT id, '',      timestamp, name, email, '',     
 getPasswordForUsernameQuery = "SELECT password FROM users WHERE username = ?;"
 setPasswordForUsernameQuery = "UPDATE users SET password = ? WHERE username = ?;"
 
+setCommentHiddenQuery      = "UPDATE comments SET hidden = ? WHERE id = ?;"
+
 ---- Constructors ----
 
 makePost row =
@@ -338,3 +341,14 @@ setPassword cn username password = do
                                                          , toSql username ]
                      )
   return ()
+
+
+-- comment moderation
+setCommentVisible :: (IConnection conn) =>
+               conn -> Int -> Bool -> IO ()
+setCommentVisible cn commentId visible = do
+    withTransaction cn (\cn ->
+                            run cn setCommentHiddenQuery [ toSql (if visible then 0 else 1 :: Int)
+                                                         , toSql commentId ]
+                       )
+    return ()

@@ -20,6 +20,87 @@
       \$(document).ready(function() {
       \$('#id_spamcheck').attr("name", "timestamp");
       });
+
+function readCookie(name) {
+    var nameEQ = name + "=";
+    var ca = document.cookie.split(';');
+    for(var i=0;i < ca.length; i++) {
+        var c = ca[i];
+	while (c.charAt(0)==' ') c = c.substring(1,c.length);
+	if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+    }
+    return null;
+}
+
+function loggedIn() {
+    return (!(readCookie("username") == null));
+}
+
+
+function setCommentVisible(cid, visible) {
+    \$.post("/blog/admin/ajax/commentvisible/", { id: cid,
+                                                  visible: (visible ? 'True' : 'False') });
+
+}
+
+function hideComment(cid, event) {
+    setCommentVisible(cid, false);
+    \$("#commentdiv" + cid).addClass("hiddenComment").removeClass("manuallyShown");
+    \$("#showcomment" + cid).show();
+    \$("#hidecomment" + cid).hide();
+}
+
+function showComment(cid, event) {
+    setCommentVisible(cid, true);
+    \$("#commentdiv" + cid).removeClass("hiddenComment");
+    \$("#hidecomment" + cid).show();
+    \$("#showcomment" + cid).hide();
+}
+
+function respondToComment(cid, event) {
+
+}
+
+function deleteComment(cid, event) {
+
+}
+
+function addCommentModeration() {
+    \$(".comment").each(function() {
+                    var cid = \$(this).find(".commentid").text();
+                    \$(this).find("#hidecomment" + cid).click(function(ev) {
+                                                                 hideComment(cid, ev);
+                                                                 ev.preventDefault();
+                                                              });
+                    \$(this).find("#showcomment" + cid).click(function(ev) {
+                                                                 showComment(cid, ev);
+                                                                 ev.preventDefault();
+                                                              });
+                    \$(this).find("#respondtocomment" + cid).click(function(ev) {
+                                                                 respondToComment(cid, ev);
+                                                                 ev.preventDefault();
+                                                              });
+                    \$(this).find("#deletecomment" + cid).click(function(ev) {
+                                                                 deleteComment(cid, ev);
+                                                                 ev.preventDefault();
+                                                              });
+    });
+    \$(".commentControls").show();
+}
+
+\$(document).ready(function() {
+                    if (loggedIn()) {
+                        addCommentModeration();
+                    }
+                    \$(".togglebar").toggle(function(ev) {
+                                               \$(this.parentNode).addClass("manuallyShown");
+                                            },
+                                            function(ev) {
+                                               \$(this.parentNode).removeClass("manuallyShown");
+                                            });
+
+});
+
     </script>
   </head>
   <body>

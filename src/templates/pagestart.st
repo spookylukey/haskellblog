@@ -36,7 +36,6 @@ function loggedIn() {
     return (!(readCookie("username") == null));
 }
 
-
 function setCommentVisible(cid, visible) {
     \$.post("/blog/admin/ajax/commentvisible/", { id: cid,
                                                   visible: (visible ? 'True' : 'False') });

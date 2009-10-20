@@ -222,9 +222,9 @@ loginView' cn req =
 
 -- | Delete auth cookies and redirect.
 logoutView req =
-    return $ Just $ (redirectResponse adminMenuUrl) `with` [ deleteCookie "username"
-                                                           , deleteCookie "timestamp"
-                                                           ]
+    return $ Just $ (redirectResponse indexUrl) `with` [ deleteCookie "username"
+                                                       , deleteCookie "timestamp"
+                                                       ]
 
 --
 -- Admin views

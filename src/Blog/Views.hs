@@ -74,7 +74,7 @@ mainIndex :: View
 mainIndex req = do
   let curpage = getPage req
   cn <- connect
-  (posts,more) <- getRecentPosts cn curpage
+  (posts,more) <- getRecentPosts cn curpage Settings.post_page_size
   cats <- getCategoriesBulk cn posts
   t <- get_template "index"
   return $ Just $ standardResponseTT req $
@@ -233,6 +233,7 @@ logoutView req =
 -- Category editing is very simple and doesn't require
 -- much validation.
 
+adminMenu :: View
 adminMenu req = do
   t <- get_template "admin_menu"
   return $ Just $ standardResponseTT req $
@@ -243,8 +244,17 @@ adminMenu req = do
           ("adminCategoriesUrl", Links.adminCategoriesUrl)
          )
 
-adminPosts = undefined
-
+adminPosts req = do
+  t <- get_template "admin_posts"
+  let curpage = getPage req
+  cn <- connect
+  (posts,more) <- getRecentPosts cn curpage Settings.admin_post_page_size
+  return $ Just $ standardResponseTT req $
+             (renderf t
+              ("pagetitle", "Edit posts")
+              ("posts", map postTemplateInfo posts)
+              ("paginglinks", pagingLinks Links.adminPostsUrl curpage more)
+             )
 
 -- | View that handles all editing of categories (add/edit/delete)
 adminCategories req = do

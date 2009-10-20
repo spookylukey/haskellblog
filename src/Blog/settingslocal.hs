@@ -11,6 +11,7 @@ reserved_names = [blog_author_name]
 admin_usernames = [blog_author_name]
 
 post_page_size = 20 :: Int
+admin_post_page_size = 100 :: Int
 domain = "lukeplant_local"
 
 secret = "123"

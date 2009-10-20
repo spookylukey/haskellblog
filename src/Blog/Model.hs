@@ -245,9 +245,9 @@ getPostById cn postid = do
     [] -> return Nothing
     (postdata:_) -> return $ Just $ makePost postdata
 
-getRecentPosts :: (IConnection conn) => conn -> Int -> IO ([P.Post], Bool)
-getRecentPosts cn page = do
-  (res,more) <- pagedQuery cn getRecentPostsQuery [] page Settings.post_page_size
+getRecentPosts :: (IConnection conn) => conn -> Int -> Int -> IO ([P.Post], Bool)
+getRecentPosts cn page pagesize = do
+  (res,more) <- pagedQuery cn getRecentPostsQuery [] page pagesize
   return (map makePost res, more)
 
 getPostsForCategory :: (IConnection conn) => conn -> Ct.Category -> Int -> IO ([P.Post], Bool)

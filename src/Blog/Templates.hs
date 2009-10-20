@@ -85,6 +85,7 @@ postTemplateInfo p = Map.fromList [ ("title", ToSElemD $ P.title p)
                                   , ("full", ToSElemD $ P.post_formatted p)
                                   , ("url", ToSElemD $ postUrl p)
                                   , ("commentsOpen", ToSElemD $ P.comments_open p)
+                                  , ("adminUrl", ToSElemD $ adminEditPostUrl p)
                                   ]
 
 categoryTemplateInfo :: C.Category -> Map.Map String ToSElemD

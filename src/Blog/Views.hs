@@ -238,9 +238,9 @@ adminMenu req = do
   return $ Just $ standardResponseTT req $
          (renderf t
           ("pagetitle", "Blog admin - menu")
-          ("newPostLink", Links.adminNewPost)
-          ("postsLink", Links.adminPosts)
-          ("categoriesLink", Links.adminCategories)
+          ("adminNewPostUrl", Links.adminNewPostUrl)
+          ("adminPostsUrl", Links.adminPostsUrl)
+          ("adminCategoriesUrl", Links.adminCategoriesUrl)
          )
 
 adminPosts = undefined

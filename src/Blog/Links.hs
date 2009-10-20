@@ -16,4 +16,8 @@ aboutUrl          = Settings.root_url ++ "about/"
 feedsUrl          = Settings.root_url ++ "feeds/"
 loginUrl          = Settings.root_url ++ "login/"
 
-adminMenuUrl      = Settings.root_url 
+adminMenuUrl      = Settings.root_url ++ "admin/"
+adminCategories   = Settings.root_url ++ "admin/category/"
+adminPosts        = Settings.root_url ++ "admin/post/"
+adminEditPost p   = Settings.root_url ++ "admin/post/edit/" ++ (show $ P.uid p) ++ "/"
+adminNewPost      = Settings.root_url ++ "admin/post/new/"

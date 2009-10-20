@@ -21,6 +21,7 @@ import System.Time (ClockTime(..), toUTCTime)
 import Text.StringTemplate
 import Text.StringTemplate.GenericStandard
 import qualified Blog.Category as Ct
+import qualified Blog.Links as Links
 import qualified Blog.Post as P
 import qualified Blog.Settings as Settings
 import qualified Data.Map as Map
@@ -231,6 +232,19 @@ logoutView req =
 
 -- Category editing is very simple and doesn't require
 -- much validation.
+
+adminMenu req = do
+  t <- get_template "admin_menu"
+  return $ Just $ standardResponseTT req $
+         (renderf t
+          ("pagetitle", "Blog admin - menu")
+          ("newPostLink", Links.adminNewPost)
+          ("postsLink", Links.adminPosts)
+          ("categoriesLink", Links.adminCategories)
+         )
+
+adminPosts = undefined
+
 
 -- | View that handles all editing of categories (add/edit/delete)
 adminCategories req = do

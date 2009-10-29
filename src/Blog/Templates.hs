@@ -102,4 +102,7 @@ commentTemplateInfo cm = Map.fromList [ ("name", ToSElemD $ Cm.name cm)
                                       , ("email", ToSElemD $ Cm.email cm)
                                       , ("uid", ToSElemD $ Cm.uid cm)
                                       , ("hidden", ToSElemD $ Cm.hidden cm)
+                                      , ("response", ToSElemD $ emptyToNothing $ Cm.response cm)
                                       ]
+
+emptyToNothing s = if null s then Nothing else Just s

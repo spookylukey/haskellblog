@@ -21,6 +21,7 @@ module Blog.Model ( addPost
                   , setPassword
                   , checkPassword
                   , setCommentVisible
+                  , setCommentResponse
                   ) where
 
 import Data.Digest.Pure.SHA (showDigest, sha1)
@@ -197,6 +198,7 @@ getPasswordForUsernameQuery = "SELECT password FROM users WHERE username = ?;"
 setPasswordForUsernameQuery = "UPDATE users SET password = ? WHERE username = ?;"
 
 setCommentHiddenQuery      = "UPDATE comments SET hidden = ? WHERE id = ?;"
+setCommentResponseQuery    = "UPDATE comments SET response = ? WHERE id = ?;"
 
 ---- Constructors ----
 
@@ -352,3 +354,13 @@ setCommentVisible cn commentId visible = do
                                                          , toSql commentId ]
                        )
     return ()
+
+setCommentResponse :: (IConnection conn) =>
+                      conn -> Int -> String -> IO ()
+setCommentResponse cn commentId response = do
+  withTransaction cn (\cn ->
+                          run cn setCommentResponseQuery [ toSql response
+                                                         , toSql commentId
+                                                         ]
+                     )
+  return ()

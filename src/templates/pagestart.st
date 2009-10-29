@@ -57,7 +57,10 @@ function showComment(cid, event) {
 }
 
 function respondToComment(cid, event) {
-
+    \$("#responsecommentid").val(cid.toString());
+    var p = \$("#respondtocomment" + cid.toString()).offset();
+    \$("#responseinput").val("");
+    \$("#responsebox").css('left', p.left).css('top', p.top + 15).show();
 }
 
 function deleteComment(cid, event) {
@@ -85,6 +88,32 @@ function addCommentModeration() {
                                                               });
     });
     \$(".commentControls").show();
+    \$("#responsebox li").each(function() {
+                    var self = \$(this);
+                    self.click(function(ev) {
+                       \$("#responseinput").val(self.text());
+                       \$("#responsesubmit").click();
+                    })
+    });
+    \$("#responsesubmit").click(function(ev) {
+                    var cid = \$("#responsecommentid").val();
+                    \$.post("/blog/admin/ajax/commentresponse/",
+                      { id: cid,
+                        response: \$("#responseinput").val()
+                      },
+                      function(data) {
+                         // rather fragile way of find .response div...
+                         \$("#comment" + cid).parent().parent().find(".response").html('<div class="responseinner">' + data + ' <span class="responsename">— luke</span></div>');
+                      }
+                    )
+                    \$("#responsebox").hide();
+                    });
+
+    \$("#responsecancel").click(function(ev) {
+                    \$("#responsebox").hide();
+                    });
+
+
 }
 
 \$(document).ready(function() {

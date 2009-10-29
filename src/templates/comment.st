@@ -8,6 +8,11 @@
       <span class="commentid">$comment.uid$</span>
          $comment.textFormatted:noescape()$
       </div>
+      <div class="response">
+        $if(comment.response)$
+        <div class="responseinner">$comment.response$ <span class="responsename">— luke</span> </div>
+        $endif$
+      </div>
       <div class="commentControls">
         <a id="hidecomment$comment.uid$" href="#" $if(comment.hidden)$style="display:none;"$endif$>Hide</a>
         <a id="showcomment$comment.uid$" href="#" $if(!comment.hidden)$style="display:none;"$endif$>Show</a>

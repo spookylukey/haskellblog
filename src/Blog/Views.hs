@@ -5,6 +5,7 @@ module Blog.Views where
 -- which has pure functions that generally return Html.
 
 import Blog.DB (connect)
+import Blog.Formats (Format(..), getFormatter)
 import Blog.Forms
 import Blog.Globals (mkCsrfField)
 import Blog.Links
@@ -366,18 +367,31 @@ adminEditPost' post isNew cn req = do
 -- Admin AJAX
 
 -- TODO - proper JSON objects
-success = buildResponse [ addContent $ utf8 "success" ] utf8TextResponse
-failure = buildResponse [ addContent $ utf8 "failure" ] utf8TextResponse
+simpleMessage msg = buildResponse [ addContent $ utf8 msg ] utf8TextResponse
+success = simpleMessage "success"
+failure = simpleMessage "failure"
 
 adminCommentVisible req = do
-  let commentId = getPOST req "id" `captureOrDefault` 0 :: Int
   let visible   = getPOST req "visible" `captureOrDefault` False
+  withValidComment req (\cn commentId -> setCommentVisible cn commentId visible)
+
+adminCommentResponse req = do
+  let response  = getPOST req "response" `captureOrDefault` "" :: String
+  let formattedResponse = getFormatter Plaintext $ response
+  withValidComment req (\cn commentId -> setCommentResponse cn commentId formattedResponse)
+  return $ Just $ simpleMessage formattedResponse
+  -- TODO - proper error handling
+
+-- Utility that pulls out common functionality of adminComment*
+withValidComment req action = do
+  let commentId = getPOST req "id" `captureOrDefault` 0 :: Int
   if commentId <= 0
-    then  return $ Just $ failure
-    else do
-      cn <- connect
-      setCommentVisible cn commentId visible
-      return $ Just $ success
+     then return $ Just $ failure
+     else do
+       cn <- connect
+       action cn commentId
+       return $ Just success
+
 
 createLoginCookies loginData timestamp =
   let username = fromJust $ Map.lookup "username" loginData

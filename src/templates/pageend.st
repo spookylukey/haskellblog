@@ -21,6 +21,20 @@
           </ul>
         </div>
       </div>
+      <div id="loginlinks">
+        <a href="/blog/login/">Login</a><br/>
+        <a href="/blog/logout/">Logout</a><br/>
+      </div>
+      <div id="responsebox" style="display:none";>
+        <ul>
+          <li>Didn't read the post</li>
+          <li>Troll!</li>
+          <li>Off-topic</li>
+          <li>Already answered in comments</li>
+        </ul>
+        Custom: <input type="text" id="responseinput" size=50> <input type="submit" id="responsesubmit" value="Send"> <input type="submit" id="responsecancel" value="Cancel">
+        <input type="hidden" id="responsecommentid" value="">
+      </div>
     </div>
   </body>
 </html>

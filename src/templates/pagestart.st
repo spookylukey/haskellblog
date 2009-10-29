@@ -102,8 +102,7 @@ function addCommentModeration() {
                         response: \$("#responseinput").val()
                       },
                       function(data) {
-                         // rather fragile way of find .response div...
-                         \$("#comment" + cid).parent().parent().find(".response").html('<div class="responseinner">' + data + ' <span class="responsename">— luke</span></div>');
+                         \$("#commentdiv" + cid.toString()).find(".response").html('<div class="responseinner">' + data + ' <span class="responsename">— luke</span></div>');
                       }
                     )
                     \$("#responsebox").hide();

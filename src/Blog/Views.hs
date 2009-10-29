@@ -382,6 +382,9 @@ adminCommentResponse req = do
   return $ Just $ simpleMessage formattedResponse
   -- TODO - proper error handling
 
+adminCommentDelete req = do
+  withValidComment req deleteComment
+
 -- Utility that pulls out common functionality of adminComment*
 withValidComment req action = do
   let commentId = getPOST req "id" `captureOrDefault` 0 :: Int

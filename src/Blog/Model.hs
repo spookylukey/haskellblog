@@ -6,6 +6,7 @@ module Blog.Model ( addPost
                   , deleteCategory
                   , addPostCategory
                   , addComment
+                  , deleteComment
                   , createUser
                   , getPostBySlug
                   , getPostById
@@ -152,6 +153,9 @@ addComment cn cm = do
   DB.doInsert cn "comments" commentColumnNames (commentColumnValues cm)
   newid <- getDbId cn
   return cm { Cm.uid = newid }
+
+deleteComment cn uid = do
+  DB.doDelete cn "comments" "WHERE id = ?" [toSql uid]
 
 -- user table
 userColumnNames = [ "username"

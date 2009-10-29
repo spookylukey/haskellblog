@@ -64,7 +64,10 @@ function respondToComment(cid, event) {
 }
 
 function deleteComment(cid, event) {
-
+    \$.post("/blog/admin/ajax/commentdelete/", { id: cid },
+                    function(data) {
+                      \$("#commentdiv" + cid.toString()).remove();
+                    });
 }
 
 function addCommentModeration() {

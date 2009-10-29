@@ -16,5 +16,20 @@ $$postMap = ${postIdsToUrls};
 
 $$catMap = ${categoryIdsToUrls};
 
+header ('HTTP/1.1 301 Moved Permanently');
 
+$$id = $$_GET['id'];
+$$cat = $$_GET['cat'];
+
+if (!empty($$id)) {
+   header('Location: ' . $$postMap[$$id]);
+   exit();
+}
+
+if (!empty($$cat)) {
+   header('Location: ' . $$catMap[$$cat]);
+   exit();
+}
+
+header('Location: /blog/')
 ?>

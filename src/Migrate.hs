@@ -110,6 +110,11 @@ createRedirectFile postUrlMap categoryUrlMap = do
                            ,(utf8 "categoryIdsToUrls", utf8 $ makePHPMap categoryUrlMap)]
     renderToFile Settings.redirect_file_output tpl ctx
 
+createSyndicationRedirectFile categoryFeedUrlMap = do
+    tpl <- readTemplate Settings.syndication_redirect_file_template
+    let ctx = Map.fromList [(utf8 "categoryIdsToUrls", utf8 $ makePHPMap categoryFeedUrlMap)]
+    renderToFile Settings.syndication_redirect_file_output tpl ctx
+
 -- Misc fixes
 -- Titles of all posts in category 'articles' have HTML in them, which is difficult to fix
 -- up.  They are only announcements, so we just delete.
@@ -152,7 +157,10 @@ main = handleSqlError $ do
                                       (map Links.postUrl newPosts)
   let categoryUrlMap = Map.fromList $ zip (map (show . C.uid) origCats)
                                           (map Links.categoryUrl newCats)
+  let categoryFeedUrlMap = Map.fromList $ zip (map (show . C.uid) origCats)
+                                              (map Links.categoryPostsFeedUrl newCats)
   createRedirectFile postUrlMap categoryUrlMap
+  createSyndicationRedirectFile categoryFeedUrlMap
 
   createUser cn "luke" True
   setPassword cn "luke" "test"

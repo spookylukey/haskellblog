@@ -12,8 +12,6 @@ indexUrl          = Settings.root_url
 postUrl p         = Settings.root_url ++ "posts/" ++ (P.slug p) ++ "/"
 categoriesUrl     = Settings.root_url ++ "categories/"
 categoryUrl c     = Settings.root_url ++ "categories/" ++ (C.slug c) ++ "/"
-aboutUrl          = Settings.root_url ++ "about/"
-feedsUrl          = Settings.root_url ++ "feeds/"
 loginUrl          = Settings.root_url ++ "login/"
 
 adminMenuUrl       = Settings.root_url ++ "admin/"
@@ -21,3 +19,8 @@ adminCategoriesUrl = Settings.root_url ++ "admin/category/"
 adminPostsUrl      = Settings.root_url ++ "admin/post/"
 adminEditPostUrl p = Settings.root_url ++ "admin/post/edit/" ++ (show $ P.uid p) ++ "/"
 adminNewPostUrl    = Settings.root_url ++ "admin/post/new/"
+
+allPostsFeedUrl        = Settings.root_url ++ "atom/"
+postCommentFeedUrl   p = Settings.root_url ++ "posts/" ++ (P.slug p) ++ "/atom/"
+categoryPostsFeedUrl c = Settings.root_url ++ "categories/" ++ (C.slug c) ++ "/atom/"
+allCommentsUrl         = Settings.root_url ++ "comments/atom/"

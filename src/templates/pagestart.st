@@ -139,8 +139,6 @@ function addCommentModeration() {
         <ul>
           <li><a href="/blog/" class="first">Home</a></li>
           <li><a href="/blog/categories/">Categories</a></li>
-          <li><a href="/blog/feeds/">Feeds</a></li>
-          <li><a href="/blog/about/">About</a></li>
         </ul>
       </div>
       <div id="maintitle">

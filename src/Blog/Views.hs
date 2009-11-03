@@ -83,6 +83,7 @@ mainIndex req = do
               ("posts", map postTemplateInfo posts)
               ("categories", map (map categoryTemplateInfo) cats)
               ("paginglinks", pagingLinks indexUrl curpage more)
+              ("atomfeedurl", allPostsFeedUrl)
              )
 
 -- | View to help with debugging
@@ -129,6 +130,7 @@ categoryView slug req = do
                           ("posts", map postTemplateInfo posts)
                           ("categories", map (map categoryTemplateInfo) cats)
                           ("paginglinks", pagingLinks (categoryUrl cat) curpage more)
+                          ("atomfeedurl", categoryPostsFeedUrl cat)
                          )
 
 -- | View that shows individual post
@@ -160,6 +162,8 @@ postView slug req = do
                         ("commentData", commentData)
                         ("formatWidget", X.toHtml $ formatWidgetForComment commentData)
                         ("commentExtra", commentExtra)
+                        ("atomfeedurl", postCommentFeedUrl post)
+                        ("atomfeedtitle", "Atom feed for comments in this post")
                        )
   where
     handleUserComment cn post req =

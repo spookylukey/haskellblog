@@ -6,9 +6,10 @@
 	  <h2>Blog links:</h2>
           <ul>
             <li><a href="/blog/">Index</a></li>
-            <li><a href="/blog/feeds/">Feeds</a></li>
             <li><a href="/blog/categories/">Categories</a></li>
-            <li><a href="/blog/about/">About blog</a></li>
+             $if(atomfeedurl)$
+             <li><a href="$atomfeedurl$">$if(atomfeedtitle)$$atomfeedtitle$$else$Atom feed$endif$</a><li>
+             $endif$
           </ul>
 	</div>
         <div class="sitelinks">

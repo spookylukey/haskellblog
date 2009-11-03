@@ -5,6 +5,7 @@ module Blog.Views where
 -- which has pure functions that generally return Html.
 
 import Blog.DB (connect)
+import Blog.Feeds
 import Blog.Formats (Format(..), getFormatter)
 import Blog.Forms
 import Blog.Globals (mkCsrfField)
@@ -19,8 +20,11 @@ import Ella.Response
 import Ella.Utils (addHtml)
 import Maybe (fromMaybe, isJust, fromJust, catMaybes)
 import System.Time (ClockTime(..), toUTCTime)
+import Text.Atom.Feed (Feed)
+import Text.Atom.Feed.Export (xmlFeed)
 import Text.StringTemplate
 import Text.StringTemplate.GenericStandard
+import Text.XML.Light (showTopElement)
 import qualified Blog.Category as Ct
 import qualified Blog.Links as Links
 import qualified Blog.Post as P
@@ -68,6 +72,14 @@ return403 req = do
                 ]
 
 
+-- Feed utilities
+
+feedResponse :: Feed -> IO (Maybe Response)
+feedResponse feed = return $ Just $
+                    with (textBasedResponse "application/atom+xml" "UTF-8")
+                             [ addContent $ utf8 $ showTopElement $ xmlFeed feed
+                             ]
+
 ---- Views
 
 -- View for the main page
@@ -85,6 +97,18 @@ mainIndex req = do
               ("paginglinks", pagingLinks indexUrl curpage more)
               ("atomfeedurl", allPostsFeedUrl)
              )
+
+-- Feed for all posts
+allPostsFeedView req = do
+  cn <- connect
+  (posts, more) <- getRecentPosts cn 1 Settings.feed_post_page_size
+  feedResponse $ allPostsFeed posts
+
+
+allCommentsFeedView req = do
+  cn <- connect
+  comments <- getRecentComments cn 1 Settings.feed_comment_page_size
+  feedResponse $ allCommentsFeed comments
 
 -- | View to help with debugging
 debug :: String -> View
@@ -132,6 +156,15 @@ categoryView slug req = do
                           ("paginglinks", pagingLinks (categoryUrl cat) curpage more)
                           ("atomfeedurl", categoryPostsFeedUrl cat)
                          )
+
+categoryPostsFeedView slug req = do
+  cn <- connect
+  mcat <- getCategoryBySlug cn slug
+  case mcat of
+    Nothing -> return404 req
+    Just cat -> do
+              (posts,more) <- getPostsForCategory cn cat 1
+              feedResponse $ categoryPostsFeed cat posts
 
 -- | View that shows individual post
 postView :: String -> View
@@ -183,6 +216,16 @@ postView slug req = do
 
           _ -> do commentExtra <- initialCommentExtra req
                   return (NoComment, emptyComment, [], commentExtra)
+
+postCommentFeedView slug req = do
+  cn <- connect
+  mp <- getPostBySlug cn slug
+  case mp of
+    Nothing -> return404 req
+    Just post -> do
+            comments <- getCommentsForPost cn post
+            feedResponse $ postCommentFeed comments post
+
 
 -- | View that displays a login form and handles logging in
 loginView :: View
@@ -391,6 +434,7 @@ withValidComment req action = do
        return $ Just success
 
 
+-- Authentication
 createLoginCookies loginData timestamp =
   let username = fromJust $ Map.lookup "username" loginData
       password = fromJust $ Map.lookup "password" loginData

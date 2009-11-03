@@ -13,10 +13,14 @@ import Ella.GenUtils (apply)
 views  = [ addSlashRedirectView
          , canonicalUri
          , empty                                      //-> mainIndex              $ []
+         , "atom/" <+/> empty                         //-> allPostsFeedView       $ []
          , "posts/" <+/> anyParam                     //-> postView               $ []
+         , "posts/" <+/> stringParam </+> "atom/"     //-> postCommentFeedView    $ []
          , "posts/" <+/> empty                        //-> postsRedirectView      $ []
          , "categories/" <+/> empty                   //-> categoriesView         $ []
          , "categories/" <+/> anyParam                //-> categoryView           $ []
+         , "categories/" <+/> stringParam</+>"atom/"  //-> categoryPostsFeedView  $ []
+         , "comments/atom/" <+/> empty                //-> allCommentsFeedView    $ []
          , "login/" <+/> empty                        //-> loginView              $ []
          , "logout/" <+/> empty                       //-> logoutView             $ []
          , "admin/" <+/> empty                        //-> adminMenu              $ [adminRequired]

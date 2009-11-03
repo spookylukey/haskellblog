@@ -1,6 +1,7 @@
 module Blog.Links where
 
 import qualified Blog.Category as C
+import qualified Blog.Comment as Cm
 import qualified Blog.Post as P
 import qualified Blog.Settings as Settings
 
@@ -23,4 +24,6 @@ adminNewPostUrl    = Settings.root_url ++ "admin/post/new/"
 allPostsFeedUrl        = Settings.root_url ++ "atom/"
 postCommentFeedUrl   p = Settings.root_url ++ "posts/" ++ (P.slug p) ++ "/atom/"
 categoryPostsFeedUrl c = Settings.root_url ++ "categories/" ++ (C.slug c) ++ "/atom/"
-allCommentsUrl         = Settings.root_url ++ "comments/atom/"
+allCommentsFeedUrl     = Settings.root_url ++ "comments/atom/"
+
+commentUrl cm p        = postUrl p ++ "#comment" ++ (show $ Cm.uid cm)

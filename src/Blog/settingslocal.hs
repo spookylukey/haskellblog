@@ -12,7 +12,10 @@ admin_usernames = [blog_author_name]
 
 post_page_size = 20 :: Int
 admin_post_page_size = 100 :: Int
+feed_post_page_size = 20 :: Int
+feed_comment_page_size = 20 :: Int
 domain = "lukeplant_local"
+absolute_root = "http://" ++ domain
 
 secret = "123"
 

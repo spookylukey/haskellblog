@@ -45,6 +45,9 @@ Executable blog.cgi
         SHA >= 1.0.2,
         HStringTemplate >= 0.6.1,
         text >= 0.3,
+        feed >= 0.3.7,
+        time >= 1.1.3,
+        xml >= 1.3.4,
         ella >= 0.1.2
   Main-is: BlogCgi.hs
   hs-source-dirs: src

@@ -184,15 +184,6 @@ postView slug req = do
           _ -> do commentExtra <- initialCommentExtra req
                   return (NoComment, emptyComment, [], commentExtra)
 
-
--- | View that shows a post as a static information page -- no comments etc.
-infoPageView :: String -> View
-infoPageView slug req = do
-  cn <- connect
-  Just post <- getPostBySlug cn slug
-  t <- get_template "info"
-  return $ Just $ standardResponseTT req $ renderf t ("post", postTemplateInfo post)
-
 -- | View that displays a login form and handles logging in
 loginView :: View
 loginView req = do

@@ -17,8 +17,6 @@ views  = [ addSlashRedirectView
          , "posts/" <+/> empty                        //-> postsRedirectView      $ []
          , "categories/" <+/> empty                   //-> categoriesView         $ []
          , "categories/" <+/> anyParam                //-> categoryView           $ []
-         , "about/" <+/> empty                        //-> infoPageView "about"   $ []
-         , "feeds/" <+/> empty                        //-> infoPageView "feeds"   $ []
          , "login/" <+/> empty                        //-> loginView              $ []
          , "logout/" <+/> empty                       //-> logoutView             $ []
          , "admin/" <+/> empty                        //-> adminMenu              $ [adminRequired]

@@ -5,10 +5,10 @@ where
 import Blog.Links
 import Blog.Utils (escapeHtmlStringT)
 import Data.Maybe (fromJust)
+import Data.Time.Clock.POSIX (posixSecondsToUTCTime)
+import Data.Time.Format (formatTime)
 import Ella.GenUtils (utf8)
 import System.Locale (defaultTimeLocale)
-import System.Time (toUTCTime, formatCalendarTime)
-import System.Time.Utils (epochToClockTime)
 import Text.XHtml
 import Text.StringTemplate
 import Text.StringTemplate.Classes (SElem(..))
@@ -63,7 +63,7 @@ formatName name = if null name
                   then "Anonymous Coward"
                   else name
 
-showDate timestamp = formatCalendarTime defaultTimeLocale  "%e %B %Y" (toUTCTime $ epochToClockTime timestamp)
+showDate timestamp = formatTime defaultTimeLocale "%e %B %Y" $ posixSecondsToUTCTime $ realToFrac timestamp
 
 -- HStringTemplate related:
 

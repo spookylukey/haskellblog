@@ -25,7 +25,6 @@ Executable migrate
 
 Executable blog.cgi
   Build-Depends:
-        array >= 0.1.0,
         base == 4.*,
         haskell98 >= 1.0.1,
         HDBC-sqlite3 >= 2.1.0,

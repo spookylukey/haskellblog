@@ -2,7 +2,7 @@
     <div class="comment$if(comment.isAuthor)$ author$endif$$if(comment.hidden)$ hiddenComment$endif$" id="commentdiv$comment.uid$">
       <div class="togglebar" $if(comment.hidden)$ title="Hidden comment" $endif$></div>
       <div class="introline">
-        <a id="comment$comment.uid$" href="#comment$comment.uid$" class="anchor">§</a> <span>On <span class="timestamp">$comment.date$</span>, <span class="commentBy">$comment.formattedName$</span> wrote:</span>
+        <a id="comment$comment.uid$" href="#comment$comment.uid$" class="anchor">&sect;</a> <span>On <span class="timestamp">$comment.date$</span>, <span class="commentBy">$comment.formattedName$</span> wrote:</span>
       </div>
       <div class="commenttext">
       <span class="commentid">$comment.uid$</span>
@@ -10,7 +10,7 @@
       </div>
       <div class="response">
         $if(comment.response)$
-        <div class="responseinner">$comment.response$ <span class="responsename">— luke</span> </div>
+        <div class="responseinner">$comment.response$ <span class="responsename">&mdash; luke</span> </div>
         $endif$
       </div>
       <div class="commentControls">

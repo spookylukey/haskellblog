@@ -103,3 +103,18 @@ escapeHtmlStringT = repl "<" "&lt;" .
                     repl "\'" "&#39;" .
                     repl "&" "&amp;"
     where repl x y = replaceLT (LT.pack x) (LT.pack y)
+
+-- | Replace a ByteString in a ByteString with another ByteString
+replaceBS find repl src
+    | LB.null src = src
+    | otherwise = let l = LB.length find
+                  in if LB.take (fromIntegral l) src == find
+                     then LB.append repl (replaceBS find repl (LB.drop (fromIntegral l) src))
+                     else LB.cons (LB.head src) (replaceBS find repl (LB.tail src))
+
+escapeHtmlStringBS = repl "<" "&lt;" .
+                     repl ">" "&gt;" .
+                     repl "\"" "&quot;" .
+                     repl "\'" "&#39;" .
+                     repl "&" "&amp;"
+    where repl x y = replaceBS (LB.pack x) (LB.pack y)

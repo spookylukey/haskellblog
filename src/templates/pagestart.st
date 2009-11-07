@@ -10,7 +10,7 @@
     <!--[if lte IE 6]><link rel="stylesheet" href="/newblog_IE6.css" type="text/css"><![endif]-->
     <title>
       $if(pagetitle)$
-        $pagetitle$ « All Unkept
+        $pagetitle$ &laquo; All Unkept
       $else$
         All Unkept
       $endif$
@@ -105,7 +105,7 @@ function addCommentModeration() {
                         response: \$("#responseinput").val()
                       },
                       function(data) {
-                         \$("#commentdiv" + cid.toString()).find(".response").html('<div class="responseinner">' + data + ' <span class="responsename">— luke</span></div>');
+                         \$("#commentdiv" + cid.toString()).find(".response").html('<div class="responseinner">' + data + ' <span class="responsename">&mdash; luke</span></div>');
                       }
                     )
                     \$("#responsebox").hide();

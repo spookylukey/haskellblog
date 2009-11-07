@@ -48,11 +48,11 @@ standardResponseBS content = buildResponse [
                              ] utf8HtmlResponse
 
 -- | Standard response, taking a Request and StringTemplate Text as input
-standardResponseTT :: Request -> StringTemplate LT.Text -> Response
+standardResponseTT :: Request -> StringTemplate LB.ByteString -> Response
 standardResponseTT req template =
     let csrffield = mkCsrfField req
         t2 = setAttribute "csrffield" csrffield template
-        rendered = (LT.encodeUtf8 $ render t2)
+        rendered = render t2
     in buildResponse [ addContent rendered
                      ] utf8HtmlResponse
 

@@ -3,7 +3,7 @@ module Blog.Templates
 where
 
 import Blog.Links
-import Blog.Utils (escapeHtmlStringT)
+import Blog.Utils (escapeHtmlStringBS)
 import Data.Maybe (fromJust)
 import Data.Time.Clock.POSIX (posixSecondsToUTCTime)
 import Data.Time.Format (formatTime)
@@ -23,15 +23,15 @@ import qualified Data.Text.Lazy as LT
 
 -- Templates
 
-get_templates :: IO (STGroup LT.Text)
+get_templates :: IO (STGroup UTF8.ByteString)
 get_templates = do
   g1 <- directoryGroup Settings.template_path
-  let g2 = setEncoderGroup escapeHtmlStringT g1
-      g3 = groupStringTemplates [("noescape", newSTMP "$it$" :: StringTemplate LT.Text)]
+  let g2 = setEncoderGroup escapeHtmlStringBS g1
+      g3 = groupStringTemplates [("noescape", newSTMP "$it$" :: StringTemplate UTF8.ByteString)]
       g4 = mergeSTGroups g2 g3
   return g4
 
-get_template :: String -> IO (StringTemplate LT.Text)
+get_template :: String -> IO (StringTemplate UTF8.ByteString)
 get_template name = do
   templates <- get_templates
   return $ fromJust $ getStringTemplate name templates

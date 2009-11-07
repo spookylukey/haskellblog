@@ -121,7 +121,7 @@ createSyndicationRedirectFile categoryFeedUrlMap = do
 -- up.  They are only announcements, so we just delete.
 deleteArticlePosts cn = do
   Just cat <- getCategoryBySlug cn "articles"
-  (posts, False) <- getPostsForCategory cn cat 1 -- there is only one page worth
+  (posts, False) <- getPostsForCategory cn cat 1 20 -- there are less than 20
   deleteCategory cn (C.uid cat)
   mapM_ (\x -> deletePost cn $ P.uid x) posts
 

@@ -276,9 +276,9 @@ getRecentPosts cn page pagesize = do
   (res,more) <- pagedQuery cn getRecentPostsQuery [] page pagesize
   return (map makePost res, more)
 
-getPostsForCategory :: (IConnection conn) => conn -> Ct.Category -> Int -> IO ([P.Post], Bool)
-getPostsForCategory cn cat curpage = do
-  (res,more) <- pagedQuery cn getPostsForCategoryQuery [toSql $ Ct.uid cat] curpage Settings.post_page_size
+getPostsForCategory :: (IConnection conn) => conn -> Ct.Category -> Int -> Int -> IO ([P.Post], Bool)
+getPostsForCategory cn cat page pagesize = do
+  (res,more) <- pagedQuery cn getPostsForCategoryQuery [toSql $ Ct.uid cat] page pagesize
   return (map makePost res, more)
 
 -- | Returns all recent comments, paired with the Post they are from

@@ -145,7 +145,7 @@ categoryView slug req = do
   case mcat of
     Nothing -> return404 req
     Just cat -> do
-              (posts,more) <- getPostsForCategory cn cat (getPage req)
+              (posts,more) <- getPostsForCategory cn cat (getPage req) Settings.post_page_size
               cats <- getCategoriesBulk cn posts
               t <- get_template "category"
               return $ Just $ standardResponseTT req $
@@ -163,7 +163,7 @@ categoryPostsFeedView slug req = do
   case mcat of
     Nothing -> return404 req
     Just cat -> do
-              (posts,more) <- getPostsForCategory cn cat 1
+              (posts,more) <- getPostsForCategory cn cat 1 Settings.feed_post_page_size
               feedResponse $ categoryPostsFeed cat posts
 
 -- | View that shows individual post

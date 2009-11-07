@@ -25,6 +25,7 @@
       <div id="loginlinks">
         <a href="/blog/login/">Login</a><br/>
         <a href="/blog/logout/">Logout</a><br/>
+        <a href="/blog/admin/">Admin</a><br/>
       </div>
       <div id="responsebox" style="display:none";>
         <ul>

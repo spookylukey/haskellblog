@@ -183,8 +183,8 @@ createUser cn username superuser = do
 -- (we can then use the same 'makePost' function)
 getPostByIdQuery        = "SELECT id, title, slug, post_raw, post_formatted, summary_raw, summary_formatted, format_id, timestamp, comments_open FROM posts WHERE id = ?;"
 getPostBySlugQuery      = "SELECT id, title, slug, '',       post_formatted, '',          '',                '',        timestamp, comments_open FROM posts WHERE slug = ?;"
-getRecentPostsQuery     = "SELECT id, title, slug, '',       '',             '',          summary_formatted, '',        timestamp, ''            FROM posts ORDER BY timestamp DESC $LIMITOFFSET;"
-getPostsForCategoryQuery= "SELECT id, title, slug, '',       '',             '',          summary_formatted, '',        timestamp, ''            FROM posts INNER JOIN post_categories ON posts.id = post_categories.post_id WHERE post_categories.category_id = ? ORDER BY timestamp DESC $LIMITOFFSET;"
+getRecentPostsQuery     = "SELECT id, title, slug, '',       post_formatted, '',          summary_formatted, '',        timestamp, ''            FROM posts ORDER BY timestamp DESC $LIMITOFFSET;"
+getPostsForCategoryQuery= "SELECT id, title, slug, '',       post_formatted, '',          summary_formatted, '',        timestamp, ''            FROM posts INNER JOIN post_categories ON posts.id = post_categories.post_id WHERE post_categories.category_id = ? ORDER BY timestamp DESC $LIMITOFFSET;"
 
 -- Used to get post related to a post, ordered to favour posts with
 -- more matching categories and close in time to the original post

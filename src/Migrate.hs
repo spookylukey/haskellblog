@@ -41,8 +41,8 @@ makeItems filename constructor = do
 -- Reading functions
 readCategories = makeItems "categories.txt" mkCat
     where mkCat row = C.Category { C.uid = read (row !! 0)
-                                 , C.name = row !! 1
-                                 , C.slug = ""
+                                 , C.name = LB.pack $ row !! 1
+                                 , C.slug = LB.empty
                                  }
 
 readPosts = makeItems "posts.txt" mkPost

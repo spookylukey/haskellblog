@@ -93,12 +93,12 @@ categoryColumnValues c = [ toSql $ Ct.name c
 
 
 addCategory cn c =  do theslug <- makeCategorySlug cn c
-                       let c2 = c { Ct.slug = theslug }
+                       let c2 = c { Ct.slug = utf8 theslug }
                        DB.doInsert cn "categories" categoryColumnNames (categoryColumnValues c2)
                        newid <- getDbId cn
                        return c2 { Ct.uid = newid }
 
-makeCategorySlug cn cat = makeSlugGeneric cn (Ct.name cat) "categories"
+makeCategorySlug cn cat = makeSlugGeneric cn (UTF8.toString $ Ct.name cat) "categories"
 
 updateCategory cn c = do
   DB.doUpdate cn "categories" categoryColumnNames (categoryColumnValues c)

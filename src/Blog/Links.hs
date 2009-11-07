@@ -13,7 +13,7 @@ import qualified Data.ByteString.Lazy.UTF8 as UTF8
 indexUrl          = Settings.root_url
 postUrl p         = Settings.root_url ++ "posts/" ++ (UTF8.toString $ P.slug p) ++ "/"
 categoriesUrl     = Settings.root_url ++ "categories/"
-categoryUrl c     = Settings.root_url ++ "categories/" ++ (C.slug c) ++ "/"
+categoryUrl c     = Settings.root_url ++ "categories/" ++ (UTF8.toString $ C.slug c) ++ "/"
 loginUrl          = Settings.root_url ++ "login/"
 
 adminMenuUrl       = Settings.root_url ++ "admin/"
@@ -24,7 +24,7 @@ adminNewPostUrl    = Settings.root_url ++ "admin/post/new/"
 
 allPostsFeedUrl        = Settings.root_url ++ "atom/"
 postCommentFeedUrl   p = Settings.root_url ++ "posts/" ++ (UTF8.toString $ P.slug p) ++ "/atom/"
-categoryPostsFeedUrl c = Settings.root_url ++ "categories/" ++ (C.slug c) ++ "/atom/"
+categoryPostsFeedUrl c = Settings.root_url ++ "categories/" ++ (UTF8.toString $ C.slug c) ++ "/atom/"
 allCommentsFeedUrl     = Settings.root_url ++ "comments/atom/"
 
 commentUrl cm p        = postUrl p ++ "#comment" ++ (show $ Cm.uid cm)

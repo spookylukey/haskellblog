@@ -19,6 +19,7 @@ import qualified Blog.Post as P
 import qualified Blog.Settings as Settings
 import qualified Data.Map as Map
 import qualified Data.ByteString.Lazy.Char8 as LB
+import qualified Data.ByteString.Lazy.UTF8 as UTF8
 import qualified Ella.Forms.Widgets.RadioButtonList as RBL
 import qualified Ella.Forms.Widgets.OptionList as OL
 import qualified Text.XHtml as X
@@ -48,7 +49,7 @@ categoriesWidget categories = OL.OptionList { selectedValues = []
                                             , name = "categories"
                                             , identifier = "id_categories"
                                             , values = map (show . Ct.uid) categories
-                                            , captions = map Ct.name categories
+                                            , captions = map (UTF8.toString . Ct.name) categories
                                             , multiple = True
                                             , size = 10
                                             }

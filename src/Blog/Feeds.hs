@@ -108,7 +108,7 @@ categoryPostsFeed cat posts =
     let basefeed = allPostsFeed posts
         url = categoryPostsFeedUrl cat
     in basefeed { feedId = fullUrl $ url
-                , feedTitle = TextString $ "All Unkept - " ++ C.name cat
+                , feedTitle = TextString $ "All Unkept - " ++ (UTF8.toString $ C.name cat)
                 , feedLinks = [ selfLink url
                               , htmlLink $ categoryUrl cat
                               ]

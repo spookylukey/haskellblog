@@ -322,7 +322,7 @@ adminCategories req = do
                         return "Category added"
                       else do
                         Just ct <- getCategoryById cn catid
-                        let ct2 = ct { Ct.name = (getPOST req "name" `captureOrDefault` "") }
+                        let ct2 = ct { Ct.name = utf8 (getPOST req "name" `captureOrDefault` "") }
                         updateCategory cn ct2
                         return ("Category " ++ show catid ++ " saved")
                else if isJust (getPOST req "delete")

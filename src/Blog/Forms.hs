@@ -9,7 +9,7 @@ import Blog.Model (checkPassword)
 import Control.Monad (liftM)
 import Data.Maybe (fromJust, isNothing, catMaybes)
 import Ella.Forms.Base
-import Ella.GenUtils (exactParse, getTimestamp)
+import Ella.GenUtils (exactParse, getTimestamp, utf8)
 import Ella.Param (captureOrDefault, Param(..))
 import Ella.Request (getPOST, getPOSTlist, hasPOST)
 import Data.String.Utils (strip)
@@ -18,6 +18,7 @@ import qualified Blog.Comment as Cm
 import qualified Blog.Post as P
 import qualified Blog.Settings as Settings
 import qualified Data.Map as Map
+import qualified Data.ByteString.Lazy.Char8 as LB
 import qualified Ella.Forms.Widgets.RadioButtonList as RBL
 import qualified Ella.Forms.Widgets.OptionList as OL
 import qualified Text.XHtml as X
@@ -68,13 +69,13 @@ emptyComment = Cm.Comment {
                  uid = undefined
                , post_id = undefined
                , timestamp = undefined
-               , name = ""
-               , email = ""
-               , text_raw = ""
+               , name = LB.empty
+               , email = LB.empty
+               , text_raw = LB.empty
                , text_formatted = undefined
                , format = Plaintext
                , hidden = False
-               , response = ""
+               , response = LB.empty
                }
 
 instance Param Format where
@@ -130,13 +131,13 @@ validateComment creds postedData blogpost =
                       uid = 0 -- for sake of preview
                     , post_id = P.uid blogpost
                     , timestamp = ts
-                    , name = name
-                    , email = email
-                    , text_raw = text
-                    , text_formatted = getFormatter format $ text
+                    , name = utf8 name
+                    , email = utf8 email
+                    , text_raw = utf8 text
+                    , text_formatted = utf8 $ getFormatter format $ text
                     , format = format
                     , hidden = False
-                    , response = ""
+                    , response = LB.empty
                     }
              , errors
              , if test_ts > 0 then test_ts else ts

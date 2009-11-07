@@ -17,7 +17,7 @@ import qualified Blog.Comment as Cm
 import qualified Blog.Post as P
 import qualified Blog.Settings as Settings
 import qualified Data.ByteString.Lazy.UTF8 as UTF8
-import qualified Data.ByteString.Lazy as LB
+import qualified Data.ByteString.Lazy.Char8 as LB
 import qualified Data.Map as Map
 import qualified Data.Text.Lazy as LT
 
@@ -59,8 +59,9 @@ pagingLinks url page shownext =
      )
     where makeLink url page text = toHtml (hotlink (url ++ "?p=" ++ (show page)) << text)
 
-formatName name = if null name
-                  then "Anonymous Coward"
+formatName :: LB.ByteString -> LB.ByteString
+formatName name = if LB.null name
+                  then LB.pack "Anonymous Coward"
                   else name
 
 showDate timestamp = formatTime defaultTimeLocale "%e %B %Y" $ posixSecondsToUTCTime $ realToFrac timestamp
@@ -96,13 +97,14 @@ categoryTemplateInfo c = Map.fromList [ ("name", ToSElemD $ C.name c)
 commentTemplateInfo :: Cm.Comment -> Map.Map String ToSElemD
 commentTemplateInfo cm = Map.fromList [ ("name", ToSElemD $ Cm.name cm)
                                       , ("formattedName", ToSElemD $ formatName $ Cm.name cm)
-                                      , ("isAuthor", ToSElemD $ Cm.name cm == Settings.blog_author_name)
+                                      , ("isAuthor", ToSElemD $ Cm.name cm == utf8 Settings.blog_author_name)
                                       , ("date", ToSElemD $ showDate $ Cm.timestamp cm)
                                       , ("textFormatted", ToSElemD $ Cm.text_formatted cm)
                                       , ("email", ToSElemD $ Cm.email cm)
                                       , ("uid", ToSElemD $ Cm.uid cm)
                                       , ("hidden", ToSElemD $ Cm.hidden cm)
-                                      , ("response", ToSElemD $ emptyToNothing $ Cm.response cm)
+                                      , ("response", ToSElemD $ emptyToNothingBS $ Cm.response cm)
                                       ]
 
 emptyToNothing s = if null s then Nothing else Just s
+emptyToNothingBS s = if LB.null s then Nothing else Just s

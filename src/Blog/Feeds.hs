@@ -16,6 +16,7 @@ import qualified Blog.Category as C
 import qualified Blog.Comment as Cm
 import qualified Blog.Post as P
 import qualified Blog.Settings as Settings
+import qualified Data.ByteString.Lazy.UTF8 as UTF8
 
 rfc3339 :: UTCTime -> String
 rfc3339 d = formatTime defaultTimeLocale "%FT%TZ" d
@@ -118,9 +119,9 @@ mkCommentEntry (comment, post) =
     Entry { entryId = fullUrl $ commentUrl comment post
           , entryTitle = TextString ("Comment #" ++ (show $ Cm.uid comment) ++ " on post " ++ (P.title post))
           , entryUpdated = formatTimestamp $ Cm.timestamp comment
-          , entryAuthors = [commentAuthor $ Cm.name comment]
+          , entryAuthors = [commentAuthor $ UTF8.toString $ Cm.name comment]
           , entryCategories = []
-          , entryContent = Just $ HTMLContent $ Cm.text_formatted comment
+          , entryContent = Just $ HTMLContent $ UTF8.toString $ Cm.text_formatted comment
           , entryContributor = []
           , entryLinks = [ htmlLink $ commentUrl comment post
                          ]

@@ -74,6 +74,9 @@ readPosts = makeItems "posts.txt" mkPost
  -- Fix dodgy stuff, and reinterpret as UTF8
 fixCodes txt = UTF8.toString $ regexReplace (LB.pack "&#10;") (LB.pack "\n") (LB.pack txt)
 
+fixCodes' :: String -> LB.ByteString
+fixCodes' txt = regexReplace (LB.pack "&#10;") (LB.pack "\n") (LB.pack txt)
+
 readPostCategories = makeItems "postcategories.txt" mkPostCategory
     where mkPostCategory row = (read (row !! 0),
                                 read (row !! 1)) :: (Int, Int)
@@ -83,13 +86,13 @@ readComments = makeItems "comments.txt" mkComment
     where mkComment row = Cm.Comment { Cm.uid = read (row !! 0)
                                      , Cm.post_id = read (row !! 1)
                                      , Cm.timestamp = read (row !! 2)
-                                     , Cm.name = fixCodes $ row !! 3
-                                     , Cm.email = row !! 4
-                                     , Cm.text_raw = fixCodes $ row !! 5
-                                     , Cm.text_formatted = fixCodes $ row !! 5
+                                     , Cm.name = fixCodes' $ row !! 3
+                                     , Cm.email = LB.pack $ row !! 4
+                                     , Cm.text_raw = fixCodes' $ row !! 5
+                                     , Cm.text_formatted = fixCodes' $ row !! 5
                                      , Cm.format = Formats.Rawhtml
                                      , Cm.hidden = False
-                                     , Cm.response = ""
+                                     , Cm.response = utf8 ""
                                      }
 -- Writing
 

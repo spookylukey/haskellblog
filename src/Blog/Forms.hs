@@ -170,11 +170,11 @@ validateLogin postedData cn = do
          return (loginData, errors)
 
 emptyPost = P.Post { uid = undefined
-                   , title = ""
+                   , title = LB.empty
                    , slug = undefined
-                   , post_raw = ""
+                   , post_raw = LB.empty
                    , post_formatted = undefined
-                   , summary_raw = ""
+                   , summary_raw = LB.empty
                    , summary_formatted = undefined
                    , format = RST
                    , timestamp = undefined
@@ -198,11 +198,11 @@ validatePost req basePost = do
                  ("post", "'Full post' is a required field."))
               ]
   let errors = map snd $ filter fst $ tests
-  return (basePost { P.title = title
-                   , P.summary_raw = summary_raw
-                   , P.summary_formatted = getFormatter Plaintext $ summary_raw
-                   , P.post_raw = post_raw
-                   , P.post_formatted = getFormatter format $ post_raw
+  return (basePost { P.title = utf8 title
+                   , P.summary_raw = utf8 summary_raw
+                   , P.summary_formatted = utf8 $ getFormatter Plaintext $ summary_raw
+                   , P.post_raw = utf8 post_raw
+                   , P.post_formatted = utf8 $ getFormatter format $ post_raw
                    , P.format = format
                    , P.comments_open = comments_open
                    }

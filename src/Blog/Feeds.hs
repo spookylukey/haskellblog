@@ -61,18 +61,18 @@ commentAuthor name = Person { personName = name
 
 mkPostEntry post =
     Entry { entryId = fullUrl $ postUrl post
-          , entryTitle = TextString $ P.title post
+          , entryTitle = TextString $ UTF8.toString $ P.title post
           , entryUpdated = formatTimestamp $ P.timestamp post
           , entryAuthors = authors
           , entryCategories = []
-          , entryContent = Just $ HTMLContent $ P.post_formatted post
+          , entryContent = Just $ HTMLContent $ UTF8.toString $ P.post_formatted post
           , entryContributor = []
           , entryLinks = [ htmlLink $ postUrl post
                          ]
           , entryPublished = Just $ formatTimestamp $ P.timestamp post
           , entryRights = Nothing
           , entrySource = Nothing
-          , entrySummary = Just $ HTMLString $ P.summary_formatted post
+          , entrySummary = Just $ HTMLString $ UTF8.toString $ P.summary_formatted post
           , entryInReplyTo = Nothing
           , entryInReplyTotal = Nothing
           , entryAttrs = []
@@ -117,7 +117,7 @@ categoryPostsFeed cat posts =
 --mkCommentEntry :: (Cm.Comment, P.Post) -> Entry
 mkCommentEntry (comment, post) =
     Entry { entryId = fullUrl $ commentUrl comment post
-          , entryTitle = TextString ("Comment #" ++ (show $ Cm.uid comment) ++ " on post " ++ (P.title post))
+          , entryTitle = TextString ("Comment #" ++ (show $ Cm.uid comment) ++ " on post " ++ (UTF8.toString $ P.title post))
           , entryUpdated = formatTimestamp $ Cm.timestamp comment
           , entryAuthors = [commentAuthor $ UTF8.toString $ Cm.name comment]
           , entryCategories = []
@@ -162,7 +162,7 @@ postCommentFeed comments post =
     let basefeed = allCommentsFeed $ zip comments (repeat post)
         url = postCommentFeedUrl post
     in basefeed { feedId = fullUrl url
-                , feedTitle = TextString $ "All Unkept - Comments on " ++ P.title post
+                , feedTitle = TextString $ "All Unkept - Comments on " ++ (UTF8.toString $ P.title post)
                 , feedLinks = [ selfLink url
                               , htmlLink (url ++ "#comments")
                               ]

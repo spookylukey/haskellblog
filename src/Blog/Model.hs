@@ -65,13 +65,13 @@ postColumnValues p = [ toSql $ P.title p
 
 addPost cn p catIds = do
   theslug <- makePostSlug cn p
-  let p2 = p { P.slug = theslug }
+  let p2 = p { P.slug = utf8 theslug }
   DB.doInsert cn "posts" postColumnNames (postColumnValues p2)
   newid <- getDbId cn
   setPostCategories cn newid catIds
   return p2 { P.uid = newid }
 
-makePostSlug cn p = makeSlugGeneric cn (P.title p) "posts"
+makePostSlug cn p = makeSlugGeneric cn (UTF8.toString $ P.title p) "posts"
 
 updatePost cn p catIds = do
   DB.doUpdate cn "posts" postColumnNames (postColumnValues p)

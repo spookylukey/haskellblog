@@ -50,10 +50,10 @@ readPosts = makeItems "posts.txt" mkPost
             >>= mapM (return . fixEmptyFullTexts)
             >>= return . sortBy (comparing P.timestamp)
     where mkPost row = P.Post { P.uid = read (row !! 0)
-                              , P.title = row !! 1
-                              , P.slug = ""
-                              , P.post_raw = ""
-                              , P.post_formatted = ""
+                              , P.title = LB.pack $ row !! 1
+                              , P.slug = LB.empty
+                              , P.post_raw = LB.empty
+                              , P.post_formatted = LB.empty
                               , P.summary_raw = fixCodes $ row !! 4
                               , P.summary_formatted = fixCodes $ row !! 4
                               , P.format = Formats.Rawhtml
@@ -65,17 +65,15 @@ readPosts = makeItems "posts.txt" mkPost
                              let fixed = fixCodes f
                              return p { P.post_raw = fixed,
                                         P.post_formatted = fixed }
-          fixEmptyFullTexts p = if null $ P.post_raw p
+          fixEmptyFullTexts p = if LB.null $ P.post_raw p
                                 then p { P.post_raw = P.summary_raw p
                                        , P.post_formatted = P.summary_formatted p
                                        }
                                 else p
 
- -- Fix dodgy stuff, and reinterpret as UTF8
-fixCodes txt = UTF8.toString $ regexReplace (LB.pack "&#10;") (LB.pack "\n") (LB.pack txt)
-
-fixCodes' :: String -> LB.ByteString
-fixCodes' txt = regexReplace (LB.pack "&#10;") (LB.pack "\n") (LB.pack txt)
+ -- Fix dodgy stuff, and reinterpret as UTF8 (via pack)
+fixCodes :: String -> LB.ByteString
+fixCodes txt = regexReplace (LB.pack "&#10;") (LB.pack "\n") (LB.pack txt)
 
 readPostCategories = makeItems "postcategories.txt" mkPostCategory
     where mkPostCategory row = (read (row !! 0),
@@ -86,10 +84,10 @@ readComments = makeItems "comments.txt" mkComment
     where mkComment row = Cm.Comment { Cm.uid = read (row !! 0)
                                      , Cm.post_id = read (row !! 1)
                                      , Cm.timestamp = read (row !! 2)
-                                     , Cm.name = fixCodes' $ row !! 3
+                                     , Cm.name = fixCodes $ row !! 3
                                      , Cm.email = LB.pack $ row !! 4
-                                     , Cm.text_raw = fixCodes' $ row !! 5
-                                     , Cm.text_formatted = fixCodes' $ row !! 5
+                                     , Cm.text_raw = fixCodes $ row !! 5
+                                     , Cm.text_formatted = fixCodes $ row !! 5
                                      , Cm.format = Formats.Rawhtml
                                      , Cm.hidden = False
                                      , Cm.response = utf8 ""

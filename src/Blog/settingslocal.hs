@@ -3,7 +3,7 @@ module Blog.Settings where
 import qualified Data.ByteString.Lazy.Char8 as LB
 
 cgi_root_path = "/home/luke/httpd/lukeplant.me.uk/web/cgi-bin"
-sqlite_path = cgi_root_path ++ "/data/test1.db"
+sqlite_path = cgi_root_path ++ "/data/blog.db"
 template_path = cgi_root_path ++ "/data/blogtemplates/"
 
 root_url = "/blog/"

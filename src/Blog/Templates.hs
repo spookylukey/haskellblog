@@ -106,5 +106,4 @@ commentTemplateInfo cm = Map.fromList [ ("name", ToSElemD $ Cm.name cm)
                                       , ("response", ToSElemD $ emptyToNothingBS $ Cm.response cm)
                                       ]
 
-emptyToNothing s = if null s then Nothing else Just s
 emptyToNothingBS s = if LB.null s then Nothing else Just s

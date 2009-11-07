@@ -7,12 +7,11 @@ where
 
 import Blog.Utils (regexReplace, regexReplaceCustom, regexReplaceS)
 import Control.Arrow ((>>>))
-import Data.ByteString.Lazy.Char8 (ByteString)
 import Data.Data
 import Data.Maybe (fromJust)
 import Data.Typeable
 import Ella.GenUtils (utf8)
-import qualified Data.ByteString.Lazy.Char8 as BL
+import qualified Data.ByteString.Lazy.Char8 as LB
 import qualified Data.ByteString.Lazy.UTF8 as UTF8
 import qualified Data.Map as Map
 import qualified Text.Pandoc as Pandoc
@@ -37,21 +36,21 @@ url_regex =
     "(?::\\d+)?"                                   ++ -- optional port
     "(?:/\\S+|/?)"
 
-escapeHtml = regexReplace "&" (BL.pack "&amp;") >>>
-             regexReplace "<" (BL.pack "&lt;") >>>
-             regexReplace ">" (BL.pack "&gt;")
+escapeHtml = regexReplace "&" (LB.pack "&amp;") >>>
+             regexReplace "<" (LB.pack "&lt;") >>>
+             regexReplace ">" (LB.pack "&gt;")
 
-escapeQuotes = regexReplace "\"" (BL.pack "&quot;")
+escapeQuotes = regexReplace "\"" (LB.pack "&quot;")
 
-normaliseCRLF = regexReplace "\r\n" (BL.pack "\n")
+normaliseCRLF = regexReplace "\r\n" (LB.pack "\n")
 normaliseCRLF_S = regexReplaceS "\r\n" "\n"
 
 -- | Convert HTTP URLS in HTML strings into anchors
-linkify = regexReplaceCustom url_regex (\s -> (BL.pack "<a href=\"") `BL.append` (escapeQuotes s) `BL.append` (BL.pack "\">") `BL.append` s `BL.append` (BL.pack "</a>"))
+linkify = regexReplaceCustom url_regex (\s -> (LB.pack "<a href=\"") `LB.append` (escapeQuotes s) `LB.append` (LB.pack "\">") `LB.append` s `LB.append` (LB.pack "</a>"))
 
-preserveLeadingWhitespace = regexReplaceCustom "^(\\s+)" (regexReplace " " (BL.pack "&nbsp;"))
+preserveLeadingWhitespace = regexReplaceCustom "^(\\s+)" (regexReplace " " (LB.pack "&nbsp;"))
 
-nl2br = regexReplace "\n" (BL.pack "<br />\n")
+nl2br = regexReplace "\n" (LB.pack "<br />\n")
 
 formatPlaintext :: String -> String
 formatPlaintext   = utf8 >>>

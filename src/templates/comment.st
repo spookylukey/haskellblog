@@ -10,7 +10,7 @@
       </div>
       <div class="response">
         $if(comment.response)$
-        <div class="responseinner">$comment.response$ <span class="responsename">&mdash; luke</span> </div>
+        <div class="responseinner">$comment.response:noescape()$ <span class="responsename">&mdash; luke</span> </div>
         $endif$
       </div>
       <div class="commentControls">

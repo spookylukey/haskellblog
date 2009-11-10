@@ -62,8 +62,7 @@ $if(post.commentsOpen)$
       </div>
       <div class="note">
       <ul>
-        <li>Javascript has to be on to get past my spam protection, sorry for any inconvenience.</li>
-        <li>By posting, you agree that I have the right to store and reproduce your comment.</li>
+        <li>Javascript has to be on to get past my spam protection, and there is a delay of 10 seconds, sorry for any inconvenience.</li>
         <li>I reserve the right to moderate comments.</li>
       </ul>
       </div>

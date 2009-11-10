@@ -15,8 +15,9 @@
         All Unkept
       $endif$
     </title>
-    <script language="javascript" src="/js/jquery-1.3.2.min.js"></script>
-    <script language="javascript">
+    <script type="text/javascript" src="/js/jquery-1.3.2.min.js"></script>
+    <script type="text/javascript">
+<!--
       \$(document).ready(function() {
       \$('#id_spamcheck').attr("name", "timestamp");
       });
@@ -130,7 +131,7 @@ function addCommentModeration() {
                                             });
 
 });
-
+//-->
     </script>
   </head>
   <body>

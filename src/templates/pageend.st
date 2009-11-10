@@ -27,7 +27,7 @@
         <a href="/blog/logout/">Logout</a><br/>
         <a href="/blog/admin/">Admin</a><br/>
       </div>
-      <div id="responsebox" style="display:none";>
+      <div id="responsebox" style="display:none;">
         <ul>
           <li>Didn't read the post</li>
           <li>Troll!</li>

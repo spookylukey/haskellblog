@@ -106,7 +106,7 @@ function addCommentModeration() {
                         response: \$("#responseinput").val()
                       },
                       function(data) {
-                         \$("#commentdiv" + cid.toString()).find(".response").html('<div class="responseinner">' + data + ' <span class="responsename">&mdash; luke</span></div>');
+                         \$("#commentdiv" + cid.toString()).find(".response").html('<div class="responseinner">' + data + ' <span class="responsename">&mdash; luke<\\/span><\\/div>');
                       }
                     )
                     \$("#responsebox").hide();

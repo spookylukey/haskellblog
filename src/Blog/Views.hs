@@ -447,6 +447,14 @@ withValidComment req action = do
        action cn commentId
        return $ Just success
 
+addSpamWordView req = do
+  let word = getPOST req "word" `captureOrDefault` ""
+  if null word
+     then return $ Just $ failure
+     else do
+       cn <- connect
+       addSpamWord cn word
+       return $ Just success
 
 -- Authentication
 createLoginCookies loginData timestamp =

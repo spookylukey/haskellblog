@@ -5,8 +5,9 @@ module Blog.Forms
 where
 
 import Blog.Formats (Format(..), getFormatter)
-import Blog.Model (checkPassword)
+import Blog.Model (checkPassword, getSpamWords)
 import Control.Monad (liftM)
+import Data.List (isInfixOf)
 import Data.Maybe (fromJust, isNothing, catMaybes)
 import Ella.Forms.Base
 import Ella.GenUtils (exactParse, getTimestamp, utf8)
@@ -102,6 +103,7 @@ validateComment creds postedData blogpost =
     --    this will catch most humans using a browser
 
       ts <- getTimestamp
+      spamwords <- getSpamWords
       let text = postedData "message" `captureOrDefault` ""
       let name = strip (postedData "name" `captureOrDefault` "")
       let email = postedData "email" `captureOrDefault` ""
@@ -123,8 +125,10 @@ validateComment creds postedData blogpost =
                      ("name", "Name too long"))
                   , (test_ts == 0, -- field missing
                      ("timestamp", "Appears to be spam"))
-                  , (ts < test_ts + 10,
+                  , (ts < test_ts + 15,
                      ("timestamp", "That didn't take long to write! Spammer?"))
+                  , (any (\w -> w `isInfixOf` text) spamwords,
+                     ("text", "Spam.  No thanks."))
                   ]
       let errors = map snd $ filter fst $ tests
 

@@ -24,6 +24,8 @@ module Blog.Model ( addPost
                   , checkPassword
                   , setCommentVisible
                   , setCommentResponse
+                  , getSpamWords
+                  , addSpamWord
                   ) where
 
 import Data.Digest.Pure.SHA (showDigest, sha1)
@@ -206,6 +208,9 @@ setPasswordForUsernameQuery = "UPDATE users SET password = ? WHERE username = ?;
 
 setCommentHiddenQuery      = "UPDATE comments SET hidden = ? WHERE id = ?;"
 setCommentResponseQuery    = "UPDATE comments SET response = ? WHERE id = ?;"
+
+getSpamWordsQuery          = "SELECT word FROM spamwords;"
+addSpamWordQuery           = "INSERT into spamwords (word) VALUES (?);"
 
 ---- Constructors ----
 
@@ -392,5 +397,18 @@ setCommentResponse cn commentId response = do
                           run cn setCommentResponseQuery [ toSql response
                                                          , toSql commentId
                                                          ]
+                     )
+  return ()
+
+getSpamWords :: IO [String]
+getSpamWords = do
+  cn <- DB.connect
+  res <- quickQuery' cn getSpamWordsQuery []
+  return [fromSql $ row !! 0 | row <- res]
+
+addSpamWord :: (IConnection conn) => conn -> String -> IO ()
+addSpamWord cn word = do
+  withTransaction cn (\cn ->
+                          run cn addSpamWordQuery [ toSql word ]
                      )
   return ()

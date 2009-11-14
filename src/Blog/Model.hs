@@ -402,7 +402,6 @@ setCommentResponse cn commentId response = do
 
 getSpamWords :: (IConnection conn) => conn -> IO [String]
 getSpamWords cn = do
-  cn <- DB.connect
   res <- quickQuery' cn getSpamWordsQuery []
   return [fromSql $ row !! 0 | row <- res]
 

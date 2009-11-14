@@ -33,5 +33,6 @@ views  = [ addSlashRedirectView
          , "admin/ajax/commentresponse/" <+/> empty   //-> adminCommentResponse   $ [adminRequired]
          , "admin/ajax/commentdelete/" <+/> empty     //-> adminCommentDelete     $ [adminRequired]
          , "admin/ajax/addspamword/" <+/> empty       //-> addSpamWordView        $ [adminRequired]
+         , "admin/ajax/deletespamword/" <+/> empty    //-> deleteSpamWordView     $ [adminRequired]
          , "debug/" <+/> anyParam                     //-> debug                  $ []
          ]

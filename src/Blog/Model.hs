@@ -26,6 +26,7 @@ module Blog.Model ( addPost
                   , setCommentResponse
                   , getSpamWords
                   , addSpamWord
+                  , deleteSpamWord
                   ) where
 
 import Data.Digest.Pure.SHA (showDigest, sha1)
@@ -211,6 +212,7 @@ setCommentResponseQuery    = "UPDATE comments SET response = ? WHERE id = ?;"
 
 getSpamWordsQuery          = "SELECT word FROM spamwords;"
 addSpamWordQuery           = "INSERT into spamwords (word) VALUES (?);"
+deleteSpamWordQuery        = "DELETE from spamwords WHERE word = ?;"
 
 ---- Constructors ----
 
@@ -409,5 +411,12 @@ addSpamWord :: (IConnection conn) => conn -> String -> IO ()
 addSpamWord cn word = do
   withTransaction cn (\cn ->
                           run cn addSpamWordQuery [ toSql word ]
+                     )
+  return ()
+
+deleteSpamWord :: (IConnection conn) => conn -> String -> IO ()
+deleteSpamWord cn word = do
+  withTransaction cn (\cn ->
+                          run cn deleteSpamWordQuery [ toSql word ]
                      )
   return ()

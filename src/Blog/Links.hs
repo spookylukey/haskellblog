@@ -25,6 +25,7 @@ adminNewPostUrl    = Settings.root_url ++ "admin/post/new/"
 allPostsFeedUrl        = Settings.root_url ++ "atom/"
 postCommentFeedUrl   p = Settings.root_url ++ "posts/" ++ (UTF8.toString $ P.slug p) ++ "/atom/"
 categoryPostsFeedUrl c = Settings.root_url ++ "categories/" ++ (UTF8.toString $ C.slug c) ++ "/atom/"
+allCommentsUrl         = Settings.root_url ++ "comments/"
 allCommentsFeedUrl     = Settings.root_url ++ "comments/atom/"
 
 commentUrl cm p        = postUrl p ++ "#comment" ++ (show $ Cm.uid cm)

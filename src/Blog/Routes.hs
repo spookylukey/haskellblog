@@ -20,6 +20,7 @@ views  = [ addSlashRedirectView
          , "categories/" <+/> empty                   //-> categoriesView         $ []
          , "categories/" <+/> anyParam                //-> categoryView           $ []
          , "categories/" <+/> stringParam</+>"atom/"  //-> categoryPostsFeedView  $ []
+         , "comments/" <+/> empty                     //-> allCommentsView        $ []
          , "comments/atom/" <+/> empty                //-> allCommentsFeedView    $ []
          , "login/" <+/> empty                        //-> loginView              $ []
          , "logout/" <+/> empty                       //-> logoutView             $ []

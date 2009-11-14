@@ -105,10 +105,24 @@ allPostsFeedView req = do
   feedResponse $ allPostsFeed posts
 
 
+allCommentsView req = do
+  let curpage = getPage req
+  cn <- connect
+  (commentsAndPosts,more) <- getRecentComments cn curpage Settings.comment_page_size
+  t <- get_template "comments"
+  return $ Just $ standardResponseTT req $
+                      (renderf t
+                       ("comments", map (commentTemplateInfo . fst) commentsAndPosts)
+                       ("urls", map (uncurry commentUrl) commentsAndPosts)
+                       ("titles", map (P.title . snd) commentsAndPosts)
+                       ("paginglinks", pagingLinks allCommentsUrl curpage more)
+                       ("atomfeedurl", allCommentsFeedUrl)
+                      )
+
 allCommentsFeedView req = do
   cn <- connect
-  comments <- getRecentComments cn 1 Settings.feed_comment_page_size
-  feedResponse $ allCommentsFeed comments
+  (commentsAndPosts,more) <- getRecentComments cn 1 Settings.feed_comment_page_size
+  feedResponse $ allCommentsFeed commentsAndPosts
 
 -- | View to help with debugging
 debug :: String -> View

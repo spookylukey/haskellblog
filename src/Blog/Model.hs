@@ -199,7 +199,7 @@ getCategoriesBulkQuery ids= "SELECT categories.id, categories.name, categories.s
 getCommentByIdQuery      = "SELECT id, post_id, timestamp, name, email, text_raw, text_formatted, format_id, hidden, response FROM comments WHERE id = ?;"
 getCommentsForPostQuery  = "SELECT id, '',      timestamp, name, email, '',       text_formatted, '',        hidden, response FROM comments WHERE post_id = ? ORDER BY timestamp ASC;"
 
-getRecentCommentsQuery   = "SELECT c.id, c.post_id, c.timestamp, c.name, c.email, '',       c.text_formatted, '',        c.hidden, c.response, p.slug as post_slug, p.title as post_title FROM comments as c INNER JOIN posts as p ON c.post_id = p.id ORDER BY c.timestamp DESC;"
+getRecentCommentsQuery   = "SELECT c.id, c.post_id, c.timestamp, c.name, c.email, '',       c.text_formatted, '',        c.hidden, c.response, p.slug as post_slug, p.title as post_title FROM comments as c INNER JOIN posts as p ON c.post_id = p.id ORDER BY c.timestamp DESC $LIMITOFFSET ;"
 
 getPasswordForUsernameQuery = "SELECT password FROM users WHERE username = ?;"
 setPasswordForUsernameQuery = "UPDATE users SET password = ? WHERE username = ?;"
@@ -282,13 +282,13 @@ getPostsForCategory cn cat page pagesize = do
   return (map makePost res, more)
 
 -- | Returns all recent comments, paired with the Post they are from
--- Contains only enough information to generate the feed.
-getRecentComments :: (IConnection conn) => conn -> Int -> Int -> IO [(Cm.Comment, P.Post)]
+-- Contains only enough information to generate the feed and the 'Recent comments' page
+getRecentComments :: (IConnection conn) => conn -> Int -> Int -> IO ([(Cm.Comment, P.Post)],Bool)
 getRecentComments cn page pagesize = do
   (res, more) <- pagedQuery cn getRecentCommentsQuery [] page pagesize
   let comments = map makeComment res
   let posts = map (\row -> minimalPost (fromSql $ row !! 10) (fromSql $ row !! 11)) res
-  return $ zip comments posts
+  return $ (zip comments posts, more)
 
 getCategoryBySlug :: (IConnection conn) => conn -> String -> IO (Maybe Ct.Category)
 getCategoryBySlug cn slug = do

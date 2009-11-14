@@ -90,7 +90,7 @@ initialCommentExtra req = getTimestamp >>= return
 
 -- | extract the posted data from a POST request and build
 -- a Comment from it, returning a Comment and a list of validation errors
-validateComment creds postedData blogpost =
+validateComment cn creds postedData blogpost =
     do
     -- TODO - nicer mechanism for validation
 
@@ -103,7 +103,7 @@ validateComment creds postedData blogpost =
     --    this will catch most humans using a browser
 
       ts <- getTimestamp
-      spamwords <- getSpamWords
+      spamwords <- getSpamWords cn
       let text = postedData "message" `captureOrDefault` ""
       let name = strip (postedData "name" `captureOrDefault` "")
       let email = postedData "email" `captureOrDefault` ""

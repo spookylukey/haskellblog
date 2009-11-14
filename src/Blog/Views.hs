@@ -217,7 +217,7 @@ postView slug req = do
         case requestMethod req of
           "POST" -> do
             creds <- getCredentials req
-            (commentData, commentErrors, commentExtra) <- validateComment creds (getPOST req) post
+            (commentData, commentErrors, commentExtra) <- validateComment cn creds (getPOST req) post
             if null commentErrors
                then if isJust (getPOST req "submit")
                     then do

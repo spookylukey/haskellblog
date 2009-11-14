@@ -52,7 +52,8 @@ standardResponseTT :: Request -> StringTemplate LB.ByteString -> Response
 standardResponseTT req template =
     let csrffield = mkCsrfField req
         t2 = setAttribute "csrffield" csrffield template
-        rendered = render t2
+        t3 = setAttribute "currentpath" (Settings.root_url ++ pathInfo req) t2
+        rendered = render t3
     in buildResponse [ addContent rendered
                      ] utf8HtmlResponse
 
@@ -257,7 +258,8 @@ loginView' cn req =
          then do
            ts <- getTimestamp
            let loginCookies = createLoginCookies loginData ts
-           return $ Just $ (redirectResponse adminMenuUrl) `with` (map addCookie loginCookies)
+           let redirectUrl = getGET req "r" `captureOrDefault` adminMenuUrl
+           return $ Just $ (redirectResponse redirectUrl) `with` (map addCookie loginCookies)
          else do
            t <- loginTemplate
            return $ Just $ standardResponseTT req $ loginPage t loginData loginErrors

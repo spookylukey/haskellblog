@@ -26,6 +26,9 @@
         <a href="/blog/login/">Login</a><br/>
         <a href="/blog/logout/">Logout</a><br/>
         <a href="/blog/admin/">Admin</a><br/>
+        $if(editpageurl)$
+          <a href="$editpageurl$">Edit</a><br/>
+        $endif$
       </div>
       <div id="responsebox" style="display:none;">
         <ul>

@@ -211,6 +211,7 @@ postView slug req = do
                         ("commentExtra", commentExtra)
                         ("atomfeedurl", postCommentFeedUrl post)
                         ("atomfeedtitle", "Atom feed for comments in this post")
+                        ("editpageurl", adminEditPostUrl post)
                        )
   where
     handleUserComment cn post req =

@@ -33,13 +33,22 @@ regexReplaceCustom ::
   -> (LB.ByteString -> LB.ByteString)  -- ^ transformation function applied to all matches
   -> LB.ByteString                     -- ^ text to operate on
   -> LB.ByteString
-regexReplaceCustom !regex replacef !text = go text []
+regexReplaceCustom !regex replacef !text = LB.concat $ regexReplaceCustomFull regex id replacef text
+
+regexReplaceCustomFull ::
+  (RegexMaker Regex CompOption ExecOption source) =>
+  source                               -- ^ regular expression
+  -> (LB.ByteString -> a)              -- ^ transformation function applied to all non-matches
+  -> (LB.ByteString -> a)              -- ^ transformation function applied to all matches
+  -> LB.ByteString                     -- ^ text to operate on
+  -> [a]
+regexReplaceCustomFull !regex keepf replacef !text = go text []
  where go str res =
            if LB.null str
-           then LB.concat . reverse $ res
+           then reverse res
            else case (str =~~ regex) :: Maybe (LB.ByteString, LB.ByteString, LB.ByteString) of
-                  Nothing -> LB.concat . reverse $ (str:res)
-                  Just (bef, match , aft) -> go aft (replacef(match):bef:res)
+                  Nothing -> reverse $ (keepf str):res
+                  Just (bef, match , aft) -> go aft (replacef(match):(keepf bef):res)
 
 
 -- | Replace using a regular expression. String version

@@ -5,7 +5,7 @@ module Blog.Formats ( Format(..)
 
 where
 
-import Blog.Utils (regexReplace, regexReplaceCustom, regexReplaceS)
+import Blog.Utils (regexReplace, regexReplaceCustom, regexReplaceCustomFull, regexReplaceS)
 import Control.Arrow ((>>>))
 import Data.Data
 import Data.Maybe (fromJust)
@@ -34,7 +34,7 @@ url_regex =
     "localhost|"                                   ++ --localhost...
     "\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})"   ++ -- ...or ip
     "(?::\\d+)?"                                   ++ -- optional port
-    "(?:/\\S+|/?)"
+    "(?:/[^\\s<>\"]+|/?)"                            -- path
 
 escapeHtml = regexReplace "&" (LB.pack "&amp;") >>>
              regexReplace "<" (LB.pack "&lt;") >>>
@@ -45,8 +45,21 @@ escapeQuotes = regexReplace "\"" (LB.pack "&quot;")
 normaliseCRLF = regexReplace "\r\n" (LB.pack "\n")
 normaliseCRLF_S = regexReplaceS "\r\n" "\n"
 
--- | Convert HTTP URLS in HTML strings into anchors
-linkify = regexReplaceCustom url_regex (\s -> (LB.pack "<a href=\"") `LB.append` (escapeQuotes s) `LB.append` (LB.pack "\">") `LB.append` s `LB.append` (LB.pack "</a>"))
+-- Need to auto convert HTTP URLs in HTML strings into anchors
+-- Problem: if we put 'linkify' step before 'escapeHtml', the HTML anchors
+-- inserted will be double escaped.  If we put it after, then we can't write
+-- a regex that will allow '>' to mark the end of the URL, because it has
+-- already been escaped to '&gt;'.  Solution: use a URL regex that splits
+-- into 'blocks', with different constructors for URLs and normal text,
+-- with different escaping strategies.
+
+data PlainTextBlocks = PTText LB.ByteString
+                     | PTUrl LB.ByteString
+
+parseLinks = regexReplaceCustomFull url_regex PTText PTUrl
+
+escapeBlocks (PTUrl s) = (LB.pack "<a href=\"") `LB.append` (escapeQuotes $ escapeHtml s) `LB.append` (LB.pack "\">") `LB.append` (escapeHtml s) `LB.append` (LB.pack "</a>")
+escapeBlocks (PTText s) = escapeHtml s
 
 preserveLeadingWhitespace = regexReplaceCustom "^(\\s+)" (regexReplace " " (LB.pack "&nbsp;"))
 
@@ -54,9 +67,10 @@ nl2br = regexReplace "\n" (LB.pack "<br />\n")
 
 formatPlaintext :: String -> String
 formatPlaintext   = utf8 >>>
-                    escapeHtml >>>
+                    parseLinks >>>
+                    map escapeBlocks >>>
+                    LB.concat >>>
                     normaliseCRLF >>>
-                    linkify >>>
                     nl2br >>>
                     preserveLeadingWhitespace >>>
                     UTF8.toString

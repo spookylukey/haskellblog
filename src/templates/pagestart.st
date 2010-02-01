@@ -122,6 +122,9 @@ function addCommentModeration() {
 \$(document).ready(function() {
                     if (loggedIn()) {
                         addCommentModeration();
+                        \$('#id_loginlink').hide();
+                    } else {
+                        \$('#id_logoutlink').hide();
                     }
                     \$(".togglebar").toggle(function(ev) {
                                                \$(this.parentNode).addClass("manuallyShown");

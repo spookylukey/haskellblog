@@ -23,8 +23,8 @@
         </div>
       </div>
       <div id="loginlinks">
-        <a href="/blog/login/" id="id_loginlink">Login</a><br/>
-        <a href="/blog/logout/" id="id_logoutlink">Logout</a><br/>
+        <a href="/blog/login/?r=$currentpath$" id="id_loginlink">Login</a><br/>
+        <a href="/blog/logout/?r=$currentpath$" id="id_logoutlink">Logout</a><br/>
         <a href="/blog/admin/">Admin</a><br/>
         $if(editpageurl)$
           <a href="$editpageurl$">Edit</a><br/>

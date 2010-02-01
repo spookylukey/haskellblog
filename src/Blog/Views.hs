@@ -19,6 +19,7 @@ import Ella.Request
 import Ella.Response
 import Ella.Utils (addHtml)
 import Maybe (fromMaybe, isJust, fromJust, catMaybes)
+import Network.CGI.Protocol (formEncode, urlEncode)
 import System.Time (ClockTime(..), toUTCTime)
 import Text.Atom.Feed (Feed)
 import Text.Atom.Feed.Export (xmlFeed)
@@ -52,7 +53,8 @@ standardResponseTT :: Request -> StringTemplate LB.ByteString -> Response
 standardResponseTT req template =
     let csrffield = mkCsrfField req
         t2 = setAttribute "csrffield" csrffield template
-        t3 = setAttribute "currentpath" (Settings.root_url ++ pathInfo req) t2
+        qs = formEncode (allGET req)
+        t3 = setAttribute "currentpath" (urlEncode (Settings.root_url ++ pathInfo req ++ (if not $ null qs then "?" ++ qs else ""))) t2
         rendered = render t3
     in buildResponse [ addContent rendered
                      ] utf8HtmlResponse
@@ -278,7 +280,8 @@ loginView' cn req =
 
 -- | Delete auth cookies and redirect.
 logoutView req =
-    return $ Just $ deleteCookie "username" $ redirectResponse indexUrl
+    let redirectUrl = getGET req "r" `captureOrDefault` indexUrl
+    in return $ Just $ deleteCookie "username" $ redirectResponse redirectUrl
 
 --
 -- Admin views

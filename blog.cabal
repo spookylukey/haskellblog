@@ -47,6 +47,7 @@ Executable blog.cgi
         feed >= 0.3.7,
         time >= 1.1.2,
         xml >= 1.3.4,
+        cgi >= 3000.0.0,
         ella >= 0.1.2
   Main-is: BlogCgi.hs
   hs-source-dirs: src

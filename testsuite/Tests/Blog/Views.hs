@@ -33,7 +33,7 @@ testLoginFails = withOneUser
 testLoginSucceeds = withOneUser
                     (\cn -> do
                        Just resp1 <- loginView' cn login_req_good
-                       assertEqual "No cookies should be set" 2 (length $ cookies resp1)
+                       assertEqual "Username cookies should be set" 1 (length $ cookies resp1)
                     )
 
 tests = test [ "login fails" ~: testLoginFails

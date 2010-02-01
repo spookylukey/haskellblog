@@ -278,9 +278,7 @@ loginView' cn req =
 
 -- | Delete auth cookies and redirect.
 logoutView req =
-    return $ Just $ (redirectResponse indexUrl) `with` [ deleteCookie "username"
-                                                       , deleteCookie "timestamp"
-                                                       ]
+    return $ Just $ deleteCookie "username" $ redirectResponse indexUrl
 
 --
 -- Admin views
@@ -466,14 +464,9 @@ withSpamWord action req = do
 -- Authentication
 createLoginCookies loginData timestamp =
   let username = fromJust $ Map.lookup "username" loginData
-      password = fromJust $ Map.lookup "password" loginData
-      expires = Just $ toUTCTime $ TOD (toInteger timestamp + 3600*24*365) 0
+      expires = Just $ toUTCTime $ TOD (toInteger timestamp + Settings.login_session_length) 0
   in [ standardCookie { cookieName = "username"
                       , cookieValue = username
-                      , cookieExpires = expires
-                      }
-     , standardCookie { cookieName = "timestamp"
-                      , cookieValue = show timestamp
                       , cookieExpires = expires
                       }
      ]
@@ -488,14 +481,7 @@ type Credentials = Maybe String
 -- Relies on secure cookies middleware
 getCredentials :: Request -> IO Credentials
 getCredentials req = do
-  current_ts <- getTimestamp
-  return $ do
-    username <- getCookieVal req "username"
-    timestamp <- getCookieVal req "timestamp" >>= capture
-    if timestamp + timeout > current_ts
-      then Just username
-      else Nothing
-
+  return $ getCookieVal req "username"
 
 -- Decorators
 

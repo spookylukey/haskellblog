@@ -31,7 +31,7 @@ import qualified Blog.Links as Links
 import qualified Blog.Post as P
 import qualified Blog.Settings as Settings
 import qualified Data.Map as Map
-import qualified Data.ByteString.Lazy as LB
+import qualified Data.ByteString.Lazy.Char8 as LB
 import qualified Data.Text.Lazy as LT
 import qualified Data.Text.Lazy.Encoding as LT
 import qualified Text.XHtml as X
@@ -55,7 +55,8 @@ standardResponseTT req template =
         t2 = setAttribute "csrffield" csrffield template
         qs = formEncode (allGET req)
         t3 = setAttribute "currentpath" (urlEncode (Settings.root_url ++ pathInfo req ++ (if not $ null qs then "?" ++ qs else ""))) t2
-        rendered = render t3
+        t4 = setAttribute "allpostsfeedurl" allPostsFeedUrl t3
+        rendered = render t4
     in buildResponse [ addContent rendered
                      ] utf8HtmlResponse
 
@@ -98,7 +99,6 @@ mainIndex req = do
               ("posts", map postTemplateInfo posts)
               ("categories", map (map categoryTemplateInfo) cats)
               ("paginglinks", pagingLinks indexUrl curpage more)
-              ("atomfeedurl", allPostsFeedUrl)
              )
 
 -- Feed for all posts
@@ -120,6 +120,7 @@ allCommentsView req = do
                        ("titles", map (P.title . snd) commentsAndPosts)
                        ("paginglinks", pagingLinks allCommentsUrl curpage more)
                        ("atomfeedurl", allCommentsFeedUrl)
+                       ("atomfeedtitle", "All comments in this blog")
                       )
 
 allCommentsFeedView req = do
@@ -172,6 +173,7 @@ categoryView slug req = do
                           ("categories", map (map categoryTemplateInfo) cats)
                           ("paginglinks", pagingLinks (categoryUrl cat) curpage more)
                           ("atomfeedurl", categoryPostsFeedUrl cat)
+                          ("atomfeedtitle", LB.pack "All posts in category " `LB.append` Ct.name cat)
                          )
 
 categoryPostsFeedView slug req = do
@@ -213,7 +215,7 @@ postView slug req = do
                         ("formatWidget", X.toHtml $ formatWidgetForComment commentData)
                         ("commentExtra", commentExtra)
                         ("atomfeedurl", postCommentFeedUrl post)
-                        ("atomfeedtitle", "Atom feed for comments in this post")
+                        ("atomfeedtitle", "All comments on this post")
                         ("editpageurl", adminEditPostUrl post)
                        )
   where

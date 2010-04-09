@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="alternate" type="application/atom+xml" title="All posts in this blog" href="$allpostsfeedurl$">
     $if(atomfeedurl)$
     <link rel="alternate" type="application/atom+xml" title="$if(atomfeedtitle)$$atomfeedtitle$$else$Atom feed$endif$" href="$atomfeedurl$">
     $endif$

@@ -142,8 +142,9 @@ function addCommentModeration() {
     <div id="container">
       <div id="toplinks">
         <ul>
-          <li><a href="/blog/" class="first">Home</a></li>
+          <li><a href="/blog/">Blog posts</a></li>
           <li><a href="/blog/categories/">Categories</a></li>
+          <li><a href="/">Home</a></li>
         </ul>
       </div>
       <div id="maintitle">

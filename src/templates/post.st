@@ -62,7 +62,7 @@ $if(post.commentsOpen)$
       </div>
       <div class="note">
       <ul>
-        <li>Javascript has to be on to get past my spam protection, and there is a delay, sorry for any inconvenience.</li>
+        <li>Javascript has to be on to get past my spam protection, and cookies, and there is a delay, sorry for any inconvenience!</li>
         <li>I reserve the right to moderate comments.</li>
       </ul>
       </div>

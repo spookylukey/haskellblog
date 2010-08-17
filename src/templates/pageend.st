@@ -1,7 +1,7 @@
         </div>
       </div>
       <div id="footer">
-      <p>Copyright <a href="mailto&#58;L.Plant.98&#64;cantab.net">Luke Plant</p>
+      <p>Copyright <a href="mailto&#58;L.Plant.98&#64;cantab.net">Luke Plant</a></p>
       </div>
       <div id="loginlinks">
         <a href="/blog/login/?r=$currentpath$" id="id_loginlink">Login</a><br/>

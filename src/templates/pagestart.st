@@ -6,7 +6,7 @@
     $if(atomfeedurl)$
     <link rel="alternate" type="application/atom+xml" title="$if(atomfeedtitle)$$atomfeedtitle$$else$Atom feed$endif$" href="$atomfeedurl$">
     $endif$
-    <link rel="StyleSheet" href="/newblog.css" type="text/css">
+    <link rel="stylesheet" href="/screen.css" type="text/css" media="screen">
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <title>
       $if(pagetitle)$

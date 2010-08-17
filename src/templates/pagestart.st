@@ -141,11 +141,20 @@ function addCommentModeration() {
   <body>
     <div id="container">
       <div id="toplinks">
-        <ul>
-          <li><a href="/blog/">Blog posts</a></li>
-          <li><a href="/blog/categories/">Categories</a></li>
-          <li><a href="/">Home</a></li>
-        </ul>
+        <div id="toplinksinner">
+          <p>Blog links</p>
+          <ul>
+            <li><a href="/blog/">Posts</a></li>
+            <li><a href="/blog/categories/">Categories</a></li>
+            <li><a href="/blog/comments/">Recent comments</a></li>
+          </ul>
+          <p>Site links</p>
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/softprojects.html">Software</a></li>
+            <li><a href="/personal.html">About me</a></li>
+          </ul>
+        </div>
       </div>
       <div id="maintitle">
         <div>All Unkept</div>

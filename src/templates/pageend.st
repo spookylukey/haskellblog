@@ -1,26 +1,7 @@
         </div>
       </div>
       <div id="footer">
-        <h1>Links</h1>
-	<div class="bloglinks">
-	  <h2>Blog links:</h2>
-          <ul>
-            <li><a href="/blog/">Index</a></li>
-            <li><a href="/blog/categories/">Categories</a></li>
-             $if(atomfeedurl)$
-             <li><a href="$atomfeedurl$">$if(atomfeedtitle)$$atomfeedtitle$$else$Atom feed$endif$</a><li>
-             $endif$
-          </ul>
-	</div>
-        <div class="sitelinks">
-          <h2>Also on this site:</h2>
-          <ul>
-            <li><a href="/" >Index</a></li>
-            <li><a href="/softprojects.html">Software</a></li>
-            <li><a href="/bibleverses/">Bible memorisation</a></li>
-            <li><a href="/personal.html">About me</a></li>
-          </ul>
-        </div>
+      <p>Copyright <a href="mailto&#58;L.Plant.98&#64;cantab.net">Luke Plant</p>
       </div>
       <div id="loginlinks">
         <a href="/blog/login/?r=$currentpath$" id="id_loginlink">Login</a><br/>

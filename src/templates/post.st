@@ -75,7 +75,7 @@ $endif$
 
 $if(hasRelated)$
   <div class="related">
-    <h1 id="related">Related: <a class="anchor" href="#related">&sect;</a></h1>
+    <h1 id="related">Possibly related: <a class="anchor" href="#related">&sect;</a></h1>
     <ul>
     $related:{
       <li><a href="$it.url$">$it.title$</a></li>

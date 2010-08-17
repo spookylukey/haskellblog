@@ -8,7 +8,6 @@
     $endif$
     <link rel="StyleSheet" href="/newblog.css" type="text/css">
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-    <!--[if lte IE 6]><link rel="stylesheet" href="/newblog_IE6.css" type="text/css"><![endif]-->
     <title>
       $if(pagetitle)$
         $pagetitle$ &laquo; All Unkept
@@ -139,6 +138,12 @@ function addCommentModeration() {
     </script>
   </head>
   <body>
+<!--[if lte IE 6]>
+   <div id="ie-message">
+      Your browser is obsolete, and doesn't display this site correctly. Please
+      upgrade to <a href="http://abetterbrowser.org/">a better browser</a>.
+   </div>
+<![endif]-->
     <div id="container">
       <div id="toplinks">
         <div id="toplinksinner">

@@ -3,9 +3,9 @@
       <div class="togglebar" $if(comment.hidden)$ title="Hidden comment" $endif$></div>
       <div class="introline">
         <a id="comment$comment.uid$" href="#comment$comment.uid$" class="anchor">&sect;</a> <span>On <span class="timestamp">$comment.date$</span>, <span class="commentBy">$comment.formattedName$</span> wrote:</span>
+        <span class="commentid">$comment.uid$</span>
       </div>
       <div class="commenttext">
-      <span class="commentid">$comment.uid$</span>
          $comment.textFormatted:noescape()$
       </div>
       <div class="response">

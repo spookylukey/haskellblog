@@ -147,20 +147,20 @@ function addCommentModeration() {
     <div id="container">
       <div id="toplinks">
         <div id="toplinksinner">
-          <p>Site links</p>
+          <p>This site:</p>
           <ul>
             <li><a href="/">Home</a></li>
             <li><a href="/softprojects.html">Software</a></li>
             <li><a href="/personal.html">About me</a></li>
           </ul>
-          <p>Blog links</p>
+          <p>This blog:</p>
           <ul>
             <li><a href="/blog/">Posts</a></li>
             <li><a href="/blog/categories/">Categories</a></li>
             <li><a href="/blog/comments/">Recent comments</a></li>
           </ul>
           $if(post)$
-          <p>Post links</p>
+          <p>This post:</p>
           <ul>
             <li><a href="#top">Top</a></li>
             <li><a href="#comments">Comments</a></li>

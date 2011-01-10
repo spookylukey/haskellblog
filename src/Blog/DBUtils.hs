@@ -18,7 +18,8 @@ import qualified Data.List as List
 
 slugFromTitle title = map toLower $ LB.unpack $
                       regexReplace (LB.pack "-+$") (LB.pack "") $
-                      regexReplace (LB.pack "[^A-Za-z0-9]+") (LB.pack "-") (LB.pack title)
+                      regexReplace (LB.pack "[^A-Za-z0-9]+") (LB.pack "-") $
+                      regexReplace (LB.pack "'") (LB.pack "") (LB.pack title)
 
 makeSlugGeneric cn title table = makeSlugGeneric' cn (slugFromTitle title) table 1
 makeSlugGeneric' cn slugBase table iter = do

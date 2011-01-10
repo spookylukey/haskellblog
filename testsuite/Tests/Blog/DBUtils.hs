@@ -17,6 +17,8 @@ insertSlug cn title slug = do
   quickQuery cn "INSERT INTO slugs (title, slug) VALUES (?, ?);" [toSql title, toSql slug]
 
 slugFromTitle1 =  "this-is-a-title" ~=? (slugFromTitle "This is a % $ /title ^£$")
+slugFromTitle2 =  "doesnt-work" ~=? (slugFromTitle "Doesn't work")
+
 makeSlugGeneric1 =
     withDB (\cn ->
             do
@@ -31,5 +33,6 @@ makeSlugGeneric1 =
 
 tests = test [
          slugFromTitle1,
+         slugFromTitle2,
          TestCase makeSlugGeneric1
         ]

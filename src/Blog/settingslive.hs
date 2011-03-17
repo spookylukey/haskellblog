@@ -1,6 +1,6 @@
 module Blog.Settings where
 
-cgi_root_path = "/home/lukeplantuk/public_html/cgi-bin/"
+cgi_root_path = "/home/cciw/webapps/lukeplant_me_uk/cgi-bin"
 sqlite_path = cgi_root_path ++ "/data/blog.db"
 template_path = cgi_root_path ++ "/data/blogtemplates/"
 
@@ -26,7 +26,7 @@ max_comment_name_size = 100 :: Int
 max_comment_email_size = 320 :: Int
 
 -- Testing
-testdb_sqlite_path = "/home/build/build/haskellblog/testsuite/test.db"
+testdb_sqlite_path = "/home/cciw/tmpstore/build/haskellblog/testsuite/test.db"
 
 -- Migration time settings:
 

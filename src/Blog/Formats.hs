@@ -78,7 +78,7 @@ formatPlaintext   = utf8 >>>
 removeRawHtml :: PD.Pandoc -> PD.Pandoc
 removeRawHtml (PD.Pandoc m blocks) = PD.Pandoc m (filter (not . isRawHtml) blocks)
     where
-      isRawHtml (PD.RawHtml s) = True
+      isRawHtml (PD.RawBlock "html" s) = True
       isRawHtml _ = False
 
 formatRST :: String -> String

@@ -12,8 +12,8 @@ data Comment = Comment {
     , timestamp :: Int
     , name :: LB.ByteString
     , email :: LB.ByteString
-    , text_raw :: LB.ByteString
-    , text_formatted :: LB.ByteString
+    , textraw :: LB.ByteString
+    , textformatted :: LB.ByteString
     , format :: Format
     , hidden :: Bool
     , response :: LB.ByteString

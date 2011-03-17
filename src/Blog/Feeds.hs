@@ -121,7 +121,7 @@ mkCommentEntry (comment, post) =
           , entryUpdated = formatTimestamp $ Cm.timestamp comment
           , entryAuthors = [commentAuthor $ UTF8.toString $ Cm.name comment]
           , entryCategories = []
-          , entryContent = Just $ HTMLContent $ UTF8.toString $ Cm.text_formatted comment
+          , entryContent = Just $ HTMLContent $ UTF8.toString $ Cm.textformatted comment
           , entryContributor = []
           , entryLinks = [ htmlLink $ commentUrl comment post
                          ]

@@ -146,8 +146,8 @@ commentColumnValues cm = [ toSql $ Cm.post_id cm
                          , toSql $ Cm.timestamp cm
                          , toSql $ Cm.name cm
                          , toSql $ Cm.email cm
-                         , toSql $ Cm.text_raw cm
-                         , toSql $ Cm.text_formatted cm
+                         , toSql $ Cm.textraw cm
+                         , toSql $ Cm.textformatted cm
                          , toSql $ fromEnum $ Cm.format cm
                          , toSql $ Cm.hidden cm
                          , toSql $ Cm.response cm
@@ -241,8 +241,8 @@ makeComment row =
                , Cm.timestamp = fromSql (row !! 2)
                , Cm.name = fromSql (row !! 3)
                , Cm.email = fromSql (row !! 4)
-               , Cm.text_raw = fromSql (row !! 5)
-               , Cm.text_formatted = fromSql (row !! 6)
+               , Cm.textraw = fromSql (row !! 5)
+               , Cm.textformatted = fromSql (row !! 6)
                , Cm.format = toEnum $ fromSql (row !! 7)
                , Cm.hidden = fromSql (row !! 8)
                , Cm.response = fromSql (row !! 9)

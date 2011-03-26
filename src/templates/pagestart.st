@@ -7,6 +7,8 @@
     <link rel="alternate" type="application/atom+xml" title="$if(atomfeedtitle)$$atomfeedtitle$$else$Atom feed$endif$" href="$atomfeedurl$">
     $endif$
     <link rel="stylesheet" href="/screen.css" type="text/css" media="screen">
+    <link href="/js/prettify/prettify.css" type="text/css" rel="stylesheet">
+    <script type="text/javascript" src="/js/prettify/prettify.js"></script>
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
     <title>
       $if(pagetitle)$
@@ -132,6 +134,10 @@ function addCommentModeration() {
                                             function(ev) {
                                                \$(this.parentNode).removeClass("manuallyShown");
                                             });
+                    \$("pre.sourceCode > code").addClass("prettyprint");
+                    \$("pre.python > code").addClass("lang-python");
+                    \$("pre.haskell > code").addClass("lang-haskell");
+                    prettyPrint();
 
 });
 //-->

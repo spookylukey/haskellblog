@@ -16,5 +16,5 @@ data Post = Post {
       summaryFormatted :: LB.ByteString,
       format :: Format,
       timestamp :: Int,
-      comments_open :: Bool
+      commentsOpen :: Bool
     } deriving (Show, Eq, Data, Typeable)

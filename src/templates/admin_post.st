@@ -46,9 +46,9 @@ $csrffield:noescape()$
     </td>
   </tr>
   <tr>
-    <td><label for="id_comments_open">Open for comments:</label></td>
+    <td><label for="id_commentsOpen">Open for comments:</label></td>
     <td>
-      <input type="checkbox" name="comments_open" $if(post.comments_open)$checked="checked"$endif$ >
+      <input type="checkbox" name="commentsOpen" $if(post.commentsOpen)$checked="checked"$endif$ >
     </td>
   </tr>
 </table>

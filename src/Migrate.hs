@@ -58,7 +58,7 @@ readPosts = makeItems "posts.txt" mkPost
                               , P.summaryFormatted = fixCodes $ row !! 4
                               , P.format = Formats.Rawhtml
                               , P.timestamp = read (row !! 2)
-                              , P.comments_open = True
+                              , P.commentsOpen = True
                               }
           addFullText p = do let dataFile = Settings.old_data_path ++ "posts/" ++ (show $ P.uid p)
                              f <- readFile dataFile
@@ -82,7 +82,7 @@ readPostCategories = makeItems "postcategories.txt" mkPostCategory
 readComments = makeItems "comments.txt" mkComment
                >>= return . sortBy (comparing Cm.timestamp)
     where mkComment row = Cm.Comment { Cm.uid = read (row !! 0)
-                                     , Cm.post_id = read (row !! 1)
+                                     , Cm.postId = read (row !! 1)
                                      , Cm.timestamp = read (row !! 2)
                                      , Cm.name = fixCodes $ row !! 3
                                      , Cm.email = LB.pack $ row !! 4
@@ -173,4 +173,4 @@ main = handleSqlError $ do
               map (\(p_id, c_id) -> (fromJust $ Map.lookup p_id p_id_map,
                                      fromJust $ Map.lookup c_id c_id_map)) pcs
           correctCommentPostIds cms p_id_map =
-              map (\cm -> cm { Cm.post_id = fromJust $ Map.lookup (Cm.post_id cm) p_id_map }) cms
+              map (\cm -> cm { Cm.postId = fromJust $ Map.lookup (Cm.postId cm) p_id_map }) cms

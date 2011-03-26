@@ -63,7 +63,7 @@ postColumnValues p = [ toSql $ P.title p
                      , toSql $ P.summaryFormatted p
                      , toSql $ fromEnum $ P.format p
                      , toSql $ P.timestamp p
-                     , toSql $ P.comments_open p
+                     , toSql $ P.commentsOpen p
                      ]
 
 addPost cn p catIds = do
@@ -142,7 +142,7 @@ commentColumnNames = [ "post_id"
                      , "hidden"
                      , "response"
                      ]
-commentColumnValues cm = [ toSql $ Cm.post_id cm
+commentColumnValues cm = [ toSql $ Cm.postId cm
                          , toSql $ Cm.timestamp cm
                          , toSql $ Cm.name cm
                          , toSql $ Cm.email cm
@@ -226,7 +226,7 @@ makePost row =
            , P.summaryFormatted = fromSql (row !! 6)
            , P.format = toEnum $ fromSql (row !! 7)
            , P.timestamp = fromSql (row !! 8)
-           , P.comments_open = fromSql (row !! 9)
+           , P.commentsOpen = fromSql (row !! 9)
            }
 
 makeCategory row =
@@ -237,7 +237,7 @@ makeCategory row =
 
 makeComment row =
     Cm.Comment { Cm.uid = fromSql (row !! 0)
-               , Cm.post_id = fromSql (row !! 1)
+               , Cm.postId = fromSql (row !! 1)
                , Cm.timestamp = fromSql (row !! 2)
                , Cm.name = fromSql (row !! 3)
                , Cm.email = fromSql (row !! 4)
@@ -258,7 +258,7 @@ minimalPost slug title =
            , P.summaryFormatted = undefined
            , P.format = undefined
            , P.timestamp = undefined
-           , P.comments_open = undefined
+           , P.commentsOpen = undefined
            }
 
 

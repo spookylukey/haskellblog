@@ -69,7 +69,7 @@ data CommentStage = NoComment
 -- | An empty comment used for populating the default form.
 emptyComment = Cm.Comment {
                  uid = undefined
-               , post_id = undefined
+               , postId = undefined
                , timestamp = undefined
                , name = LB.empty
                , email = LB.empty
@@ -115,7 +115,7 @@ validateComment cn creds postedData blogpost =
                      ("format", "Please choose a format from the list"))
                   , (name `elem` Settings.reserved_names && not (maybe False (==name) creds),
                      ("name", "That name is reserved."))
-                  , (not $ P.comments_open blogpost,
+                  , (not $ P.commentsOpen blogpost,
                      ("", "Post is closed for comments"))
                   , (length text > Settings.max_comment_message_size,
                      ("message", "Message too long"))
@@ -134,7 +134,7 @@ validateComment cn creds postedData blogpost =
 
       return (Cm.Comment {
                       uid = 0 -- for sake of preview
-                    , post_id = P.uid blogpost
+                    , postId = P.uid blogpost
                     , timestamp = ts
                     , name = utf8 name
                     , email = utf8 email
@@ -183,7 +183,7 @@ emptyPost = P.Post { uid = undefined
                    , summaryFormatted = undefined
                    , format = RST
                    , timestamp = undefined
-                   , comments_open = True
+                   , commentsOpen = True
                    }
 
 -- | Extract a 'post', the 'post categories' and any errors
@@ -194,7 +194,7 @@ validatePost req basePost = do
   let summaryRaw = getPOST req "summaryRaw" `captureOrDefault` ""
   let postRaw = getPOST req "postRaw" `captureOrDefault` ""
   let format = getPOST req "format" `captureOrDefault` Plaintext
-  let comments_open = hasPOST req "comments_open"
+  let commentsOpen = hasPOST req "commentsOpen"
   let tests = [ (null title,
                  ("title", "'Title' is a required field."))
               , (null summaryRaw,
@@ -209,7 +209,7 @@ validatePost req basePost = do
                    , P.postRaw = utf8 postRaw
                    , P.postFormatted = utf8 $ getFormatter format $ postRaw
                    , P.format = format
-                   , P.comments_open = comments_open
+                   , P.commentsOpen = commentsOpen
                    }
          , categories
          , errors

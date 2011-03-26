@@ -8,7 +8,7 @@ import Data.Typeable
 
 data Comment = Comment {
       uid :: Int
-    , post_id :: Int
+    , postId :: Int
     , timestamp :: Int
     , name :: LB.ByteString
     , email :: LB.ByteString

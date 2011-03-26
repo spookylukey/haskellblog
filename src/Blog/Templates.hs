@@ -85,7 +85,7 @@ postTemplateInfo p = Map.fromList [ ("title", ToSElemD $ P.title p)
                                   , ("summary", ToSElemD $ P.summaryFormatted p)
                                   , ("full", ToSElemD $ P.postFormatted p)
                                   , ("url", ToSElemD $ postUrl p)
-                                  , ("commentsOpen", ToSElemD $ P.comments_open p)
+                                  , ("commentsOpen", ToSElemD $ P.commentsOpen p)
                                   , ("adminUrl", ToSElemD $ adminEditPostUrl p)
                                   ]
 

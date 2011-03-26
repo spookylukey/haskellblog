@@ -52,10 +52,10 @@ readPosts = makeItems "posts.txt" mkPost
     where mkPost row = P.Post { P.uid = read (row !! 0)
                               , P.title = LB.pack $ row !! 1
                               , P.slug = LB.empty
-                              , P.post_raw = LB.empty
-                              , P.post_formatted = LB.empty
-                              , P.summary_raw = fixCodes $ row !! 4
-                              , P.summary_formatted = fixCodes $ row !! 4
+                              , P.postRaw = LB.empty
+                              , P.postFormatted = LB.empty
+                              , P.summaryRaw = fixCodes $ row !! 4
+                              , P.summaryFormatted = fixCodes $ row !! 4
                               , P.format = Formats.Rawhtml
                               , P.timestamp = read (row !! 2)
                               , P.comments_open = True
@@ -63,11 +63,11 @@ readPosts = makeItems "posts.txt" mkPost
           addFullText p = do let dataFile = Settings.old_data_path ++ "posts/" ++ (show $ P.uid p)
                              f <- readFile dataFile
                              let fixed = fixCodes f
-                             return p { P.post_raw = fixed,
-                                        P.post_formatted = fixed }
-          fixEmptyFullTexts p = if LB.null $ P.post_raw p
-                                then p { P.post_raw = P.summary_raw p
-                                       , P.post_formatted = P.summary_formatted p
+                             return p { P.postRaw = fixed,
+                                        P.postFormatted = fixed }
+          fixEmptyFullTexts p = if LB.null $ P.postRaw p
+                                then p { P.postRaw = P.summaryRaw p
+                                       , P.postFormatted = P.summaryFormatted p
                                        }
                                 else p
 
@@ -86,8 +86,8 @@ readComments = makeItems "comments.txt" mkComment
                                      , Cm.timestamp = read (row !! 2)
                                      , Cm.name = fixCodes $ row !! 3
                                      , Cm.email = LB.pack $ row !! 4
-                                     , Cm.textraw = fixCodes $ row !! 5
-                                     , Cm.textformatted = fixCodes $ row !! 5
+                                     , Cm.textRaw = fixCodes $ row !! 5
+                                     , Cm.textFormatted = fixCodes $ row !! 5
                                      , Cm.format = Formats.Rawhtml
                                      , Cm.hidden = False
                                      , Cm.response = utf8 ""

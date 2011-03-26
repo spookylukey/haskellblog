@@ -10,7 +10,7 @@ $if(showPreview)$
 <div class="postpreview">
 <h1 class="posttitle">$post.title$</h1>
 <div class="post">
-  $post.post_formatted:noescape()$
+  $post.postFormatted:noescape()$
 </div>
 </div>
 $endif$
@@ -31,12 +31,12 @@ $csrffield:noescape()$
   <tr>
     <td colspan="2">
       <label for="id_summary">Summary</label><br />
-      <textarea id="id_summary_raw" name="summary_raw" cols="80" rows="5">$post.summary_raw$</textarea>
+      <textarea id="id_summaryRaw" name="summaryRaw" cols="80" rows="5">$post.summaryRaw$</textarea>
     </td>
   </tr>
     <td colspan="2">
       <label for="id_text">Full post</label><br />
-      <textarea id="id_post_raw" name="post_raw" cols="80" rows="30">$post.post_raw$</textarea>
+      <textarea id="id_postRaw" name="postRaw" cols="80" rows="30">$post.postRaw$</textarea>
     </td>
   </tr>
   <tr>

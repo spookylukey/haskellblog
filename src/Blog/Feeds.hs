@@ -65,14 +65,14 @@ mkPostEntry post =
           , entryUpdated = formatTimestamp $ P.timestamp post
           , entryAuthors = authors
           , entryCategories = []
-          , entryContent = Just $ HTMLContent $ UTF8.toString $ P.post_formatted post
+          , entryContent = Just $ HTMLContent $ UTF8.toString $ P.postFormatted post
           , entryContributor = []
           , entryLinks = [ htmlLink $ postUrl post
                          ]
           , entryPublished = Just $ formatTimestamp $ P.timestamp post
           , entryRights = Nothing
           , entrySource = Nothing
-          , entrySummary = Just $ HTMLString $ UTF8.toString $ P.summary_formatted post
+          , entrySummary = Just $ HTMLString $ UTF8.toString $ P.summaryFormatted post
           , entryInReplyTo = Nothing
           , entryInReplyTotal = Nothing
           , entryAttrs = []
@@ -121,7 +121,7 @@ mkCommentEntry (comment, post) =
           , entryUpdated = formatTimestamp $ Cm.timestamp comment
           , entryAuthors = [commentAuthor $ UTF8.toString $ Cm.name comment]
           , entryCategories = []
-          , entryContent = Just $ HTMLContent $ UTF8.toString $ Cm.textformatted comment
+          , entryContent = Just $ HTMLContent $ UTF8.toString $ Cm.textFormatted comment
           , entryContributor = []
           , entryLinks = [ htmlLink $ commentUrl comment post
                          ]

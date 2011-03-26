@@ -73,8 +73,8 @@ emptyComment = Cm.Comment {
                , timestamp = undefined
                , name = LB.empty
                , email = LB.empty
-               , textraw = LB.empty
-               , textformatted = undefined
+               , textRaw = LB.empty
+               , textFormatted = undefined
                , format = Plaintext
                , hidden = False
                , response = LB.empty
@@ -138,8 +138,8 @@ validateComment cn creds postedData blogpost =
                     , timestamp = ts
                     , name = utf8 name
                     , email = utf8 email
-                    , textraw = utf8 text
-                    , textformatted = utf8 $ getFormatter format $ text
+                    , textRaw = utf8 text
+                    , textFormatted = utf8 $ getFormatter format $ text
                     , format = format
                     , hidden = False
                     , response = LB.empty
@@ -177,10 +177,10 @@ validateLogin postedData cn = do
 emptyPost = P.Post { uid = undefined
                    , title = LB.empty
                    , slug = undefined
-                   , post_raw = LB.empty
-                   , post_formatted = undefined
-                   , summary_raw = LB.empty
-                   , summary_formatted = undefined
+                   , postRaw = LB.empty
+                   , postFormatted = undefined
+                   , summaryRaw = LB.empty
+                   , summaryFormatted = undefined
                    , format = RST
                    , timestamp = undefined
                    , comments_open = True
@@ -191,23 +191,23 @@ emptyPost = P.Post { uid = undefined
 validatePost req basePost = do
   let title = getPOST req "title" `captureOrDefault` ""
   let categories = catMaybes $ map capture $ getPOSTlist req "categories" :: [Int]
-  let summary_raw = getPOST req "summary_raw" `captureOrDefault` ""
-  let post_raw = getPOST req "post_raw" `captureOrDefault` ""
+  let summaryRaw = getPOST req "summaryRaw" `captureOrDefault` ""
+  let postRaw = getPOST req "postRaw" `captureOrDefault` ""
   let format = getPOST req "format" `captureOrDefault` Plaintext
   let comments_open = hasPOST req "comments_open"
   let tests = [ (null title,
                  ("title", "'Title' is a required field."))
-              , (null summary_raw,
+              , (null summaryRaw,
                   ("summary", "'Summary' is a required field."))
-              , (null post_raw,
+              , (null postRaw,
                  ("post", "'Full post' is a required field."))
               ]
   let errors = map snd $ filter fst $ tests
   return (basePost { P.title = utf8 title
-                   , P.summary_raw = utf8 summary_raw
-                   , P.summary_formatted = utf8 $ getFormatter Plaintext $ summary_raw
-                   , P.post_raw = utf8 post_raw
-                   , P.post_formatted = utf8 $ getFormatter format $ post_raw
+                   , P.summaryRaw = utf8 summaryRaw
+                   , P.summaryFormatted = utf8 $ getFormatter Plaintext $ summaryRaw
+                   , P.postRaw = utf8 postRaw
+                   , P.postFormatted = utf8 $ getFormatter format $ postRaw
                    , P.format = format
                    , P.comments_open = comments_open
                    }

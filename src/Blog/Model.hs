@@ -57,10 +57,10 @@ postColumnNames = [ "title"
                   ]
 postColumnValues p = [ toSql $ P.title p
                      , toSql $ P.slug p
-                     , toSql $ P.post_raw p
-                     , toSql $ P.post_formatted p
-                     , toSql $ P.summary_raw p
-                     , toSql $ P.summary_formatted p
+                     , toSql $ P.postRaw p
+                     , toSql $ P.postFormatted p
+                     , toSql $ P.summaryRaw p
+                     , toSql $ P.summaryFormatted p
                      , toSql $ fromEnum $ P.format p
                      , toSql $ P.timestamp p
                      , toSql $ P.comments_open p
@@ -146,8 +146,8 @@ commentColumnValues cm = [ toSql $ Cm.post_id cm
                          , toSql $ Cm.timestamp cm
                          , toSql $ Cm.name cm
                          , toSql $ Cm.email cm
-                         , toSql $ Cm.textraw cm
-                         , toSql $ Cm.textformatted cm
+                         , toSql $ Cm.textRaw cm
+                         , toSql $ Cm.textFormatted cm
                          , toSql $ fromEnum $ Cm.format cm
                          , toSql $ Cm.hidden cm
                          , toSql $ Cm.response cm
@@ -220,10 +220,10 @@ makePost row =
     P.Post { P.uid = fromSql (row !! 0)
            , P.title = fromSql (row !! 1)
            , P.slug = fromSql (row !! 2)
-           , P.post_raw = fromSql (row !! 3)
-           , P.post_formatted = fromSql (row !! 4)
-           , P.summary_raw = fromSql (row !! 5)
-           , P.summary_formatted = fromSql (row !! 6)
+           , P.postRaw = fromSql (row !! 3)
+           , P.postFormatted = fromSql (row !! 4)
+           , P.summaryRaw = fromSql (row !! 5)
+           , P.summaryFormatted = fromSql (row !! 6)
            , P.format = toEnum $ fromSql (row !! 7)
            , P.timestamp = fromSql (row !! 8)
            , P.comments_open = fromSql (row !! 9)
@@ -241,8 +241,8 @@ makeComment row =
                , Cm.timestamp = fromSql (row !! 2)
                , Cm.name = fromSql (row !! 3)
                , Cm.email = fromSql (row !! 4)
-               , Cm.textraw = fromSql (row !! 5)
-               , Cm.textformatted = fromSql (row !! 6)
+               , Cm.textRaw = fromSql (row !! 5)
+               , Cm.textFormatted = fromSql (row !! 6)
                , Cm.format = toEnum $ fromSql (row !! 7)
                , Cm.hidden = fromSql (row !! 8)
                , Cm.response = fromSql (row !! 9)
@@ -252,10 +252,10 @@ minimalPost slug title =
     P.Post { P.uid = undefined
            , P.title = title
            , P.slug = slug
-           , P.post_raw = undefined
-           , P.post_formatted = undefined
-           , P.summary_raw = undefined
-           , P.summary_formatted = undefined
+           , P.postRaw = undefined
+           , P.postFormatted = undefined
+           , P.summaryRaw = undefined
+           , P.summaryFormatted = undefined
            , P.format = undefined
            , P.timestamp = undefined
            , P.comments_open = undefined

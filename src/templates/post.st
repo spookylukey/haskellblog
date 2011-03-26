@@ -53,7 +53,7 @@ $if(post.commentsOpen)$
         </tr>
       </table>
 
-      <div><textarea name="message" id="id_message" cols="80" rows="25">$commentData.textraw$</textarea></div>
+      <div><textarea name="message" id="id_message" cols="80" rows="25">$commentData.textRaw$</textarea></div>
       <div><input type="hidden" id="id_spamcheck" name="spamcheck" value="$commentExtra$">
       </div>
       <div>

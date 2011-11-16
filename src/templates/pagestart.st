@@ -142,7 +142,6 @@ function addCommentModeration() {
 });
 //-->
     </script>
-    <script type="text/javascript" src="http://americancensorship.org/js"></script>
   </head>
   <body>
 <!--[if lte IE 6]>

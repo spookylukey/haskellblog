@@ -32,5 +32,6 @@ var pageTracker = _gat._getTracker("UA-6741729-1");
 pageTracker._trackPageview();
 } catch(err) {}</script>
   </body>
+  <script type="text/javascript" src="http://americancensorship.org/js"></script>
 </html>
 
